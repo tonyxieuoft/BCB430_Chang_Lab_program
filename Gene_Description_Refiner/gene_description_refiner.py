@@ -149,22 +149,35 @@ def homology_search(search_requests: List[Dict],
         for key in request.keys():
             if key == "None" or key == "Less":
                 for taxon in request[key]:
+                    driver.find_element(By.XPATH, "//*[text()[. = 'Somewhat similar sequences (blastn)']]").click()
+
                     if key == "Less":
                         driver.find_element(By.NAME, "QUERYFILE").\
                             send_keys(os.path.join(queries_path, request["Gene"], taxon + ".fas"))
                     else:
                         driver.find_element(By.NAME, "QUERYFILE"). \
                             send_keys(os.path.join(queries_path, request["Gene"], "none.fas"))
-                    driver.find_element(By.NAME, "EQ_MENU"). \
-                        click()
-                    driver.find_element(By.NAME, "EQ_MENU"). \
-                        clear()
-                    driver.find_element(By.NAME, "EQ_MENU"). \
-                        send_keys(taxon)
-                    get_element(driver, By.CLASS_NAME, "ui-ncbiautocomplete-options", 40)
-                    time.sleep(0.5)
-                    driver.find_element(By.XPATH, "//input[@value='BLAST']").\
-                        click()
+                    #  time.sleep(0.5)
+                    while True:
+
+                        driver.find_element(By.NAME, "EQ_MENU"). \
+                            click()
+                        driver.find_element(By.NAME, "EQ_MENU"). \
+                            clear()
+                        driver.find_element(By.NAME, "EQ_MENU"). \
+                            send_keys(taxon)
+                        get_element(driver, By.CLASS_NAME, "ui-ncbiautocomplete-options", 40)
+                        driver.find_element(By.XPATH, "//input[@value='BLAST']").\
+                            click()
+                        try:
+                            alert = driver.switch_to.alert
+                            print(alert.text)
+                            alert.accept()
+                            print("alert came up")
+                            time.sleep(0.5)
+                        except Exception:
+                            break
+
                     print("got to the end!")
                     gene_blast_order.append([request["Gene"], key])
                     driver.execute_script("window.open('https://blast.ncbi.nlm.nih.gov/Blast.cgi?PROGRAM=blastn&PAGE_TYPE=BlastSearch&LINK_LOC=blasthome')")
@@ -188,7 +201,7 @@ def homology_search(search_requests: List[Dict],
                 if gene_blast_order[i][1] == "Less":
                     cutoff = 0.0
                 else:
-                    cutoff = 1e-40
+                    cutoff = 1e-50
 
                 if float(get_element(desc_table_row, By.CLASS_NAME, "c9", 40).text) <= cutoff:
                     entries += desc_table_row.find_element(By.CSS_SELECTOR, ".c12.l.lim").\
@@ -267,8 +280,6 @@ def gene_description_refiner(exon_pull_path: str, save_dir: str,
     make_refined_query_file(new_queries, original_query_file, save_dir)
 
     os.remove(queries_path)
-
-
 
 
 if __name__ == "__main__":

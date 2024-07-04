@@ -83,26 +83,43 @@ def read_gene_table(text: str, seq_start: int, seq_stop: int) -> Dict:
         if line_no != len(table):
             # invariant: the name of the transcript that the exon table is based
             # off of will always be two lines up (subject to change)
-            transcript_name = re.split("\t|\s|\n", table[line_no - 2])[6]
-            line_no += 1
-            exons = []
-            # iterate through the exon table
-            while table[line_no] != "":
-                # split by double tabs (what separates the columns)
-                exon_line = table[line_no].split("\t\t")
-                # coding exon endpoints stored by dashes
-                endpoints = exon_line[1].split("-")
+            table_columns = table[line_no - 1].split("\t\t")
 
-                # only include the "exon" if its endpoints are within the gene
-                if min(seq_start, seq_stop) <= min(int(endpoints[0]),
-                                                   int(endpoints[1])) and \
-                        max(int(endpoints[0]),
-                            int(endpoints[1])) <= max(seq_start, seq_stop):
-                    exons.append(endpoints)
+            # get the coding column -> if it doesn't exist, we don't do anything
+            coding_no = 0
+            while coding_no < len(table_columns) and \
+                    table_columns[coding_no] != "Genomic Interval Coding":
+                coding_no += 1
+
+            table_heading = table[line_no - 2].split()
+            if coding_no != len(table_columns) and len(table_heading) >= 5 and \
+                    list_to_string(table_heading[:4], " ") == "Exon table for mRNA":
+
+                transcript_name = table_heading[4]
 
                 line_no += 1
+                exons = []
+                # iterate through the exon table
+                while table[line_no] != "":
+                    # split by double tabs (what separates the columns)
+                    exon_line = table[line_no].split("\t\t")
+                    # coding exon endpoints stored by dashes
+                    endpoints = exon_line[coding_no].split("-")
 
-            dct[transcript_name] = exons
+                    # only include the "exon" if its endpoints are within the gene
+                    if min(seq_start, seq_stop) <= min(int(endpoints[0]),
+                                                       int(endpoints[1])) and \
+                            max(int(endpoints[0]),
+                                int(endpoints[1])) <= max(seq_start, seq_stop):
+                        exons.append(endpoints)
+
+                    line_no += 1
+
+                dct[transcript_name] = exons
+
+            else:
+                # this is to skip over the "------" -> we hunt for the next one
+                line_no += 1
         # continues for each transcript variant (which will have an exon table
     return dct
 
@@ -323,3 +340,11 @@ def ncbi_exon_puller(search_query: str, gene_queries: List[str],
                     write_exon_to_gene_file(transcript_filename,
                                             fasta_heading, exon_sequence)
                     exon_no += 1
+
+if __name__ == "__main__":
+    Entrez.email = "xiaohan.xie@mail.utoronto.ca"
+
+    gene_table_file = Entrez.efetch(db='gene', id="131764012,136129011,133094716", rettype='gene_table',
+                                    retmode="text")
+    table_in_text = str(gene_table_file.read())
+    print(table_in_text)

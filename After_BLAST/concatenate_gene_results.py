@@ -40,8 +40,8 @@ def concatenate_gene_results(paths: List[str], save_path):
 
 if __name__ == "__main__":
 
-    exon_pull_path1 = r"C:\Users\tonyx\Downloads\NCBI_exon_pull_results (11)"
-    exon_pull_path2 = r"C:\Users\tonyx\Downloads\blast_results1"
+    exon_pull_path1 = r"C:\Users\tonyx\Downloads\NCBI_exon_pull_results (22)"
+    #exon_pull_path2 = r"C:\Users\tonyx\Downloads\blast_results1"
     # blast_path = r"C:\Users\tonyx\Downloads\blast_test_again4"
-    save_path = r"C:\Users\tonyx\Downloads\alignments5"
-    concatenate_gene_results([exon_pull_path1, exon_pull_path2], save_path)
+    save_path = r"C:\Users\tonyx\Downloads\alignments6"
+    concatenate_gene_results([exon_pull_path1], save_path)

@@ -6,6 +6,7 @@ from Bio import Entrez
 from Basic_Tools.lists_and_files import file_to_list
 
 from NCBI_Exon_Puller.ncbi_exon_puller import ncbi_exon_puller
+from NCBI_Exon_Puller.ncbi_exon_puller_v2 import ncbi_exon_puller_v2
 
 NCBI_CALL_ATTEMPTS = 5
 
@@ -53,16 +54,18 @@ def build_search_query(gene_queries: List[str], description_queries: List[str],
     :return: the correctly formatted search query in string form
     """
     divider = ""
-    search_query = ""
+    search_query = "("
     # appends the gene name queries to the search
     for gene_query in gene_queries:
-        search_query = search_query + divider + "(" + gene_query + "[gene] AND \"" + taxon + "\"[organism])"
+        search_query += divider + "\"" + gene_query + "\"[gene]"
         divider = " OR "
 
     # appends the gene description queries to the search
     for description_query in description_queries:
-        search_query = search_query + divider + "(" + description_query + "[ALL] AND \"" + taxon + "\"[organism])"
+        search_query += divider + "\"" + description_query + "\"[ALL]"
         divider = " OR "
+
+    search_query += ") AND \"" + taxon + "\"[orgn]"
 
     return search_query
 
@@ -99,15 +102,15 @@ def handle_ncbi_exon_puller(save_path, genes_filepath, taxon_filepath):
             print("searching with query: " + search_query + "...")
 
             # everything else is done by the use case
-            ncbi_exon_puller(search_query, gene_queries, description_queries,
-                             taxon_folder, gene_name)
+            ncbi_exon_puller_v2(search_query, gene_queries, description_queries,
+                             taxon_folder, gene_name, exons_or_full="full")
 
 
 if __name__ == "__main__":
 
     Entrez.email = "xiaohan.xie@mail.utoronto.ca"
 
-    user_specified_directory = r'C:\Users\tonyx\Downloads\NCBI_exon_pull_results (21)'
+    user_specified_directory = r'C:\Users\tonyx\Downloads\NCBI_exon_pull_results (22)'
     genes_filepath = r'C:\Users\tonyx\Downloads\refined_query_file.txt'
     taxon_filepath = r'C:\Users\tonyx\Downloads\phototransduction_taxa.txt'
 
