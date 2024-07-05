@@ -8,7 +8,7 @@ from selenium.webdriver.remote.webelement import WebElement
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
-WAIT_CONSTANT = 0.1
+WAIT_CONSTANT = 0.01
 
 
 class DriverTimeoutException(Exception):

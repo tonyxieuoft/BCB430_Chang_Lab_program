@@ -14,7 +14,7 @@ def missing_elasmobranch_genes(general_folder: str):
 
 if __name__ == "__main__":
 
-    path = r"C:\Users\tonyx\Downloads\NCBI_exon_pull_results (22)"
+    path = r"C:\Users\tonyx\Downloads\NCBI_exon_pull_results (10)"
     for gene in os.listdir(path):
         gene_path = os.path.join(path, gene)
 
