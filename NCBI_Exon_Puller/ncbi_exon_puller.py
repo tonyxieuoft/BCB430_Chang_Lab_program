@@ -272,6 +272,7 @@ def ncbi_exon_puller(search_query: str, gene_queries: List[str],
         # gene name, description and scientific name of the organism are
         # obtained in the summary to verify if the accession is relevant to our
         # search
+
         curr_gene_name = summary['Name']
         gene_description = summary['Description']
         scientific_name = summary["Organism"]['ScientificName']

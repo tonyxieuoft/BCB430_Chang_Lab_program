@@ -14,7 +14,7 @@ LESS_CUTOFF = 5
 def make_refined_gene_name_file(names_dict: Dict, original_file: str,
                                 save_path: str) -> None:
 
-    new_query_path = os.path.join(save_path, "refined_query_file_3.txt")
+    new_query_path = os.path.join(save_path, "refined_query_file_5.txt")
     new_query_file = open(new_query_path, "w")
 
     original_arr = file_to_list(original_file)
@@ -134,6 +134,6 @@ def gene_description_refiner(exon_pull_path: str, save_dir: str,
 
 if __name__ == "__main__":
     # exon_path = r"C:\Users\tonyx\Downloads\refine_test"
-    exon_path = r"C:\Users\tonyx\Downloads\of_interest\NCBI_exon_pull_results (11)"
+    exon_path = r"C:\Users\tonyx\Downloads\NCBI_exon_pull_results_non_refined"
     og_query_file = r"C:\Users\tonyx\Downloads\gene_queries - Copy.txt"
     gene_description_refiner(exon_path, r"C:\Users\tonyx\Downloads", og_query_file)

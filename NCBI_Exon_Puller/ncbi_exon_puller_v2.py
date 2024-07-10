@@ -173,14 +173,29 @@ def ncbi_exon_puller_v2(search_query: str, gene_queries: List[str],
         summary_no += 1
 
         curr_gene_name = summary['Name']
+        gene_name_aliases = summary["OtherAliases"].split(",")
         gene_description = summary['Description']
         scientific_name = summary["Organism"]["ScientificName"]
+
+        relevant = False
+        if gene_name_aliases != "":
+
+            alias_no = 0
+            while alias_no < len(gene_name_aliases) and \
+                    gene_name_aliases[alias_no].strip().upper() not in gene_queries:
+                alias_no += 1
+
+            if alias_no < len(gene_name_aliases):
+                relevant = True
 
         if (curr_gene_name.upper() in gene_queries or
             gene_description.upper() in description_queries) and \
                 not os.path.isdir(os.path.join(taxon_folder, scientific_name)) and \
                 len(summary['LocationHist']) != 0:
 
+            relevant = True
+
+        if relevant:
             relevant_ids.append(ids_arr[summary_no])
             relevant_organisms.append(scientific_name)
 
