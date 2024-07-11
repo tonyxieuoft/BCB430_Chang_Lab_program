@@ -110,9 +110,9 @@ if __name__ == "__main__":
 
     Entrez.email = "xiaohan.xie@mail.utoronto.ca"
 
-    user_specified_directory = r'C:\Users\tonyx\Downloads\NCBI_exon_pull_results_refined'
-    genes_filepath = r'C:\Users\tonyx\Downloads\refined_query_file_5.txt'
-    taxon_filepath = r'C:\Users\tonyx\Downloads\phototransduction_taxa.txt'
+    user_specified_directory = r'C:\Users\tonyx\Downloads\NCBI_exons_bat'
+    genes_filepath = r'C:\Users\tonyx\Downloads\gene_queries - Copy.txt'
+    taxon_filepath = r'C:\Users\tonyx\Downloads\bat_taxa.txt'
 
     handle_ncbi_exon_puller(user_specified_directory, genes_filepath,
                             taxon_filepath)

@@ -14,7 +14,7 @@ LESS_CUTOFF = 5
 def make_refined_gene_name_file(names_dict: Dict, original_file: str,
                                 save_path: str) -> None:
 
-    new_query_path = os.path.join(save_path, "refined_query_file_5.txt")
+    new_query_path = os.path.join(save_path, "refined_query_file_no_gene_name.txt")
     new_query_file = open(new_query_path, "w")
 
     original_arr = file_to_list(original_file)
@@ -123,7 +123,7 @@ def gene_description_refiner(exon_pull_path: str, save_dir: str,
     ids_of_interest, gene_efetch_order = homology_search(search_requests, queries_path)
 
     # the query sequences are no longer needed
-    shutil.rmtree(queries_path)
+    # shutil.rmtree(queries_path)
 
     # efetch all ids of interest, parse the feature table
     new_names = get_gene_names_from_accessions(ids_of_interest, gene_efetch_order)

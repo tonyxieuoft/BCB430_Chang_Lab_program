@@ -80,7 +80,6 @@ def read_gene_table_v2(text: str, organisms: List[str]) -> Dict:
                 transcript = Transcript(line_keywords[4])
 
                 line_no += 2
-
                 table_data = table[line_no].split("\t\t")
 
                 # keep going before hitting the empty line
@@ -90,15 +89,9 @@ def read_gene_table_v2(text: str, organisms: List[str]) -> Dict:
                     cds = table_data[cds_column_no].split("-")
 
                     if transcript.check_valid_cds(exon, cds):
-
-                        cds_range = abs(int(cds[1]) - int(cds[0]))
-                        if transcript.cds_start == -1:
-                            transcript.cds_start = abs(int(cds[0]) - int(exon[0])) + 1
-                            transcript.cds.append((transcript.cds_start, transcript.cds_start + cds_range))
-                            transcript.cds_end = transcript.cds_start + cds_range
-                        else:
-                            transcript.cds.append((transcript.cds_end + 1, transcript.cds_end + 1 + cds_range))
-                            transcript.cds_end = transcript.cds_end + 1 + cds_range
+                        transcript.add_cds(exon, cds)
+                    else:
+                        transcript.add_to_exons_no_cds_space(exon)
 
                     line_no += 1
                     table_data = table[line_no].split("\t\t")
@@ -260,8 +253,11 @@ def ncbi_exon_puller_v2(search_query: str, gene_queries: List[str],
 if __name__ == "__main__":
 
     Entrez.email = "xiaohan.xie@mail.utoronto.ca"
-
-    ncbi_exon_puller_v2("cetacea[orgn] rho[gene]", ["RHO"], [], "hello", "")
+    gene_table_file = Entrez.efetch(db='gene', id="109911846", rettype='gene_table',
+                                    retmode="text")
+    table_in_text = str(gene_table_file.read())
+    print(table_in_text)
+    #ncbi_exon_puller_v2("cetacea[orgn] rho[gene]", ["RHO"], [], "hello", "")
 
 
 

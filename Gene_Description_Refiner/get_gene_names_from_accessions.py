@@ -47,9 +47,9 @@ def parse_feature_table(ft_table: str, gene_efetch_order: List) -> Dict:
             # once we hit the next "number", we are onto the next feature
             while len(keywords) > 0 and not keywords[0].isdigit():
                 potential_query = ""
-                if keywords[0] == "gene":
-                    potential_query = "g:" + keywords[1]
-                elif keywords[0] == "gene_desc":
+                #if keywords[0] == "gene":
+                #    potential_query = "g:" + keywords[1]
+                if keywords[0] == "gene_desc":
                     gene_description = list_to_string(keywords[1:], " ")
                     if gene_description.find("-like") == -1:
                         potential_query = "d:" + gene_description
