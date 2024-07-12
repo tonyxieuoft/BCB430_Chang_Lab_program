@@ -1,7 +1,7 @@
 import os
 from typing import List
 
-from After_BLAST.concatenate_exons import concatenate_exons
+from After_BLAST2.concatenate_exons import concatenate_exons
 from Prepare_For_BLAST.get_longest_transcript import get_longest_transcript
 
 

@@ -1,8 +1,7 @@
 import os
-import shutil
 from typing import Dict
 
-from After_BLAST.concatenate_exons import concatenate_exons
+from After_BLAST2.concatenate_exons import concatenate_exons
 from Basic_Tools.lists_and_files import file_to_list, list_to_string
 from Gene_Description_Refiner.get_gene_names_from_accessions import \
     get_gene_names_from_accessions

@@ -4,13 +4,12 @@ import time
 from Bio import Entrez
 from Bio.Blast import NCBIWWW
 
-from After_BLAST.concatenate_gene_results import concatenate_gene_results
+from After_BLAST2.concatenate_gene_results import concatenate_gene_results
 from Basic_Tools.lists_and_files import make_unique_directory
 from Basic_Tools.numeric_user_input import numeric_user_input
 
 # Press the green button in the gutter to run the script.
 from NCBI_Exon_Puller.handle_ncbi_exon_puller import handle_ncbi_exon_puller
-from NCBI_Genome_Blaster.driver_genome_blaster import driver_genome_blaster
 from NCBI_Genome_Blaster.local_genome_blaster import local_genome_blaster
 from Prepare_For_BLAST.prepare_query_files import prepare_query_files
 from User_Interaction.expect_threshold_user_input import \
