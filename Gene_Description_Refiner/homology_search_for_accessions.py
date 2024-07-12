@@ -6,12 +6,8 @@ from selenium.common import WebDriverException
 from selenium import webdriver
 
 from selenium.webdriver.common.by import By
-from Basic_Tools.driver_tools import get_element, DriverTimeoutException, WAIT_CONSTANT
-from Basic_Tools.lists_and_files import file_to_list, list_to_string
-
-from Bio import Entrez
-
-from Gene_Description_Refiner.get_gene_names_from_accessions import parse_feature_table
+from Basic_Tools.driver_tools import DriverTimeoutException, WAIT_CONSTANT
+from Basic_Tools.lists_and_files import list_to_string
 
 MAX_PROCESSES = 15
 

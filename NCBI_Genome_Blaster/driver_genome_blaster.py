@@ -1,14 +1,12 @@
 import os.path
 import time
 import os
-from typing import Dict, List
+from typing import List
 
 from selenium import webdriver
 from selenium.common import WebDriverException
 from selenium.webdriver import ActionChains, Keys
 from selenium.webdriver.common.by import By
-from selenium.webdriver.remote.webelement import WebElement
-from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from NCBI_Genome_Blaster.assemble_blast_result_sequences import parse_blast_xml
 from Basic_Tools.driver_tools import get_element, get_elements, try_click

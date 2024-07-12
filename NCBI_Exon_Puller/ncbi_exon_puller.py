@@ -1,8 +1,7 @@
 import os
 import time
-from typing import List, Dict, Tuple
+from typing import List, Dict
 from Bio import Entrez
-import re
 
 from Basic_Tools.lists_and_files import list_to_string
 

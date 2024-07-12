@@ -1,7 +1,6 @@
 import os
 
 from Basic_Tools.basic_dictionaries import json_to_dict
-from Basic_Tools.lists_and_files import file_to_list
 
 if __name__ == "__main__":
 

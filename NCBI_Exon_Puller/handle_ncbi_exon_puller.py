@@ -1,11 +1,9 @@
 import os
-import time
 from typing import List, Tuple
 from Bio import Entrez
 
 from Basic_Tools.lists_and_files import file_to_list
 
-from NCBI_Exon_Puller.ncbi_exon_puller import ncbi_exon_puller
 from NCBI_Exon_Puller.ncbi_exon_puller_v2 import ncbi_exon_puller_v2
 
 NCBI_CALL_ATTEMPTS = 5
