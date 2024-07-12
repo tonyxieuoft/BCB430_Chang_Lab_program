@@ -4,7 +4,7 @@ import time
 from Bio import Entrez
 from Bio.Blast import NCBIWWW
 
-from After_BLAST2.concatenate_gene_results import concatenate_gene_results
+from After_BLAST.concatenate_gene_results import concatenate_gene_results
 from Basic_Tools.lists_and_files import make_unique_directory
 from Basic_Tools.numeric_user_input import numeric_user_input
 
