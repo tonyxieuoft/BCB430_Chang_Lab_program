@@ -9,7 +9,7 @@ from NCBI_Exon_Puller import ncbi_exon_puller as v1
 from NCBI_Exon_Puller.Transcript import Transcript
 
 
-def ncbi_get_gene_features_v2(ids: str, organisms: List[str]) -> Dict:
+def ncbi_get_gene_features_v2(ids: str, id_to_org: Dict[str, str]) -> Dict:
 
     table_in_text = ""
     success, attempts = False, 0
@@ -28,18 +28,26 @@ def ncbi_get_gene_features_v2(ids: str, organisms: List[str]) -> Dict:
     if attempts == v1.NCBI_CALL_ATTEMPTS:
         raise v1.NcbiCallFailException("Failure to fetch table of gene features")
 
-    return read_gene_table_v2(table_in_text, organisms)
+    return read_gene_table_v2(table_in_text, id_to_org)
 
 
-def read_gene_table_v2(text: str, organisms: List[str]) -> Dict:
+def read_gene_table_v2(text: str, id_to_org: Dict[str, str]) -> Dict:
 
     table = text.split("\n")
+    organisms = []
+    line_no = 0
+
+    while table[line_no].strip():
+        split_line = table[line_no].split()
+        if len(split_line) >= 3 and split_line[0] == "Gene" and split_line[1] == "ID:":
+            curr_id = split_line[2][:-1]
+            organisms.append(id_to_org[curr_id])
+        line_no += 1
 
     orgs_to_transcripts = {}
 
     org_no = 0
     curr_org = ""
-    line_no = 0
     while line_no < len(table):
 
         line_keywords = table[line_no].split()
@@ -194,8 +202,12 @@ def ncbi_exon_puller_v2(search_query: str, gene_queries: List[str],
 
     relevant_ids_string = list_to_string(relevant_ids, ",")
 
+    id_to_org = {}
+    for i in range(len(relevant_ids)):
+        id_to_org[relevant_ids[i]] = relevant_organisms[i]
+
     orgs_to_transcripts = ncbi_get_gene_features_v2(relevant_ids_string,
-                                                    relevant_organisms)
+                                                    id_to_org)
 
     transcript_list = []
     for org in orgs_to_transcripts:
@@ -212,7 +224,9 @@ def ncbi_exon_puller_v2(search_query: str, gene_queries: List[str],
         for transcript in orgs_to_transcripts[org]:
             if transcript.cds_end <= len(transcript_to_sequence[transcript.accession]):
                 transcript_filename = \
-                    os.path.join(taxon_folder, org, transcript.accession + ".fas")
+                    os.path.join(taxon_folder, org,
+                                 str(transcript.get_cds_length()) + "_" +
+                                 transcript.accession + ".fas")
 
                 transcript_file = open(transcript_filename, "w")
 
@@ -253,11 +267,12 @@ def ncbi_exon_puller_v2(search_query: str, gene_queries: List[str],
 if __name__ == "__main__":
 
     Entrez.email = "xiaohan.xie@mail.utoronto.ca"
-    gene_table_file = Entrez.efetch(db='gene', id="109911846", rettype='gene_table',
+    gene_table_file = Entrez.efetch(db='gene', id="105573713", rettype='gene_table',
                                     retmode="text")
     table_in_text = str(gene_table_file.read())
     print(table_in_text)
     #ncbi_exon_puller_v2("cetacea[orgn] rho[gene]", ["RHO"], [], "hello", "")
+
 
 
 

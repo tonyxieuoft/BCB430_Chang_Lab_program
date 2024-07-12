@@ -12,10 +12,9 @@ LESS_CUTOFF = 5
 
 
 def make_refined_gene_name_file(names_dict: Dict, original_file: str,
-                                save_path: str) -> None:
+                                refined_path: str) -> None:
 
-    new_query_path = os.path.join(save_path, "refined_query_file_no_gene_name.txt")
-    new_query_file = open(new_query_path, "w")
+    new_query_file = open(refined_path, "w")
 
     original_arr = file_to_list(original_file)
     for line in original_arr:
@@ -42,14 +41,14 @@ def get_random_query_sequence(taxon_path: str) -> str or None:
     return concatenate_exons(random_file_path)
 
 
-def get_genes_needing_refinement(exon_pull_path, save_dir):
+def get_genes_needing_refinement(exon_pull_path, temp_homology_directory):
 
     search_requests = []
 
     for gene in os.listdir(exon_pull_path):
 
         # make a directory that will contain query sequences for the gene
-        query_path = os.path.join(save_dir, "homology_search", gene)
+        query_path = os.path.join(temp_homology_directory, gene)
         os.mkdir(query_path)
 
         gene_path = os.path.join(exon_pull_path, gene)
@@ -107,20 +106,18 @@ def get_genes_needing_refinement(exon_pull_path, save_dir):
     return search_requests
 
 
-def gene_description_refiner(exon_pull_path: str, save_dir: str,
-                             original_query_file: str):
+def gene_description_refiner(exon_pull_path: str, temp_homology_directory: str,
+                             original_query_file: str, refined_query_filename: str):
 
     # holds query sequences that will be used for the homology search
-    queries_path = os.path.join(save_dir, "homology_search")
-    os.mkdir(queries_path)
 
     # starting with an NCBI exon pull results folder, obtain genes that are
     # missing reference sequences
-    search_requests = get_genes_needing_refinement(exon_pull_path, save_dir)
+    search_requests = get_genes_needing_refinement(exon_pull_path, temp_homology_directory)
 
     # conduct parallel BLAST searches, identify any accessions that might have
     # gene names of interest
-    ids_of_interest, gene_efetch_order = homology_search(search_requests, queries_path)
+    ids_of_interest, gene_efetch_order = homology_search(search_requests, temp_homology_directory)
 
     # the query sequences are no longer needed
     # shutil.rmtree(queries_path)
@@ -129,7 +126,7 @@ def gene_description_refiner(exon_pull_path: str, save_dir: str,
     new_names = get_gene_names_from_accessions(ids_of_interest, gene_efetch_order)
 
     # based on the pulled out gene names, make a new gene name query file
-    make_refined_gene_name_file(new_names, original_query_file, save_dir)
+    make_refined_gene_name_file(new_names, original_query_file, refined_query_filename)
 
 
 if __name__ == "__main__":

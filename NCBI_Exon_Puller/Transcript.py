@@ -1,7 +1,4 @@
 
-class NoGenomicBeginningException(Exception):
-    pass
-
 class Transcript:
 
     def __init__(self, accession: str):
@@ -39,6 +36,9 @@ class Transcript:
         else:
             self.cds.append((self.cds_end + 1, self.cds_end + 1 + cds_range))
             self.cds_end = self.cds_end + 1 + cds_range
+
+    def get_cds_length(self):
+        return self.cds_end - self.cds_start + 1
 
 
 

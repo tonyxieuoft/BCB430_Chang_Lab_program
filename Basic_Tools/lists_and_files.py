@@ -59,11 +59,12 @@ def unique_filepath(file_path: str) -> str:
         return file_path
 
     else:
+        path_sections = os.path.splitext(file_path)
         iteration = 1
-        altered_name = file_path + str(iteration)
+        altered_name = path_sections[0] + str(iteration) + path_sections[1]
         while os.path.exists(altered_name):
             iteration += 1
-            altered_name = file_path + str(iteration)
+            altered_name = path_sections[0] + str(iteration) + path_sections[1]
 
         return altered_name
 
