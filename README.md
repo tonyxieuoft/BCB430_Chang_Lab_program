@@ -45,23 +45,27 @@ As its name suggests, the NCBI exon puller executes the major use case of pullin
 
 #### Required Input
 
-##### Gene name and description query file
+##### Gene Query File
 
-The user will first be prompted by the program to provide a path to a file containing gene names and descriptions to query with. The file must be tab-delimited, in .txt format, and organized the following way:
+The user will first be prompted by the program to provide a path to a file containing **gene names** and **descriptions** to query with. The file must be *tab-delimited*, in *.txt* format, and organized the following way:
 ```
 marker:gene1query1   marker:gene1query2   ...
 marker:gene2query1   marker:gene2query2   ...
 marker:gene3query1   marker:gene3query2   ...
 ...
 ```
-where all queries for a gene are on the same line, separated by commas similar to a comma-separated-file format (.csv). Before each query is a marker denoting the type of query. Markers are separated from the queries they denote via colons (':'). 
+where all queries for a gene are on the same line, separated by tabs. The 
 
-The following markers are available:
+Before each query is a **marker** denoting the *type of query*. Markers are separated from the queries they denote via colons (:). The following markers are available:
 - `g` : indicates that a query is an abbreviated gene name (eg. 'RHO', 'GRK7').  
 - `d` : indicates that a query is a gene description. (eg. 'rhodopsin', 'G protein-coupled receptor kinase 7')
+ For genes that are known under multiple possible abbreviated names or description, multiple instances of the same marker can be used in a given line.
 
- For genes that are known under multiple possible abbreviated names or description, multiple instances of the same marker can be used in a given line.   
-
+**An Example.** If a user wished to extract gene sequences for 'rhodopsin' and 'G protein-coupled receptor kinase 7', they could use the following gene query file:
+```
+g:rho\td:rhodopsin
+g:grk7\td:"G protein-coupled receptor kinase 7"
+```
 
 ## Pulling exons from NCBI
 
