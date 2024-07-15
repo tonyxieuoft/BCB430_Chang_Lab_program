@@ -7,6 +7,9 @@ from Basic_Tools.lists_and_files import list_to_string
 
 def parse_feature_table(ft_table: str, gene_efetch_order: List) -> Dict:
 
+    if not gene_efetch_order:
+        return {}
+
     names_dict = {}
     for gene in gene_efetch_order:
         if gene not in names_dict:

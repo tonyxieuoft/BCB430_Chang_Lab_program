@@ -7,7 +7,7 @@ from Prepare_For_BLAST.get_longest_transcript import get_longest_transcript
 
 def concatenate_gene_results(paths: List[str], save_path):
 
-    encountered_species = {}
+    gene_to_encountered_species = {}
 
     for general_directory in paths:
 
@@ -15,6 +15,15 @@ def concatenate_gene_results(paths: List[str], save_path):
             # create (or append to) the gene file
             gene_save_file = open(os.path.join(save_path, gene) + ".fas", "a")
             gene_path = os.path.join(general_directory, gene)
+
+            # it's different for every gene, no? but we prioritize the
+            # exon puller results regardless
+            if gene not in gene_to_encountered_species:
+                gene_to_encountered_species[gene] = {}
+
+            # this actually also helps negate species duplicates for overlapping
+            # taxa
+            encountered_species = gene_to_encountered_species
 
             for taxa in os.listdir(gene_path):
                 taxa_path = os.path.join(gene_path, taxa)
@@ -37,6 +46,7 @@ def concatenate_gene_results(paths: List[str], save_path):
                             gene_save_file.write(to_write)
 
             gene_save_file.close()
+
 
 if __name__ == "__main__":
 

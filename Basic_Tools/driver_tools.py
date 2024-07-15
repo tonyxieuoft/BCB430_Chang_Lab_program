@@ -70,6 +70,22 @@ def try_click(specific_driver, by_what, description) -> bool:
         return False
 
 
+def try_get(specific_driver, by_what, description) -> bool:
+    """
+    Attempts a click, returning True if successful and False otherwise.
+
+    :param specific_driver: driver
+    :param by_what: type of description, ex. By.ID, By.XPATH
+    :param description: description of element to click, in string form
+    :return: True iff the click was successful
+    """
+
+    try:
+        specific_driver.find_element(by_what, description)
+        return True
+    except WebDriverException:
+        return False
+
 def clicking_wrapper(specific_driver, by_what, description,
                      timer_limit) -> None:
     """

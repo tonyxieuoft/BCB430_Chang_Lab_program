@@ -68,7 +68,7 @@ def build_search_query(gene_queries: List[str], description_queries: List[str],
     return search_query
 
 
-def handle_ncbi_exon_puller(save_path, genes_filepath, taxon_filepath):
+def handle_ncbi_exon_puller(save_path, genes_filepath, taxon_filepath, exons_or_full):
 
     # parse user input (every gene line in genes_lines corresponds to a set of
     # queries for a particular gene) - see documentation for more
@@ -101,7 +101,7 @@ def handle_ncbi_exon_puller(save_path, genes_filepath, taxon_filepath):
 
             # everything else is done by the use case
             ncbi_exon_puller_v2(search_query, gene_queries, description_queries,
-                             taxon_folder, gene_name, exons_or_full="full")
+                             taxon_folder, gene_name, exons_or_full)
 
 
 if __name__ == "__main__":
@@ -114,4 +114,4 @@ if __name__ == "__main__":
     taxon_filepath = r'C:\Users\tonyx\Downloads\phototransduction_taxa.txt'
 
     handle_ncbi_exon_puller(user_specified_directory, genes_filepath,
-                            taxon_filepath)
+                            taxon_filepath, "exons")

@@ -155,7 +155,7 @@ def ncbi_get_transcript_sequences(accs: List[str]) -> Dict:
 
 def ncbi_exon_puller_v2(search_query: str, gene_queries: List[str],
                         description_queries: List[str], taxon_folder: str,
-                        gene_name: str, exons_or_full="exons"):
+                        gene_name: str, exons_or_full):
 
     search_results = v1.ncbi_gene_search(search_query)
     ids_arr = search_results["IdList"]
@@ -267,10 +267,17 @@ def ncbi_exon_puller_v2(search_query: str, gene_queries: List[str],
 if __name__ == "__main__":
 
     Entrez.email = "xiaohan.xie@mail.utoronto.ca"
-    gene_table_file = Entrez.efetch(db='gene', id="105573713", rettype='gene_table',
-                                    retmode="text")
-    table_in_text = str(gene_table_file.read())
-    print(table_in_text)
+    #gene_table_file = Entrez.efetch(db='gene', id="105573713", rettype='gene_table',
+    #                                retmode="text")
+    #table_in_text = str(gene_table_file.read())
+    #print(table_in_text)
+
+    handle = Entrez.efetch(db="taxonomy", id='elasmobranchii')
+    print(Entrez.read(handle))
+
+
+    #for summary in summaries:
+    #    print(summary)
     #ncbi_exon_puller_v2("cetacea[orgn] rho[gene]", ["RHO"], [], "hello", "")
 
 

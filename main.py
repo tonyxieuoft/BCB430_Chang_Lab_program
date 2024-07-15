@@ -151,7 +151,7 @@ if __name__ == '__main__':
     expect_value = 0
     if expect_choice == 2:
         print("Enter an expect threshold value. It must be greater than 0 and "
-              "less than or equal to 1.")
+              "less than or equal to 1:")
         expect_value = expect_threshold_user_input()
 
     print("=============================================")

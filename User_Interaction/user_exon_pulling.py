@@ -5,7 +5,7 @@ from Basic_Tools.lists_and_files import file_to_list
 
 def enter_gene_filepath() -> str:
 
-    print("Enter a valid file path containing names and descriptions for genes "
+    print("Enter a valid file path containing names and descriptions for GENES "
           "of interest. These will be used as keywords to query the NCBI "
           "database.")
 

@@ -1,0 +1,80 @@
+from typing import Dict, List
+
+from Basic_Tools.lists_and_files import file_to_list
+
+
+def auto_assign_taxa_to_ref(lineage_dct: Dict, ref_species: List[str],
+                            overhead_taxon: str) -> List:
+    """
+    Given an overarching taxon (ex. cetacea, elasmobranchii), delegate
+    sub-branches of the taxon for reference species to blast against. This is to
+    ensure that query sequences are as similar to the subject as possible.
+
+    :param lineage_dct: a dictionary where keys are species and values are lists
+    corresponding to a species' lineage.
+    :param ref_species: a list of reference species to delegate sub-taxa to
+    :param overhead_taxon: the overarching taxon
+    :return: a list of tuples each containing a reference species and the
+    corresponding sub-taxon in the overhead_taxon it was assigned to. Order
+    matters, in that species-taxon combos at the top of the list will be blasted
+    first, and NOT be reblasted later.
+    """
+    lineage_assignments = {}
+    result = []
+    for ref in ref_species:
+        ref_lineage = lineage_dct[ref]
+        depth = 0
+        # traces up the lineage and assigns them to itself until bumping into
+        # a subject_taxa that has already been assigned
+        while ref_lineage[depth] != overhead_taxon and \
+                ref_lineage[depth] not in lineage_assignments:
+            lineage_assignments[ref_lineage[depth]] = ref
+            depth += 1
+
+        if ref_lineage[depth] == overhead_taxon and \
+                overhead_taxon not in lineage_assignments:
+            # if the overhead taxon is reached for the first time
+            lineage_assignments[overhead_taxon] = ref
+            result.insert(0, [ref, overhead_taxon])
+        else:
+            # this happens after bumping into an already assigned subject_taxa
+            # therefore, its subject_taxa is the one just below it
+            result.insert(0, [ref, ref_lineage[depth-1]])
+            # insert at the front
+
+    return result
+
+
+def get_assignments(auto: int, lineage_dict: Dict[str, List[str]],
+                    taxid_codes: Dict[str, str],
+                    taxa_to_species_dict: Dict[str, List[str]]) -> List:
+    """
+    Get the sub-branch assignments for each reference species.
+
+    :param auto: '1' for automatic determination of assignments, '0' for
+    manually entering assignments.
+    :param lineage_dict: a dictionary where keys are species names and values
+    are lists of taxa corresponding to the lineage of a species
+    :param taxid_codes: a dictionary where keys are taxa and values are taxids
+    :param taxa_to_species_dict: a dictionary where keys are taxa and values are
+    reference species in the taxa
+    :return: a list of reference -> taxa assignments
+    """
+    # automatic assignment of reference species to sub-branches of overhead taxa
+    if auto == 1:
+        assignments = []
+        # for each overhead taxon, get automatic assignments. concatenate them
+        # at the end as a list of entries to BLAST.
+        for taxon in taxid_codes.keys():
+            taxid = taxid_codes[taxon]
+            assignments += auto_assign_taxa_to_ref(lineage_dict, taxa_to_species_dict[taxon], taxid)
+        return assignments
+
+    # user themselves inputs a file, where it's reference sequence + taxon for
+    # name
+    else:
+        # ex. r"C:\Users\tonyx\Downloads\concatenate_species.txt"
+        assignments_file = input("Please enter a valid directory for files of "
+                                 "assignments")
+        assignments = file_to_list(assignments_file)
+        return assignments

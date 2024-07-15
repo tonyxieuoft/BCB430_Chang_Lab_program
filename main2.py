@@ -19,9 +19,9 @@ if __name__ == "__main__":
         elif menu_choice == 2:
             menu.gene_description_refiner_view()
         elif menu_choice == 3:
-            pass
+            menu.genome_blaster_view()
         elif menu_choice == 4:
-            pass
+            menu.alignment_creator_view()
         else:
             sys.exit(0)
 

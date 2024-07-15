@@ -1,3 +1,6 @@
+import os
+
+from Bio import Entrez
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from typing import Dict
@@ -36,14 +39,35 @@ def get_taxonomy_lineage(species_string: str) -> Dict:
     # table of complete phylogenies
     table = driver.find_element(By.XPATH, "//h2")
     # each row is for a separate species
-    rows = table.find_elements(By.XPATH, ".//tr")
+    table_elements = table.find_elements(By.XPATH, ".//td")
     phylo_dict = {}
-    for row in rows[1:]:
-        columns = row.find_elements(By.XPATH, ".//td")
-        # if columns[CODE_COLUMN] == "1":
-        phylo_dict[columns[SPECIES_NAME_COLUMN].text] = \
-            columns[PHYLOGENY_COLUMN].text.split(" ")
+
+    i = 4
+    while i < len(table_elements):
+        phylo_dict[table_elements[i+SPECIES_NAME_COLUMN].text] = \
+            table_elements[i+PHYLOGENY_COLUMN].text.split(" ")
+        i += 4
 
     return phylo_dict
 
 
+def get_taxa_taxids(general_dir):
+
+    # TODO remove the entrez email
+    Entrez.email = "xiaohan.xie@mail.utoronto"
+
+    genes = os.listdir(general_dir)
+    taxa = os.listdir(os.path.join(general_dir, genes[0]))
+    taxids = {}
+
+    for taxon in taxa:
+        handle = Entrez.esearch(db="taxonomy", term=taxon)
+        taxid = Entrez.read(handle)['IdList'][0]
+        taxids[taxid] = taxon
+
+    return taxids
+
+
+if __name__ == "__main__":
+    general_dir = r"C:\Users\tonyx\Downloads\NCBI_exons_bat"
+    print(get_taxa_taxids(general_dir))

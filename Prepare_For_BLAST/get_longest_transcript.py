@@ -11,6 +11,7 @@ def get_longest_transcript(directory):
     transcript is in the fasta heading.
     :return:
     """
+    # TODO how to replace this for blast?
     longest_transcript_length = 0
     longest_transcript = ""
     for transcript in os.listdir(directory):

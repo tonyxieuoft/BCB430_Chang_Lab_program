@@ -54,11 +54,19 @@ def parse_blast_xml(file: str, save_dir: str, taxon_name: str, curr_species):
             # get the top sequence for the top hit
             if isinstance(top_hit["Hit_hsps"], list):
                 seq_data = top_hit["Hit_hsps"][0]
-                print("SOMETHING STRANGE: " + curr_species + " " + gene_name)
+                #print("SOMETHING STRANGE: " + curr_species + " " + gene_name)
             else:
                 seq_data = top_hit["Hit_hsps"]["Hsp"]
 
             result_sequence = seq_data["Hsp_hseq"]
+
+            temp_filter_out_gaps = ""
+            for ch in result_sequence:
+                if ch != "-":
+                    temp_filter_out_gaps += ch
+
+            result_sequence = temp_filter_out_gaps
+
             query_bound1 = int(seq_data["Hsp_query-from"])
             query_bound2 = int(seq_data["Hsp_query-to"])
 
@@ -66,8 +74,9 @@ def parse_blast_xml(file: str, save_dir: str, taxon_name: str, curr_species):
             missing_right = query_seq_length - query_bound2
             # given this, can easily fill up with "N"s or "-"s
 
-            accession = top_hit['Hit_def'].split(" ")[0]
-            print("accessing accession: " + accession)
+            # accession = top_hit['Hit_def'].split(" ")[0]
+            accession = top_hit['Hit_accession']
+            #print("accessing accession: " + accession)
 
             hit_max = int(top_hit['Hit_len'])
 
@@ -103,15 +112,18 @@ def parse_blast_xml(file: str, save_dir: str, taxon_name: str, curr_species):
                             to_salvage = lower_bound - upper_bound + 1
 
                     string = ""
-                    if to_salvage > 0:
+                    if 0 < to_salvage < 5:
                         arr = ncbi_get_gene_sequence(accession, lower_bound,
                                                  upper_bound, strand)
                         for ch in arr:
                             string += ch
 
-                    string = "-"*(missing_left - to_salvage) + string
+                        string = "-"*(missing_left - to_salvage) + string
 
-                    print("missing left recovered: " + string + " iteration: " + exon_iteration['Iteration_iter-num'])
+                    else:
+                        string = "-"*missing_left + string
+
+                    #print("missing left recovered: " + string + " iteration: " + exon_iteration['Iteration_iter-num'])
 
                     result_sequence = string + result_sequence
 
@@ -140,15 +152,17 @@ def parse_blast_xml(file: str, save_dir: str, taxon_name: str, curr_species):
                             to_salvage = lower_bound - upper_bound + 1
 
                     string = ""
-                    if to_salvage > 0:
+                    if 5 > to_salvage > 0:
                         arr = ncbi_get_gene_sequence(accession, lower_bound, upper_bound, strand)
 
                         for ch in arr:
                             string += ch
 
-                    string = string + "-"*(missing_right - to_salvage)
+                        string = string + "-"*(missing_right - to_salvage)
+                    else:
+                        string = string + "-"*missing_right
 
-                    print("missing right recovered: " + string + " iteration: " + exon_iteration['Iteration_iter-num'])
+                    # print("missing right recovered: " + string + " iteration: " + exon_iteration['Iteration_iter-num'])
 
                     result_sequence = result_sequence + string
 

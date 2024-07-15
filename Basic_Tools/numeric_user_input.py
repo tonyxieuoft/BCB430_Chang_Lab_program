@@ -14,7 +14,8 @@ def numeric_user_input(lower_range: int, upper_range: int, first_prompt: str,
     user_input = int(input(first_prompt))
     while user_input < lower_range or user_input > upper_range:
         if following_prompt == "":
-            user_input = int(input(first_prompt))
+            user_input = int(input("Select between " + str(lower_range) +
+                                   " and " + str(upper_range) + ", inclusive."))
         else:
             user_input = int(input(following_prompt))
 
