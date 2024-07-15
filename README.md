@@ -16,11 +16,11 @@ Google Chrome, ChromeDriver and Selenium are required for the web-driver based a
 
 1. Ensure the requirements are met.
 
-2. ownload the code. This can be achieved by cloning the repository via the following command:
+2. Download the code. This can be achieved by cloning the repository via the following command:
 ```
 git clone https://github.com/tonyxieuoft/NCBI_Gene_Extraction_Pipeline.git
 ```
-Alternatively, click "code" on the repository page, then "Download ZIP" in the drop-down menu, then unzip the file.
+ Alternatively, click "code" on the repository page, then "Download ZIP" in the drop-down menu, then unzip the file.
 
 3. `cd` into the program directory `NCBI_Gene_Extraction_Pipeline` via the command line.  
 
