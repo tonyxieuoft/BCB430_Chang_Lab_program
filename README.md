@@ -5,7 +5,7 @@
 The following must be installed:
 - Google Chrome
 - ChromeDriver (https://sites.google.com/chromium.org/driver/downloads/)
-- Selenium for Python (https://www.selenium.dev/downloads/)
+- Selenium for Python (https://pypi.org/project/selenium/)
 - BioPython (https://biopython.org/wiki/Download)
 
 More specifically, BioPython is required to access the NCBI Entrez API, and Selenium is required for the web-driver based automation of NCBI BLAST.
