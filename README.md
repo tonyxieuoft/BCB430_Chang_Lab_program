@@ -8,11 +8,18 @@ The following must be installed:
 - Selenium for Python (https://pypi.org/project/selenium/)
 - BioPython (https://biopython.org/wiki/Download)
 
-More specifically, BioPython is required to access the NCBI Entrez API, and Selenium is required for the web-driver based automation of NCBI BLAST.
+Selenium for Python and BioPython are both Python libraries, and can be installed from the command line using Python's package management tool `pip`. More information is available in the above links. 
 
-## Usage
+Google Chrome, ChromeDriver and Selenium are required for the web-driver based automation of NCBI BLAST, whereas BioPython is required to pull sequences from the NCBI Entrez database. 
 
-Ensure the requirements are met, clone the repository and run the main program. 
+## Installation and Usage
+
+1) Ensure the requirements are met.
+2) Download the code by:
+   a) cloning the repository running the following command: `git clone https://github.com/tonyxieuoft/NCBI_Gene_Extraction_Pipeline.git`, OR
+   b) clicking "code" on the repository page, then "Download ZIP" in the drop-down menu, then unzipping the file.
+3) `cd` into the program directory via the command line.  
+4) Run the main program by calling `python3 main.py`
 
 ## Program Overview
 
