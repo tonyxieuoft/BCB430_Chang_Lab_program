@@ -17,9 +17,11 @@ Google Chrome, ChromeDriver and Selenium are required for the web-driver based a
 1) Ensure the requirements are met.
 2) Download the code by:
    - cloning the repository running the following command:
-     ```git clone https://github.com/tonyxieuoft/NCBI_Gene_Extraction_Pipeline.git```, OR
+     ```
+     git clone https://github.com/tonyxieuoft/NCBI_Gene_Extraction_Pipeline.git
+     ```, OR
    - clicking "code" on the repository page, then "Download ZIP" in the drop-down menu, then unzipping the file.
-3) `cd` into the program directory via the command line.  
+3) `cd` into the program directory `NCBI_Gene_Extraction_Pipeline` via the command line.  
 4) Run the main program by calling `python3 main.py`
 
 ## Program Overview
