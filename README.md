@@ -15,13 +15,11 @@ Google Chrome, ChromeDriver and Selenium are required for the web-driver based a
 ## Installation and Usage
 
 1. Ensure the requirements are met.
-
 2. Download the code. This can be achieved by cloning the repository via the following command:
 ```
 git clone https://github.com/tonyxieuoft/NCBI_Gene_Extraction_Pipeline.git
 ```
 3. `cd` into the program directory `NCBI_Gene_Extraction_Pipeline`.  
-
 4. Run the main program via the command `python3 main.py`
 
 ## Program Overview
@@ -32,23 +30,38 @@ The program automates the extraction of gene sequences across different organism
 
 After running the program, it first asks the user for their email, which is required for NCBI Entrez and acts as a point of contact if any issues arise. The user will also be prompted specify the full path to a directory to which the program can download files. For instance, if the user is running the program on Windows 10 and wishes the program to download files to their Downloads folder, they must specify the path `C:\Users\{user}\Downloads`. 
 
-After the user enters in basic details, a main menu with these five options appear:
+After the user enters in basic details, a main menu with five options appears:
 1. Pull existing sequence data from the NCBI Gene database
 2. Refine gene names and descriptions used to query the NCBI Gene database.
 3. Run NCBI BLAST to pull exons from whole GENOMES
 4. Concatenate gene sequences into alignment files
 5. Quit the program
 
-   
+The rationale, required input and resultant output for options 1-4 are stated below. 
 
-# 
+### Option 1. Pull existing sequence data from the NCBI Gene database
 
-2) (skippable) Given user-inputted lists of genes and taxa, the program pulls out all available exon information from NCBI and directs it to an output file. Contact with the NCBI server is achieved through the Entrez API. 
-3) The program organizes seuqences pulled out in step 2 (or during a previous iteration of the program) into query files in preparation for BLAST.
-4) Using the query files assembled in step 3, the program runs the NCBI BLAST program against genomes in the NCBI database for specified taxa. To do so, the program utilizes a Selenium-based webdriver to emulate a web user. 
-5) Finally, the program concatenates the results and outputs alignments by gene.
+As its name suggests, the NCBI exon puller executes the major use case of pulling experimentally-derived or predicted sequences available on the NCBI Gene database.
 
-Details for steps 2-5 are provided below. 
+#### Required Input
+
+##### Gene name and description query file
+
+The user will first be prompted by the program to provide a path to a file containing gene names and descriptions to query with. The file must be tab-delimited, in .txt format, and organized the following way:
+```
+marker:gene1query1   marker:gene1query2   ...
+marker:gene2query1   marker:gene2query2   ...
+marker:gene3query1   marker:gene3query2   ...
+...
+```
+where all queries for a gene are on the same line, separated by commas similar to a comma-separated-file format (.csv). Before each query is a marker denoting the type of query. Markers are separated from the queries they denote via colons (':'). 
+
+The following markers are available:
+- `g` : indicates that a query is an abbreviated gene name (eg. 'RHO', 'GRK7').  
+- `d` : indicates that a query is a gene description. (eg. 'rhodopsin', 'G protein-coupled receptor kinase 7')
+
+ For genes that are known under multiple possible abbreviated names or description, multiple instances of the same marker can be used in a given line.   
+
 
 ## Pulling exons from NCBI
 
