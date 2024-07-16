@@ -1,5 +1,9 @@
 # NCBI Exon Extraction and BLAST Pipeline
 
+##### Table of Contents
+
+[Requirements](##Requirements)
+
 ## Requirements
 
 The following must be installed:
