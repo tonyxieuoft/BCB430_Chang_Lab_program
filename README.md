@@ -124,7 +124,7 @@ Oftentimes, gene names and descriptions for the same gene vary between different
 
 For instance, CNGA3, a visual gene involved in the phototransduction cycle in cones, has the gene description `cyclic nucleotide-gated cation channel alpha 3, cone` for bony fish, but in elasmobranches it is labelled `cyclic nucleotide gated channel subunit alpha 3a`. In the same vein, the abbreviated gene name for CNGA3 in elasmobranchs is `CNGA3A`. Although the differences are slight (missing 'cation', addition of 'subunit', one letter addition), the NCBI exon puller filters for **exact** gene name and description matches (to avoid pulling extraneous gene sequences), and would fail to pull out the elasmobranch sequences had the gene description for fish been used. 
 
-To alleviate the burden of manually checking the gene name/description naming conventions for every taxa of interest, the program can automatically identify alternative gene names/descriptions. First, the user must run an iteration of option #1 (the NCBI exon puller). Sequences acquired via the NCBI exon puller act as queries for **sequence homology searches** of the NCBI **nucleotide (nt)** database. When highly similar transcripts are identified, their gene names and descriptions are extracted and appended to a new, "refined" gene name/description query file.  
+To alleviate the burden of manually checking the gene name/description naming conventions for every taxa of interest, the program can automatically identify alternative gene names/descriptions. First, the user must run an iteration of option #1 (the NCBI exon puller). Sequences acquired via the NCBI exon puller then act as queries for **sequence homology searches** of the NCBI **nucleotide (nt)** database. When highly similar transcripts are identified, their gene names and descriptions are extracted and appended to a new, "refined" gene name/description query file.  
 
 The formats of required input and resultant output files/directories are stated below in greater detail:
 
@@ -132,7 +132,7 @@ The formats of required input and resultant output files/directories are stated 
 
 The directory must be in ***NEPR (NCBI exon pull results) format**, and contain sequences for the genes the user wishes to refine names/descriptions for. Ideally, there should be a query sequence for each gene and taxon of interest. 
 
-As mention, the easiest way to generate query sequences is to **first run an iteration of option #1** with the same genes and taxa of interest. If a previous iteration of the NCBI Exon Puller has been ran in a program session, the program will automatically suggest the filepath to its results directory as input for the gene description refiner. 
+As mentioned, the easiest way to generate query sequences is to **first run an iteration of option #1** with the same genes and taxa of interest. If a previous iteration of the NCBI Exon Puller has been ran in a program session, the program will automatically suggest the filepath to its results directory as input for the gene description refiner. 
 
 #### Original gene query file (required input)
 
@@ -146,9 +146,9 @@ After the homology search is complete, the refined file should be used as the in
 
 ### Option 3 part (a): Generating query files in preparation of blasting whole GENOMES (NCBI Genome Blaster)
 
-The main purpose of the NCBI Genome Blaster is predict and extract gene sequences from un-annotated whole genomes of species that do not directly have NCBI Gene database sequences.  
+The main purpose of the NCBI Genome Blaster is predict and extract gene sequences from unannotated whole genomes of species that do not directly have NCBI Gene database sequences.  
 
-BLAST requires the provision of reference sequences to query subject genomes the user wishes to predict gene-coding regions for. For the current version of the program, these reference sequences must be in **NEPR** format and acquired from an iteration of the NCBI exon puller.  
+BLAST requires the provision of reference sequences to query subject genomes. For the current version of the program, these reference sequences must be in contained in a **NEPR** format directory and acquired from an iteration of the NCBI exon puller.  
 
 Ideally, the phylogenetic distance between the query sequence and subject genome species' should be minimal to maximize the likelihood of accurate coding-region extraction. Therefore, it is unwise to use a single reference sequence to query subject genomes for an entire large taxon; this is especially true for genes under positive selection. Instead, each reference species should be assigned to BLAST subject genomes for a **small** taxon that they are closest to **within** the overarching taxon of interest. 
 
@@ -158,11 +158,11 @@ The program generates query files for BLAST based on the above considerations. T
 
 As stated, this directory must be in **NEPR** format. If a previous iteration of the NCBI Exon Puller has ran during the program session, the program automatically suggests the path to its results directory as input for the NCBI Genome Blaster. The genes and taxa of interest within the input reference sequence directory will dictate the genes and taxa of interest whose sequences will be pulled out by the NCBI Genome Blaster. 
 
-To illustrate, suppose a user specified an initial iteration of the NCBI exon puller (option #1) to pull out rhodopsin sequences for the taxon `Chiroptera`. Afterward, suppose they called option #3 and selected the results directory as the reference sequence directory. Then, the NCBI Genome Blaster would BLAST and extract rhodopsin sequences exclusively from Chiroptera subject genomes that did not have results from the NCBI Exon Puller. 
+For instance, suppose a user specified an initial iteration of the NCBI exon puller (option #1) to pull out rhodopsin sequences for the taxon `Chiroptera`. Afterward, suppose they called option #3 and selected the results directory as the reference sequence directory. Then, the NCBI Genome Blaster would BLAST and extract rhodopsin sequences exclusively from Chiroptera subject genomes that did not have results from the NCBI Exon Puller. 
 
 #### Automatic or Manual Assignment (required input)
 
-The program asks for users to choose between automatic or manual assignment of reference species to sub-taxa within the overarching taxa of interest to BLAST. Automatic assignment effectively assigns a reference species to every subject genome with the goal of maximizing query sequence to subject genome similarity. Read more about this method and its rationale in the *Methods and Algorithms* section. Alternatively, the user can choose to manually select the sub-taxa within the overarching taxa of interest that each reference species will BLAST against.  
+The program asks for users to choose between automatic or manual assignment of reference species to sub-taxa within the overarching taxa of interest to BLAST. Automatic assignment assigns a reference species to every subject genome with the goal of maximizing query sequence to subject genome similarity. Read more about this method and its rationale in the *Methods and Algorithms* section. Alternatively, the user can choose to manually select the sub-taxa within the overarching taxa of interest that each reference species will BLAST against.  
 
 #### Manual Assignment File (optional input)
 
@@ -224,7 +224,7 @@ The user is given the opportunity to enter a custom expect threshold, or stick w
 
 #### BLAST Results Directory (output)
 
-The BLAST results directory has the same structure as **NEPR** directories. The gene and taxonomic directories from the reference sequence-containing input NEPR directory are conserved. All naming conventions for fasta files and fasta headings remain the same. The only exception is the replacement of the "mRNA accession" section in the fasta heading with a "reference query mRNA accession" section, as the new BLAST-predicted sequences do not directly correspond to any sequences in NCBI Entrez.   
+The BLAST results directory has the same structure as **NEPR** directories. The gene and taxonomic directories from the input NEPR directory in option 3 part (a) (supplying query sequences) to are conserved. All naming conventions for fasta files and fasta headings remain the same. The only exception is the replacement of the "mRNA accession" section in the fasta heading with a "reference query mRNA accession" section, as the new BLAST-predicted sequences do not directly correspond to any RNA transcript sequences in NCBI Entrez.   
 
 ### Option 4: Concatenate gene sequences into alignment files
 
@@ -238,7 +238,7 @@ If the NCBI exon puller and/or Genome Blaster have previously ran during the pro
 
 #### Alignments Directory (output)
 
-This directory contains fasta files, each corresponding to one gene alignment. 
+This directory contains alignment files in fasta format for each gene present in the input directory. 
 
 ## Methods and Algorithms
 
