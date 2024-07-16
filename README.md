@@ -28,7 +28,7 @@ The program automates the extraction of gene sequences across different organism
 - Pulling exons for well-annotated genes and taxa from the NCBI Gene database
 - Using NCBI BLAST to predict and extract gene sequences from non-well annotated genomes
 
-After running the program, it first asks the user for their email, which is required for NCBI Entrez and acts as a point of contact if any issues arise. The user will also be prompted specify the full path to a directory to which the program can download files. For instance, if the user is running the program on Windows 10 and wishes the program to download files to their Downloads folder, they must specify the path `C:\Users\{user}\Downloads`. 
+After running the program, it first asks the user for their email, which is required for NCBI Entrez and acts as a point of contact if any issues arise. The user will also be prompted specify the full path to a directory to which the program can download files. For instance, if the user is running the program on Windows and wishes the program to download files to their Downloads folder, they must specify the path `C:\Users\{user}\Downloads`. 
 
 After the user enters in basic details, a main menu with five options appears:
 1. Pull existing sequence data from the NCBI Gene database
@@ -183,62 +183,73 @@ Molossus molossus,27621
 Desmodus rotundus,9415
 Myotis daubentonii,9397
 ```
-Based on the file, the program first blasts Molossus molossus query sequences against the taxon 27621 (Molossus). Then, the program blasts Desmodus rotundus query sequences against the taxon 9415 (Phyllostomidae). However, when it finally comes time to blast Myotis daubentonii query sequences against 9397 (Chiroptera), as the subject genomes in Molossus and Phyllostomidae have just been blasted, only members of Chiroptera *not* in Molossus and Phyllostomidae will actually be blasted against by Myotis daubentonii. 
+Based on the file, the program first blasts Molossus molossus query sequences against the taxon 27621 (Molossus). Then, the program blasts Desmodus rotundus query sequences against the taxon 9415 (Phyllostomidae). However, when it finally comes time to blast Myotis daubentonii query sequences against 9397 (Chiroptera), as the subject genomes in Molossus and Phyllostomidae have already been blasted (and Molossus, Phyllostomidae are sub-taxa of Chiroptera), only members of Chiroptera *not* in Molossus and Phyllostomidae will actually be blasted against by Myotis daubentonii. 
 
-**An Alternative Example.** Suppose the user now wishes to blast Myotis daubentonii query againsts against all genomes in Chiroptera first, then blast Molossus molossus query sequences against Molossus genomes. They provide the following 
-
-
-- recommended program flow - since many are dependent, read the recommended program flow.
-
-
-To prepare query files for BLAST, a folder of sequences mirroring the structure of directories outputted after pulling exons from NCBI must be provided. If the user blasts directly after pulling exons, the output folder of pulled exons will be used to compile the query files for BLAST. 
-
-
-### Manual assignment of reference species to sub-taxa
-
-Much more goes into phylogenetic analysis than purely clade and lineage information, and the algorithm only crudely estimates appropriate reference sequence for a given taxon. If the user is willing to spend more time, they can manually specify these assignments to increase accuracy. The format of the file used to give assignment commands is as follows:
+**An Alternative Example.** Suppose the user now wishes to blast Myotis daubentonii query againsts against all genomes in Chiroptera first, then blast Molossus molossus query sequences against Molossus genomes. They provide the following manual assignment file:
 ```
-reference_species1,sub_taxa1
-reference_species2,sub_taxa2
-reference_species3,sub_taxa3
-...
+Myotis daubentonii,9397
+Molossus molossus,27621
 ```
+The program first blasts Myotis daubentonii query sequences against subject genomes for all of Chiroptera. But when the program executes the next line, as Molossus genomes were already blasted against by Myotis daubentonii, Molossus molossus query sequences are blasted against *no* subject genomes.  
 
-### Filling in missing genes
+#### Query File Directory (Output)
 
-For speed's sake, pulled sequences for all genes for a given reference species are combined into one query file before BLAST occurs. Sometimes, a reference species will be missing some user-specified genes. In cases where this occurs, the user can manually (or automatically) specify alternative species from which the missing gene sequences can be pulled from and used. No file is required to specify this; instead a response system is built directly into the program when a missing gene is detected.
+After automatic or manual assignment is complete, for each reference species, the program concatenates all of its sequences into one query file. Each query file's title is the sub-taxon its reference species is assigned to, and all query files are stored in a single query file directory. If a reference species is missing a particular gene sequence, the gap is filled in by the gene sequence of another reference species that shares the earliest most recent common ancestor.
 
+This output largely serves no function to the user. Instead, it carries intermediate data for option 3(b) to run. 
 
-Run NCBI BLAST to pull exons from whole GENOMES
+### Option 3 part (b): Run NCBI BLAST to pull exons from whole GENOMES
 
-## Automatic NCBI BLAST
+As stated previously, the main purpose of the NCBI Genome Blaster is predict and extract gene sequences from un-annotated whole genomes of species that do not directly have NCBI Gene database sequences.
 
-No input files are required for this part. Everything will ahve been handled by the section of the pipeline right above that handles preparing for BLAST. The user can specify custom BLAST parameters, which include:
-- expect threshold
-- word size
+If option 3 part (b) is reached, most of the input work will have already been handled by option 3 part (a), with sub-taxa assignment and query file generation complete. 
 
-Please note that a Selenium-based webdriver will be used to run this part of the program. A pop-up chrome tab will appear: DO NOT CLOSE IT, unless you wish to terminate the program. THe program emulates a web-user, and accesses NCBI BLAST directly from a web browser. When the program runs to completion, all downloaded files and opened tabs will be automatically closed. 
+The formats of the remaining required input and resultant output files/directories at this step are stated below in greater detail:
 
-TODO: accessing BLAST via CLOUD services or locally, after eukaryotic genomes have been downloaded to the local server.
+#### Remote or Local BLAST (required input)
 
-### Concatenate gene sequences into alignment files
+The user is asked to choose between blasting remotely on the NCBI server or locally using only their computer's resources. 
 
-No input files are required for this section. Here, results from BLAST are automatically concatenated into gene alignments. 
+During the automation of remote BLAST, the program emulates a web user and accesses the NCBI web application to obtain genome accessions and run BLAST processes. At any given moment, approximately ten BLAST processes run parallel to each other. 
 
-TODO: automate alignment algorithms like ClustalW
+In contrast, local BLAST requires the additional installment of the NCBI BLAST+ and NCBI Datasets command line applications. In the local BLAST workflow, subject genomes are sequentially downloaded, blasted against, then immediately deleted one-by-one. The process is slow and laborious, with the main bottleneck being the genome download step. Currently, because of its issues, local BLAST is not supported. Right now, I am working to create a "local server" version of the local BLAST that leverages the increased memory and processing power of local servers to improve upon these weaknesses. 
+
+#### Expect Threshold (optional input)
+
+The user is given the opportunity to enter a custom expect threshold, or stick with the default e-value of 0.05. As the program automatically only selects sequences with the lowest e-values, changing the expect threshold here does not make a significant difference, and may actually decrease BLAST efficiency. 
+
+#### BLAST Results Directory (output)
+
+The BLAST results directory has the same structure as **NEPR** directories. The gene and taxonomic directories from the reference sequence-containing input NEPR directory are conserved. All naming conventions for fasta files and fasta headings remain the same. The only exception is the replacement of the "mRNA accession" section in the fasta heading with a "reference query mRNA accession" section, as the new BLAST-predicted sequences do not directly correspond to any sequences in NCBI Entrez.   
+
+### Option 4: Concatenate gene sequences into alignment files
+
+Once gene sequences are obtained from the NCBI Gene database and extracted from unannotated genomes via BLAST, this option offers the capacity to concatenate all sequences from different species for a particular gene into one gene alignment. If the gene sequences are split into exons, the program joins them together in the alignment. 
+
+The formats of the remaining required input and resultant output files/directories at this step are stated below in greater detail:
+
+#### NEPR / BLAST Result Directories (required input)
+
+If the NCBI exon puller and/or Genome Blaster have previously ran during the program session, the program automatically suggests their results as input. Otherwise, the user must manually input paths to directories (in NEPR format) that contain gene sequences they wish to concatenate into alignments. 
+
+#### Alignments Directory (output)
+
+This directory contains fasta files, each corresponding to one gene alignment. 
 
 ## Methods and Algorithms
 
 ### Automatic assignment of reference species to sub-taxa in option 3(a)
 
-To ensure query sequences are as similar to the subject genome as possible yet altogether cover the entire taxa, the user can select the option for the program to automatically assign available reference query sequences to blast against subject genomes only within a sub-branch of the taxa they are most similar to. How the program does this given an overarching taxon to blast and reference species within that taxon is as follows:
+To ensure query sequences are as similar to the subject genome as possible yet altogether cover the entire taxa, the user can select the option for the program to automatically assign available reference query sequences to blast against subject genomes only within a sub-branch of the taxa they are most similar to. 
+
+How the program does this given an overarching taxon to blast and reference species within that taxon is as follows:
 1) Select an arbitary reference species S1 and assign it to the overarching taxon.
 2) Select a different reference species S2 and assign it to the largest taxon *T* within its lineage such that *T* is not in the lineage of another already-selected reference species.
 3) Repeat step 3 for species S3, S4 ... until all reference species have been assigned a taxon.
 
-The order in which these sub-taxa will be blasted is the reverse order that they were assigned, and species that have been blasted are not blasted again. I'll use the following example to make the algorithm clearer: 
-```
-Utilizing the program to pull exons for the taxa 'Elasmobranchii', the user has reference sequences from three species:
+The order in which these sub-taxa will be blasted is the reverse order that they were assigned, and species that have been blasted are not blasted again. 
+
+**An Example.** Utilizing the program to pull exons for the taxa 'Elasmobranchii', suppose the user has reference sequences from three species:
 
 (1) Carcharodon carcharias
 (2) Amblyraja radiata
@@ -250,19 +261,15 @@ The lineages for each species is as follows:
 (2) Amblyraja -> Rajidae -> Rajiformes -> Batoidea -> Elasmobranchii
 (3) Hemiscyllium -> Hemiscylliidae > Orectolobiformes -> Galeoidea -> Galeomorphii -> Selachii -> Elasmobranchii
 
-Suppose for step 1 of the algorithm, the program arbirtrarily selects Amblyraja radiata and assigns it the
-overarching taxon, 'Elasmobranchii.' For step 2 of the algorithm, it arbitrarily selects Hemiscyllium ocellatum
-and assigns it 'Selachii', the largest taxon in its lineage not in the lineage of Amblyraja radiata. Finally,
-Carcharodon carcharias is assigned 'Lamniformes', as Elasmobranchii, Selachii, Galeomorphii, and Galoeidea are
-in Hemiscyllium ocellatum's lineage (and Elasmobranchii is also in Amblyraja radiata's lineage).
+Suppose for step 1 of the algorithm, the program arbirtrarily selects Amblyraja radiata and assigns it the overarching taxon, 'Elasmobranchii.' For step 2 of the algorithm, it arbitrarily selects Hemiscyllium ocellatum and assigns it 'Selachii', the largest taxon in its lineage not in the lineage of Amblyraja radiata. Finally, Carcharodon carcharias is assigned 'Lamniformes', as Elasmobranchii, Selachii, Galeomorphii, and Galoeidea are in Hemiscyllium ocellatum's lineage (and Elasmobranchii is also in Amblyraja radiata's lineage).
 
-When it's time to BLAST, Carcharodon carcharias sequences are used first to query against Lamniforme genomes.
-Then, as the genomes of species that have been already blasted are not blasted again Hemiscyllium ocellatum
-sequences are used to query against non-Lamniforme Selachii genomes. Finally, Amblyraja radiata sequences query
-non-Lamniforme, non-Selachii (which overlaps) genomes, and are thereby effectively blasted only against Batoidea. 
-```
+When it's time to BLAST, Carcharodon carcharias sequences are used first to query against Lamniforme genomes. Then, as the genomes of species that have been already blasted are not blasted again Hemiscyllium ocellatum sequences are used to query against non-Lamniforme Selachii genomes. Finally, Amblyraja radiata sequences query non-Lamniforme, non-Selachii (which overlaps) genomes, and are thereby effectively blasted only against Batoidea. 
 
+**Finished Example.**
 
+Please note that much more goes into phylogenetic analysis than purely clade and lineage information, and the algorithm only roughly estimates appropriate reference sequence for a given taxon. If the user is willing to spend more time and has phylogenetic trees with molecuar distances on hand, they can manually specify these assignments to increase accuracy.
+
+### More to come!
 
 
 
