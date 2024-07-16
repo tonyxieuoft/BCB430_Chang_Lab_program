@@ -99,7 +99,11 @@ The user is asked whether they would like exons or the full gene sequences to be
 
 #### NCBI Exon Pull Results (output)
 
-The results pulled out from the NCBI Exon Puller are contained within in a layer of nested folders with the following structure: `General Folder -> Gene -> Taxon -> Species`. Each species folder contains fasta files, each containing a different transcript variant.
+The results pulled out from the NCBI Exon Puller are contained within in a layer of nested folders with the following structure: 
+```
+General Folder -> Gene -> Taxon -> Species
+```
+Each species folder contains fasta files that each correspond to a different transcript variant.
 
 The directory names at the `Gene` layer are based on the first names/descriptions of each line of the input gene query file. For instance, if the input gene query file was:
 ```
