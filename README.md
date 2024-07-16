@@ -125,13 +125,13 @@ The formats of required input and resultant output files/directories are stated 
 
 #### Directory containing query sequences for homology search (required input)
 
-The directory **must be in NEPR (NCBI exon pull results) format**, and contain sequences for the genes the user wishes to refine names/descriptions for. Ideally, the query sequences provided should be from the **same taxa** as the taxa of interest the user wishes to pull genes for. 
+The directory must be in ***NEPR (NCBI exon pull results) format**, and contain sequences for the genes the user wishes to refine names/descriptions for. Ideally, the query sequences provided should be from the **same taxa** as the taxa of interest the user wishes to pull genes for. 
 
 Given the above two considerations, the easiest way to generate query sequences is to simply **first run an iteration of option #1**, with the gene query and taxa files containing the genes and taxa of interest to refine names and descriptions for.
 
 #### Original gene query file (required input)
 
-This file must be in the same format as one used by the NCBI exon puller (see above). This file is used as a starting template for the refined gene query file. (below) 
+This file must be in the same format as one used as input by the NCBI exon puller (see above). This file is used as a starting template for the refined gene query file. (below) 
 
 #### Refined gene query file (output)
 
@@ -140,6 +140,8 @@ The refined file produced by the gene description refiner is in the *same format
 After the homology search is complete, the refined file should be used in a **second** iteration of the NCBI exon puller to acquire sequences that were previously missed.  
 
 ### Option 3 part (a): Generating query files in preparation of blasting whole GENOMES
+
+
 
 To prepare query files for BLAST, a folder of sequences mirroring the structure of directories outputted after pulling exons from NCBI must be provided. If the user blasts directly after pulling exons, the output folder of pulled exons will be used to compile the query files for BLAST. 
 
@@ -188,6 +190,9 @@ reference_species3,sub_taxa3
 ### Filling in missing genes
 
 For speed's sake, pulled sequences for all genes for a given reference species are combined into one query file before BLAST occurs. Sometimes, a reference species will be missing some user-specified genes. In cases where this occurs, the user can manually (or automatically) specify alternative species from which the missing gene sequences can be pulled from and used. No file is required to specify this; instead a response system is built directly into the program when a missing gene is detected.
+
+
+Run NCBI BLAST to pull exons from whole GENOMES
 
 ## Automatic NCBI BLAST
 
