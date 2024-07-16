@@ -6,8 +6,20 @@
 - [Installation and Usage](https://github.com/tonyxieuoft/NCBI_Gene_Extraction_Pipeline#installation-and-usage)
 - [Program Overview](https://github.com/tonyxieuoft/NCBI_Gene_Extraction_Pipeline#program-overview)
     - [Pull existing sequence data from the NCBI Gene database](https://github.com/tonyxieuoft/NCBI_Gene_Extraction_Pipeline#option-1-pull-existing-sequence-data-from-the-ncbi-gene-database-ncbi-exon-puller)
-        - [Gene Query File (required input)](https://github.com/tonyxieuoft/NCBI_Gene_Extraction_Pipeline#gene-query-file-required-input)
-    - [test]
+        - Input
+            - [Gene Query File](https://github.com/tonyxieuoft/NCBI_Gene_Extraction_Pipeline#gene-query-file-required-input)
+            - [Taxa File](https://github.com/tonyxieuoft/NCBI_Gene_Extraction_Pipeline#taxa-file-required-input)
+            - [Exons or Full Sequences](https://github.com/tonyxieuoft/NCBI_Gene_Extraction_Pipeline#exons-or-full-sequences-required-input)
+            - [Selecting For optimal Transcript Variants](https://github.com/tonyxieuoft/NCBI_Gene_Extraction_Pipeline#selecting-for-optimal-transcript-variants-required-input)
+        - Output
+            - [NCBI Exon Pull Results directory](https://github.com/tonyxieuoft/NCBI_Gene_Extraction_Pipeline#ncbi-exon-pull-results-output)
+    - [Refine gene names and descriptions used to query the NCBI Gene database](https://github.com/tonyxieuoft/NCBI_Gene_Extraction_Pipeline#option-2-refine-gene-names-and-descriptions-used-to-query-the-ncbi-gene-database-gene-description-refiner)
+        - Input
+            - [Gene Query File](https://github.com/tonyxieuoft/NCBI_Gene_Extraction_Pipeline#gene-query-file-required-input)
+            - [Taxa File](https://github.com/tonyxieuoft/NCBI_Gene_Extraction_Pipeline#taxa-file-required-input)
+            - [Exons or Full Sequences](https://github.com/tonyxieuoft/NCBI_Gene_Extraction_Pipeline#exons-or-full-sequences-required-input)
+            - [Selecting For optimal Transcript Variants](https://github.com/tonyxieuoft/NCBI_Gene_Extraction_Pipeline#selecting-for-optimal-transcript-variants-required-input)
+        - Output
     
 
 ## Requirements
