@@ -150,7 +150,7 @@ def driver_genome_blaster_v2(save_path: str, queries_path: str,
 
     for species in novel_species_info:
         lineage = all_lineage_info[species["name"]]
-        curr_del = ""
+        curr_del = None
         curr_rank = len(taxa_blast_order)
         for i in range(len(lineage)):
             if lineage[i] in blast_order_dict:
@@ -159,6 +159,13 @@ def driver_genome_blaster_v2(save_path: str, queries_path: str,
                     curr_rank = blast_order_dict[lineage[i]]
 
         species["del"] = curr_del
+
+    filter_out_no_del = []
+    for species in novel_species_info:
+        if species['del'] is not None:
+            filter_out_no_del.append(species)
+
+    novel_species_info = filter_out_no_del
 
     print("blasting processes have begun...")
 

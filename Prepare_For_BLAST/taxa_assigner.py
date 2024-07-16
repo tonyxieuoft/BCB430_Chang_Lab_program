@@ -1,3 +1,4 @@
+import os
 from typing import Dict, List
 
 from Basic_Tools.lists_and_files import file_to_list
@@ -74,7 +75,22 @@ def get_assignments(auto: int, lineage_dict: Dict[str, List[str]],
     # name
     else:
         # ex. r"C:\Users\tonyx\Downloads\concatenate_species.txt"
-        assignments_file = input("Please enter a valid directory for files of "
-                                 "assignments")
-        assignments = file_to_list(assignments_file)
+        correct_file = False
+        assignments_arr = []
+        while not correct_file:
+            assignments = []
+            assignments_file = input("Please enter a path to valid taxon assignment file: ")
+            if not os.path.isfile(assignments_file):
+                print("Invalid. File does not exist.")
+            else:
+                correct_file = True
+                assignments_arr = file_to_list(assignments_file)
+                for line in assignments_arr:
+                    split_line = line.strip().split(",")
+                    if len(split_line) != 2 or not split_line[1].isalnum():
+                        print("Invalid. File format is incorrect")
+                        correct_file = False
+                        break
+                    assignments.append(line.split(","))
+
         return assignments

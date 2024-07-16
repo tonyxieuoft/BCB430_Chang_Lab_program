@@ -7,7 +7,7 @@ from Gene_Description_Refiner.get_gene_names_from_accessions import \
     get_gene_names_from_accessions
 from Gene_Description_Refiner.homology_search_for_accessions import homology_search
 
-LESS_CUTOFF = 5
+LESS_CUTOFF = float('inf')
 
 
 def make_refined_gene_name_file(names_dict: Dict, original_file: str,

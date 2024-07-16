@@ -303,7 +303,8 @@ class UI:
         if auto_assign == 1:
             print("Automatic assignment selected.")
         else:
-            print("Manual assignment selected.")
+            print("Manual assignment selected. A prompt to input a path to a "
+                  "manual taxon assignment file will appear later.")
         auto_fill = 1  # I don't see how this should ever be manual
         print()
         queries_path = make_unique_directory(self.download_dir, "query_files")

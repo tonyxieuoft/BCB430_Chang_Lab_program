@@ -10,6 +10,8 @@ def parse_feature_table(ft_table: str, gene_efetch_order: List) -> Dict:
     if not gene_efetch_order:
         return {}
 
+    print("gathering results...")
+
     names_dict = {}
     for gene in gene_efetch_order:
         if gene not in names_dict:
@@ -84,7 +86,7 @@ def parse_feature_table(ft_table: str, gene_efetch_order: List) -> Dict:
 
 def get_gene_names_from_accessions(ids, gene_efetch_order):
 
-    Entrez.email = "xiaohan.xie@mail.utoronto.ca"
+    #Entrez.email = "xiaohan.xie@mail.utoronto.ca"
     efetch_handle = Entrez.efetch(db='nuccore', id=ids, rettype="ft")
 
     return parse_feature_table(str(efetch_handle.read()), gene_efetch_order)

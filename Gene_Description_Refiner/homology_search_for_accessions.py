@@ -90,8 +90,7 @@ def homology_search(search_requests: List[Dict],
                     queries_path: str) -> [str, List[str]]:
 
     chrome_options = webdriver.ChromeOptions()
-    #chrome_options.add_argument('--headless')
-    #chrome_options.add_argument('--disable-gpu')
+    chrome_options.add_argument('--headless')
     driver = webdriver.Chrome(chrome_options)
 
     driver.get('https://blast.ncbi.nlm.nih.gov/Blast.cgi?PROGRAM=blastn&PAGE_TYPE=BlastSearch&LINK_LOC=blasthome')
@@ -102,15 +101,15 @@ def homology_search(search_requests: List[Dict],
     gene_efetch_order = []
     # access the gene search page, which will have the refseq data
     # rate limiting factor
+
     for request in search_requests:
+        print("starting search process for " + request['Gene'] + "...")
         for key in request.keys():
             if key == "None" or key == "Less":
                 for taxon in request[key]:
 
                     enter_blast_process(driver, request["Gene"], taxon, queries_path, key)
                     gene_blast_tab_order.append([request["Gene"], key])
-
-                    print("opening tab")
 
                     if len(driver.window_handles) == MAX_PROCESSES + 1:
                         scrape_description_tables(driver, gene_blast_tab_order,

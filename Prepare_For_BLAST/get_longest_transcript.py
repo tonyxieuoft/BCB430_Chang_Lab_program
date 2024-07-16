@@ -42,7 +42,7 @@ def get_longest_transcript(directory):
 if __name__ == "__main__":
 
     directory = r"C:\Users\tonyx\Downloads\Balaenoptera musculus"
-    print(get_longest_transcript(directory))
+    #print(get_longest_transcript(directory))
 
 
 
