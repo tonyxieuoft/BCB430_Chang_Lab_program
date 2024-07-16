@@ -45,14 +45,14 @@ As its name suggests, the NCBI exon puller automates the process of pulling expe
 
 #### Gene Query File (required input)
 
-The user will first be prompted by the program to provide a path to a file containing **gene names** and **descriptions** to query with. The file must be *tab-delimited*, in *.txt* format, and organized the following way:
+The user will first be prompted by the program to provide a path to a file containing **gene names** and **descriptions** to query the NCBI Gene database with. The file must be *tab-delimited*, in *.txt* format, and organized the following way:
 ```
 marker:gene1query1   marker:gene1query2   ...
 marker:gene2query1   marker:gene2query2   ...
 marker:gene3query1   marker:gene3query2   ...
 ...
 ```
-where all queries for a gene are on the same line, separated by tabs. The first query in a line is arbitrarily denoted within the program as the "gene name" for that gene.
+where all queries for a gene are on the *same* line, separated by tabs. 
 
 Before each query is a **marker** denoting the *type of query*. Markers are separated from the queries they denote via colons (:). The following markers are available:
 - `g` : indicates that a query is an abbreviated gene name (eg. 'RHO', 'GRK7').  
@@ -68,7 +68,7 @@ g:abca4   d:"ATP binding cassette subfamily A member 4"
 ```
 There is no limit to the number of genes that can be inputted into the gene query file. Note that the file is case-insensitive to query *names* and *descriptions*, but markers must be lowercase. Therefore `g:RHO`, `g:rho`, and `g:Rho` yield the same results, but `G:rho` results in an error.  
 
-As the NCBI exon puller filters results based on **exact** matches, provided gene names and descriptions must be identical to the ones stored in the NCBI database.
+The NCBI exon puller filters results based on **exact** matches, so provided gene names and descriptions must be identical to the ones stored in the NCBI database.
 
 #### Taxa File (required input)
 
