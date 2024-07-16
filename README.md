@@ -54,18 +54,45 @@ marker:gene2query1   marker:gene2query2   ...
 marker:gene3query1   marker:gene3query2   ...
 ...
 ```
-where all queries for a gene are on the same line, separated by tabs. The 
+where all queries for a gene are on the same line, separated by tabs. The first query in a line is arbitrarily denoted within the program as the "gene name" for that gene.
 
 Before each query is a **marker** denoting the *type of query*. Markers are separated from the queries they denote via colons (:). The following markers are available:
 - `g` : indicates that a query is an abbreviated gene name (eg. 'RHO', 'GRK7').  
 - `d` : indicates that a query is a gene description. (eg. 'rhodopsin', 'G protein-coupled receptor kinase 7')
- For genes that are known under multiple possible abbreviated names or description, multiple instances of the same marker can be used in a given line.
 
-**An Example.** If a user wished to extract gene sequences for 'rhodopsin' and 'G protein-coupled receptor kinase 7', they could use the following gene query file:
+For genes that are known under multiple possible abbreviated names or description, more than two queries and multiple instances of the same marker can be used in a given line.
+
+**An Example.** If a user wished to extract gene sequences for 'rhodopsin', 'G protein-coupled receptor kinase 7', and 'ATP binding cassette subfamily A member 4' (abbrev. gene name ABCA4), they could use the following gene query file:
 ```
-g:rho\td:rhodopsin
-g:grk7\td:"G protein-coupled receptor kinase 7"
+g:rho     d:rhodopsin
+g:grk7    d:"G protein-coupled receptor kinase 7"
+g:abca4   d:"ATP binding cassette subfamily A member 4"
 ```
+There is no limit to the number of genes that can be inputted into the gene query file. Note that the file is case-insensitive to query *names* and *descriptions*, but markers must be lowercase. Therefore 'g:RHO', 'g:rho', and 'g:Rho' yield the same results, but 'G:rho' results in an error.  
+
+##### Taxa File
+
+After providing the gene query file, the user will additionally be prompted to provide a path to a file containing **taxa of interest** to pull for. Again, the file must be in *.txt* format, with one taxon per line as follows:
+```
+taxon1
+taxon2
+taxon3
+...
+```
+Note that the provided names must match a record in NCBI's taxonomy database. 
+
+**An Example.** Continuing the previous gene query example, if the user wished to pull those vision-related genes for bats, whales/dolphins/porpoises and humans, they cound use the following taxa file:
+```
+chiroptera
+cetacea
+Homo sapiens
+```
+Again, like the gene query file, the taxon names are *case-insensitive*. 
+
+##### Exons or Full Sequences
+
+Finally, the user will be asked whether they would like exons or the full gene sequences to be pulled out. In both cases, only **coding regions** will be returned. 
+
 
 ## Pulling exons from NCBI
 
