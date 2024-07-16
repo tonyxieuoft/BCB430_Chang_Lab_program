@@ -15,7 +15,7 @@ Google Chrome, ChromeDriver and Selenium are required for the web-driver based a
 ## Installation and Usage
 
 1. Ensure the requirements are met.
-2. Download the code. This can be achieved by cloning the repository via the following command:
+2. Download the code. If Git is installed (https://git-scm.com/book/en/v2/Getting-Started-Installing-Git), this can be achieved by cloning the repository on the command line with the following command:
 ```
 git clone https://github.com/tonyxieuoft/NCBI_Gene_Extraction_Pipeline.git
 ```
