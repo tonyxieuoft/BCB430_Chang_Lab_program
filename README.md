@@ -2,7 +2,7 @@
 
 ##### Table of Contents
 
-[Requirements](##Requirements)
+[Requirements]([##Requirements](https://github.com/tonyxieuoft/NCBI_Gene_Extraction_Pipeline/blob/master/README.md#requirements))
 
 ## Requirements
 
