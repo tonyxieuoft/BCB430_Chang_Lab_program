@@ -39,7 +39,7 @@ After the user enters in basic details, a main menu with five options appears:
 
 The rationale, required input and resultant output for options 1-4 are stated below. 
 
-### Option 1. Pull existing sequence data from the NCBI Gene database
+### Option 1. Pull existing sequence data from the NCBI Gene database (NCBI Exon Puller)
 
 As its name suggests, the NCBI exon puller executes the major use case of pulling experimentally-derived or predicted sequences available on the NCBI Gene database. Most of the other options requires that the NCBI exon puller be run at least once before they can function. The formats of required input and resultant output files/directories are stated below. 
 
@@ -91,10 +91,11 @@ Again, like the gene query file, the taxon names are *case-insensitive*.
 
 #### Exons or Full Sequences (required input)
 
-Finally, the user will be asked whether they would like exons or the full gene sequences to be pulled out. In both cases, only **coding regions** will be returned. Rather than a file, the user simply enters '1' for exons, and '2' for full sequences.
+The user will be asked whether they would like exons or the full gene sequences to be pulled out. In both cases, only **coding regions** will be returned. Rather than a file, the user simply enters '1' for exons, and '2' for full sequences.
 
-#### 
+#### Selecting for Optimal Transcript Variants (required input)
 
+After sequences from NCBI have been pulled out, there will likely exist *multiple* transcript variants for the same gene for certain species. The user will be asked whether they would like to keep these variants, or automatically select for the variant with optimal length and **discard the rest**. Read more about this method and its rationale in the *Methods and Algorithms* section. 
 
 #### NCBI Exon Pull Results (output)
 
@@ -113,7 +114,7 @@ Each *fasta file* is titled `{transcript_length}_{transcript_accession}.fas` and
 
 From here on forth, the structure of the directories produced by the NCBI Exon Puller will be referred to as the **NEPR** format.
 
-### Option 2: Refine gene names and descriptions used to query the NCBI Gene database
+### Option 2: Refine gene names and descriptions used to query the NCBI Gene database (Gene Description Refiner)
 
 Oftentimes, gene names and descriptions for the same gene vary between different taxa. This inconsistent naming is especially prevelant for taxonomic groups that lack sequence annotation (eg. Elasmobranchii, the group containing sharks, rays and skates). 
 
@@ -127,7 +128,7 @@ The formats of required input and resultant output files/directories are stated 
 
 The directory must be in ***NEPR (NCBI exon pull results) format**, and contain sequences for the genes the user wishes to refine names/descriptions for. Ideally, the query sequences provided should be from the **same taxa** as the taxa of interest the user wishes to pull genes for. 
 
-Given the above two considerations, the easiest way to generate query sequences is to simply **first run an iteration of option #1**, with the gene query and taxa files containing the genes and taxa of interest to refine names and descriptions for.
+Given the above two considerations, the easiest way to generate query sequences is to simply **first run an iteration of option #1**, with the gene query and taxa files containing the genes and taxa of interest to refine names and descriptions for. If a previous iteration of the NCBI Exon Puller has been ran in a program session, the program will automatically suggest the filepath to its results as input for the gene description refiner. 
 
 #### Original gene query file (required input)
 
@@ -141,6 +142,11 @@ After the homology search is complete, the refined file should be used in a **se
 
 ### Option 3 part (a): Generating query files in preparation of blasting whole GENOMES
 
+todo:
+- rationale is big, -> sequences need to be as close as possible
+- algorithms section -> copy off of the progress report
+- auto blast should still be about the same
+- recommended program flow - since many are dependent, read the recommended program flow.
 
 
 To prepare query files for BLAST, a folder of sequences mirroring the structure of directories outputted after pulling exons from NCBI must be provided. If the user blasts directly after pulling exons, the output folder of pulled exons will be used to compile the query files for BLAST. 
