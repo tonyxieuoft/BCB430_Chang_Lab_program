@@ -41,11 +41,9 @@ The rationale, required input and resultant output for options 1-4 are stated be
 
 ### Option 1. Pull existing sequence data from the NCBI Gene database
 
-As its name suggests, the NCBI exon puller executes the major use case of pulling experimentally-derived or predicted sequences available on the NCBI Gene database.
+As its name suggests, the NCBI exon puller executes the major use case of pulling experimentally-derived or predicted sequences available on the NCBI Gene database. Most of the other options requires that the NCBI exon puller be run at least once before they can function. The formats of required input and resultant output files/directories are stated below. 
 
-#### Required Input
-
-##### Gene Query File
+#### Gene Query File (required input)
 
 The user will first be prompted by the program to provide a path to a file containing **gene names** and **descriptions** to query with. The file must be *tab-delimited*, in *.txt* format, and organized the following way:
 ```
@@ -68,9 +66,9 @@ g:rho     d:rhodopsin
 g:grk7    d:"G protein-coupled receptor kinase 7"
 g:abca4   d:"ATP binding cassette subfamily A member 4"
 ```
-There is no limit to the number of genes that can be inputted into the gene query file. Note that the file is case-insensitive to query *names* and *descriptions*, but markers must be lowercase. Therefore 'g:RHO', 'g:rho', and 'g:Rho' yield the same results, but 'G:rho' results in an error.  
+There is no limit to the number of genes that can be inputted into the gene query file. Note that the file is case-insensitive to query *names* and *descriptions*, but markers must be lowercase. Therefore `g:RHO`, `g:rho`, and `g:Rho` yield the same results, but `G:rho` results in an error.  
 
-##### Taxa File
+#### Taxa File (required input)
 
 After providing the gene query file, the user will additionally be prompted to provide a path to a file containing **taxa of interest** to pull for. Again, the file must be in *.txt* format, with one taxon per line as follows:
 ```
@@ -89,46 +87,27 @@ Homo sapiens
 ```
 Again, like the gene query file, the taxon names are *case-insensitive*. 
 
-##### Exons or Full Sequences
+#### Exons or Full Sequences (required input)
 
-Finally, the user will be asked whether they would like exons or the full gene sequences to be pulled out. In both cases, only **coding regions** will be returned. 
+Finally, the user will be asked whether they would like exons or the full gene sequences to be pulled out. In both cases, only **coding regions** will be returned. Rather than a file, the user simply enters '1' for exons, and '2' for full sequences. 
 
+#### NCBI Exon Pull Results (output)
 
-## Pulling exons from NCBI
+The results pulled out from the NCBI Exon Puller are contained within in a layer of nested folders with the following structure: `General Folder -> Gene -> Taxon -> Species`. Each species folder contains fasta files that each correspond to a different transcript version.
 
-The user provides two files on hand for this part of the program: one that lists taxa to pull sequences for, and another that lists queries that the program will use to search for specific genes. 
-
-### Taxa file
-
-The taxa file should be in .txt format, and must be organized the following way:
+The directory names at the `Gene` layer are the first queries in each line of the input gene query file. For instance, if the input gene query file was:
 ```
-taxon1
-taxon2
-taxon3
-...
+g:rho                 g:rh1    d:rhodopsin
+d:cyclooxygenase-2    g:cox2
 ```
-Note that there are no headers. Each line contains one taxon. 
+then the name of the gene directories would be `rho` and `cyclooxygenase-2`. 
 
-### Gene query file
+The directory names at the `Taxon` layer are the names from the input taxa file, and the directory names at the `Species` layer are the scientific names of species with available transcripts. 
 
-The structure of input for the gene query file is more involved, and the file should be in either .txt or .csv format. As a .txt file, it must be organized the following way:
-```
-marker: gene1query1, marker: gene1query2,   ...
-marker: gene2query1, marker: gene2query2,   ...
-marker: gene3query1, marker: gene3:query2,  ...
-...
-```
-where all queries for a gene are on the same line, separated by commas similar to a comma-separated-file format (.csv). Before each query is a marker denoting the type of query. Markers are separated from the queries they denote via colons (':'). 
+Each *fasta file* is titled `{transcript_length}_{transcript_accession}.fas` and each *fasta heading* includes the gene, scientific name, transcript accession, genome accession, and interval (relative to +1) of a particular exon/full sequence. 
 
-The following markers are available:
-- `g` : indicates that a query is an abbreviated gene name (eg. 'RHO', 'GRK7').  
-- `d` : indicates that a query is a gene description. (eg. 'rhodopsin', 'G protein-coupled receptor kinase 7')
+From here on forth, the structure of the directories produced by the NCBI Exon Puller will be referred to as the **NEPR** format.
 
- For genes that are known under multiple possible abbreviated names or description, multiple instances of the same marker can be used in a given line.
-
- ### Output directory
-
- The results pulled out from the program are outputted in a layer of nested folders with the following structure: `General Folder -> Gene -> Taxon -> Species`. Each species folder contains fasta files that each correspond to a different transcript version. 
 
 ## Preparing query files for BLAST.
 
