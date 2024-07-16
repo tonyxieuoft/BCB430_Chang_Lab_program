@@ -251,23 +251,21 @@ The order in which these sub-taxa will be blasted is the reverse order that they
 
 **An Example.** Utilizing the program to pull exons for the taxa 'Elasmobranchii', suppose the user has reference sequences from three species:
 
-(1) Carcharodon carcharias
-(2) Amblyraja radiata
-(3) Hemiscyllium ocellatum
+1) Carcharodon carcharias
+2) Amblyraja radiata
+3) Hemiscyllium ocellatum
 
 The lineages for each species is as follows:
 
-(1) Carcharodon -> Lamninae -> Alopiidae -> Lamniformes -> Galeoidea -> Galeomorphii -> Selachii -> Elasmobranchii
-(2) Amblyraja -> Rajidae -> Rajiformes -> Batoidea -> Elasmobranchii
-(3) Hemiscyllium -> Hemiscylliidae > Orectolobiformes -> Galeoidea -> Galeomorphii -> Selachii -> Elasmobranchii
+1) Carcharodon -> Lamninae -> Alopiidae -> Lamniformes -> Galeoidea -> Galeomorphii -> Selachii -> Elasmobranchii
+2) Amblyraja -> Rajidae -> Rajiformes -> Batoidea -> Elasmobranchii
+3) Hemiscyllium -> Hemiscylliidae > Orectolobiformes -> Galeoidea -> Galeomorphii -> Selachii -> Elasmobranchii
 
 Suppose for step 1 of the algorithm, the program arbirtrarily selects Amblyraja radiata and assigns it the overarching taxon, 'Elasmobranchii.' For step 2 of the algorithm, it arbitrarily selects Hemiscyllium ocellatum and assigns it 'Selachii', the largest taxon in its lineage not in the lineage of Amblyraja radiata. Finally, Carcharodon carcharias is assigned 'Lamniformes', as Elasmobranchii, Selachii, Galeomorphii, and Galoeidea are in Hemiscyllium ocellatum's lineage (and Elasmobranchii is also in Amblyraja radiata's lineage).
 
 When it's time to BLAST, Carcharodon carcharias sequences are used first to query against Lamniforme genomes. Then, as the genomes of species that have been already blasted are not blasted again Hemiscyllium ocellatum sequences are used to query against non-Lamniforme Selachii genomes. Finally, Amblyraja radiata sequences query non-Lamniforme, non-Selachii (which overlaps) genomes, and are thereby effectively blasted only against Batoidea. 
 
-**Finished Example.**
-
-Please note that much more goes into phylogenetic analysis than purely clade and lineage information, and the algorithm only roughly estimates appropriate reference sequence for a given taxon. If the user is willing to spend more time and has phylogenetic trees with molecuar distances on hand, they can manually specify these assignments to increase accuracy.
+**Please note** that much more goes into phylogenetic analysis than purely clade and lineage information, and the algorithm only roughly estimates appropriate reference sequence for a given taxon. If the user is willing to spend more time and has phylogenetic trees with molecuar distances on hand, they can manually specify these assignments to increase accuracy.
 
 ### More to come!
 
