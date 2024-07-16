@@ -91,7 +91,10 @@ Again, like the gene query file, the taxon names are *case-insensitive*.
 
 #### Exons or Full Sequences (required input)
 
-Finally, the user will be asked whether they would like exons or the full gene sequences to be pulled out. In both cases, only **coding regions** will be returned. Rather than a file, the user simply enters '1' for exons, and '2' for full sequences. 
+Finally, the user will be asked whether they would like exons or the full gene sequences to be pulled out. In both cases, only **coding regions** will be returned. Rather than a file, the user simply enters '1' for exons, and '2' for full sequences.
+
+#### 
+
 
 #### NCBI Exon Pull Results (output)
 
@@ -116,15 +119,27 @@ Oftentimes, gene names and descriptions for the same gene vary between different
 
 To demonstrate, the gene description for CNGA3, a visual gene involved in the phototransduction cycle in cones is titled `cyclic nucleotide-gated cation channel alpha 3, cone` for bony fish, but in elasmobranches it is titled `cyclic nucleotide gated channel subunit alpha 1b`. Similarly, the abbreviated gene name for CNGA3 for bony fish is `cnga3`, but in elasmobranchs it is `cnga3a`. Although the differences are slight (missing 'cation', addition of 'subunit', one letter addition), the NCBI exon puller filters based on **exact** gene name and description matches (to avoid pulling extraneous gene sequences), and would fail to pull out the elasmobranch sequences had the gene description for fish been used. 
 
-Considering the above, to make 
+Considering the above, to make creating gene query files less tedious when the user has many taxa of interest, the program can automatically search for and add alternative gene names/descriptions to a "refined" gene query file. First, the user must run an iteration of option #1 (the NCBI exon puller) to acquire query sequences for a **homology search** (via BLAST) of the NCBI **nucleotide (nt)** database. Then, once highly similar transcripts are identified, their gene names and descriptions are extracted and appended to a new, "refined" gene name and description query file.  
 
+The formats of required input and resultant output files/directories are stated below in greater detail:
 
-### Option 3: Run NCBI BLAST to pull exons from whole GENOMES
+#### Directory containing query sequences for homology search (required input)
 
+The directory **must be in NEPR (NCBI exon pull results) format**, and contain sequences for the genes the user wishes to refine names/descriptions for. Ideally, the query sequences provided should be from the **same taxa** as the taxa of interest the user wishes to pull genes for. 
 
+Given the above two considerations, the easiest way to generate query sequences is to simply **first run an iteration of option #1**, with the gene query and taxa files containing the genes and taxa of interest to refine names and descriptions for.
 
+#### Original gene query file (required input)
 
-## Preparing query files for BLAST.
+This file must be in the same format as one used by the NCBI exon puller (see above). This file is used as a starting template for the refined gene query file. (below) 
+
+#### Refined gene query file (output)
+
+The refined file produced by the gene description refiner is in the *same format* as the original gene input file. The refined file begins as a *copy* of the original. After identifying alternative names/descriptions for genes in the original gene query file, the program appends these newly extracted names to the end of the gene's line in the refined gene query file. 
+
+After the homology search is complete, the refined file should be used in a **second** iteration of the NCBI exon puller to acquire sequences that were previously missed.  
+
+### Option 3 part (a): Generating query files in preparation of blasting whole GENOMES
 
 To prepare query files for BLAST, a folder of sequences mirroring the structure of directories outputted after pulling exons from NCBI must be provided. If the user blasts directly after pulling exons, the output folder of pulled exons will be used to compile the query files for BLAST. 
 
