@@ -28,7 +28,7 @@ The program automates the extraction of gene sequences across different organism
 - Pulling exons for well-annotated genes and taxa from the NCBI Gene database
 - Using NCBI BLAST to predict and extract gene sequences from non-well annotated genomes
 
-After running the program, it first asks the user for their email, which is required for NCBI Entrez and acts as a point of contact if any issues arise. The user will also be prompted specify the full path to a directory to which the program can download files. For instance, if the user is running the program on Windows and wishes the program to download files to their Downloads folder, they must specify the path `C:\Users\{user}\Downloads`. 
+After running the program, the user is first aked for their email, which is required for NCBI Entrez and acts as a point of contact if any issues arise. The user will also be prompted specify the full path to a directory to which the program can download files. For instance, if the user is running the program on the Windows command line and wishes the program to download files to their Downloads folder, they must specify the path `C:\Users\{user}\Downloads`. 
 
 After the user enters in basic details, a main menu with five options appears:
 1. Pull existing sequence data from the NCBI Gene database
