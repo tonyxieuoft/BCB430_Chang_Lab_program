@@ -2,7 +2,7 @@
 
 ## Table of Contents
 
-- [Requirements](https://github.com/tonyxieuoft/NCBI_Gene_Extraction_Pipeline/blob/master/README.md#requirements)
+- [Requirements](#requirements)
 - [Installation and Usage](https://github.com/tonyxieuoft/NCBI_Gene_Extraction_Pipeline#installation-and-usage)
 - [Program Overview](https://github.com/tonyxieuoft/NCBI_Gene_Extraction_Pipeline#program-overview)
     - [Pull existing sequence data from the NCBI Gene database](https://github.com/tonyxieuoft/NCBI_Gene_Extraction_Pipeline#option-1-pull-existing-sequence-data-from-the-ncbi-gene-database-ncbi-exon-puller)
