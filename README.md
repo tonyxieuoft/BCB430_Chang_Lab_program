@@ -41,7 +41,7 @@ The rationale, required input and resultant output for options 1-4 are stated be
 
 ### Option 1. Pull existing sequence data from the NCBI Gene database (NCBI Exon Puller)
 
-As its name suggests, the NCBI exon puller executes the major use case of pulling experimentally-derived or predicted sequences available on the NCBI Gene database. Most of the other options requires that the NCBI exon puller be run at least once before they can function. The formats of required input and resultant output files/directories are stated below. 
+As its name suggests, the NCBI exon puller automates the process of pulling experimentally-derived or predicted sequences available on the NCBI Gene database. The formats of required input and resultant output files/directories are stated below. 
 
 #### Gene Query File (required input)
 
@@ -68,7 +68,7 @@ g:abca4   d:"ATP binding cassette subfamily A member 4"
 ```
 There is no limit to the number of genes that can be inputted into the gene query file. Note that the file is case-insensitive to query *names* and *descriptions*, but markers must be lowercase. Therefore `g:RHO`, `g:rho`, and `g:Rho` yield the same results, but `G:rho` results in an error.  
 
-As the NCBI exon puller filters results based on **exact** matches, please note that gene names and descriptions must be identical to the ones stored in the NCBI database.
+As the NCBI exon puller filters results based on **exact** matches, provided gene names and descriptions must be identical to the ones stored in the NCBI database.
 
 #### Taxa File (required input)
 
@@ -81,32 +81,32 @@ taxon3
 ```
 Note that the provided names must match a record in NCBI's taxonomy database. 
 
-**An Example.** Continuing the previous gene query example, if the user wished to pull those vision-related genes for bats, whales/dolphins/porpoises and humans, they cound use the following taxa file:
+**An Example.** Suppose the user wanted to pull the genes in the previous example from bats, whales/dolphins/porpoises and humans, they could use the following taxa file:
 ```
 chiroptera
 cetacea
 Homo sapiens
 ```
-Again, like the gene query file, the taxon names are *case-insensitive*. 
+Again, like names and descriptions in the gene query file, the taxon names are *case-insensitive*. 
 
 #### Exons or Full Sequences (required input)
 
-The user will be asked whether they would like exons or the full gene sequences to be pulled out. In both cases, only **coding regions** will be returned. Rather than a file, the user simply enters '1' for exons, and '2' for full sequences.
+The user is asked whether they would like exons or the full gene sequences to be pulled out. In both cases, only **coding regions** will be returned. Rather than a file, the user simply enters '1' for exons, and '2' for full sequences.
 
 #### Selecting for Optimal Transcript Variants (required input)
 
-After sequences from NCBI have been pulled out, there will likely exist *multiple* transcript variants for the same gene for certain species. The user will be asked whether they would like to keep these variants, or automatically select for the variant with optimal length and **discard the rest**. Read more about this method and its rationale in the *Methods and Algorithms* section. 
+*Multiple* transcript variants for the same gene and species may be pulled out in an iteration of the NCBI exon puller. The user will be asked whether they would like to keep all variants, or automatically select for the variant with "optimal length" and **discard the rest**. Read more about this method and its rationale in the *Methods and Algorithms* section. 
 
 #### NCBI Exon Pull Results (output)
 
-The results pulled out from the NCBI Exon Puller are contained within in a layer of nested folders with the following structure: `General Folder -> Gene -> Taxon -> Species`. Each species folder contains fasta files that each correspond to a different transcript version.
+The results pulled out from the NCBI Exon Puller are contained within in a layer of nested folders with the following structure: `General Folder -> Gene -> Taxon -> Species`. Each species folder contains fasta files, each containing a different transcript variant.
 
-The directory names at the `Gene` layer are the first queries in each line of the input gene query file. For instance, if the input gene query file was:
+The directory names at the `Gene` layer are based on the first names/descriptions of each line of the input gene query file. For instance, if the input gene query file was:
 ```
 g:rho                 g:rh1    d:rhodopsin
 d:cyclooxygenase-2    g:cox2
 ```
-then the name of the gene directories would be `rho` and `cyclooxygenase-2`. 
+then the names of the Gene-level directories would be `rho` and `cyclooxygenase-2`. 
 
 The directory names at the `Taxon` layer are the names from the input taxa file, and the directory names at the `Species` layer are the scientific names of species with available transcripts. 
 
@@ -118,17 +118,17 @@ From here on forth, the structure of the directories produced by the NCBI Exon P
 
 Oftentimes, gene names and descriptions for the same gene vary between different taxa. This inconsistent naming is especially prevelant for taxonomic groups that lack sequence annotation (eg. Elasmobranchii, the group containing sharks, rays and skates). 
 
-To demonstrate, the gene description for CNGA3, a visual gene involved in the phototransduction cycle in cones is titled `cyclic nucleotide-gated cation channel alpha 3, cone` for bony fish, but in elasmobranches it is titled `cyclic nucleotide gated channel subunit alpha 1b`. Similarly, the abbreviated gene name for CNGA3 for bony fish is `cnga3`, but in elasmobranchs it is `cnga3a`. Although the differences are slight (missing 'cation', addition of 'subunit', one letter addition), the NCBI exon puller filters based on **exact** gene name and description matches (to avoid pulling extraneous gene sequences), and would fail to pull out the elasmobranch sequences had the gene description for fish been used. 
+For instance, CNGA3, a visual gene involved in the phototransduction cycle in cones, has the gene description `cyclic nucleotide-gated cation channel alpha 3, cone` for bony fish, but in elasmobranches it is labelled `cyclic nucleotide gated channel subunit alpha 3a`. In the same vein, the abbreviated gene name for CNGA3 in elasmobranchs is `CNGA3A`. Although the differences are slight (missing 'cation', addition of 'subunit', one letter addition), the NCBI exon puller filters for **exact** gene name and description matches (to avoid pulling extraneous gene sequences), and would fail to pull out the elasmobranch sequences had the gene description for fish been used. 
 
-Considering the above, to make creating gene query files less tedious when the user has many taxa of interest, the program can automatically search for and add alternative gene names/descriptions to a "refined" gene query file. First, the user must run an iteration of option #1 (the NCBI exon puller) to acquire query sequences for a **homology search** (via BLAST) of the NCBI **nucleotide (nt)** database. Then, once highly similar transcripts are identified, their gene names and descriptions are extracted and appended to a new, "refined" gene name and description query file.  
+To alleviate the burden of manually checking the gene name/description naming conventions for every taxa of interest, the program can automatically identify alternative gene names/descriptions. First, the user must run an iteration of option #1 (the NCBI exon puller). Sequences acquired via the NCBI exon puller act as queries for **sequence homology searches** of the NCBI **nucleotide (nt)** database. When highly similar transcripts are identified, their gene names and descriptions are extracted and appended to a new, "refined" gene name/description query file.  
 
 The formats of required input and resultant output files/directories are stated below in greater detail:
 
 #### Directory containing query sequences for homology search (required input)
 
-The directory must be in ***NEPR (NCBI exon pull results) format**, and contain sequences for the genes the user wishes to refine names/descriptions for. Ideally, the query sequences provided should be from the **same taxa** as the taxa of interest the user wishes to pull genes for. 
+The directory must be in ***NEPR (NCBI exon pull results) format**, and contain sequences for the genes the user wishes to refine names/descriptions for. Ideally, there should be a query sequence for each gene and taxon of interest. 
 
-Given the above two considerations, the easiest way to generate query sequences is to simply **first run an iteration of option #1**, with the gene query and taxa files containing the genes and taxa of interest to refine names and descriptions for. If a previous iteration of the NCBI Exon Puller has been ran in a program session, the program will automatically suggest the filepath to its results as input for the gene description refiner. 
+As mention, the easiest way to generate query sequences is to **first run an iteration of option #1** with the same genes and taxa of interest. If a previous iteration of the NCBI Exon Puller has been ran in a program session, the program will automatically suggest the filepath to its results directory as input for the gene description refiner. 
 
 #### Original gene query file (required input)
 
@@ -138,9 +138,19 @@ This file must be in the same format as one used as input by the NCBI exon pulle
 
 The refined file produced by the gene description refiner is in the *same format* as the original gene input file. The refined file begins as a *copy* of the original. After identifying alternative names/descriptions for genes in the original gene query file, the program appends these newly extracted names to the end of the gene's line in the refined gene query file. 
 
-After the homology search is complete, the refined file should be used in a **second** iteration of the NCBI exon puller to acquire sequences that were previously missed.  
+After the homology search is complete, the refined file should be used as the input gene query file in a **second** iteration of the NCBI exon puller to acquire sequences that were previously missed.  
 
 ### Option 3 part (a): Generating query files in preparation of blasting whole GENOMES
+
+NCBI BLAST requires the provision of reference sequences to query subject genomes the user wishes to predict gene-coding regions for. For the current version of the program, these reference sequences must be in NEPR format and acquired from an iteration of the NCBI exon puller.  
+
+Ideally, the phylogenetic distance between the query sequence and subject genome species' should be minimal to maximize the likelihood of accurate coding-region extraction. Therefore, it is unwise to use a single reference sequence to query subject genomes for an entire large taxon; this is especially true for genes under positive selection. Instead, each reference species should be assigned to BLAST subject genomes within a **small** taxon that they are closest to **within** the overarching taxon of interest. 
+
+The program generates query files for BLAST based on the above considerations. The formats of required input and resultant output files/directories are stated below in greater detail:
+
+#### Directory Containing Reference Sequences (required input)
+
+As stated, 
 
 todo:
 - rationale is big, -> sequences need to be as close as possible
