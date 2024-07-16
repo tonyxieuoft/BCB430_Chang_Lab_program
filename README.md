@@ -10,17 +10,36 @@
             - [Gene Query File](#gene-query-file-required-input)
             - [Taxa File](#taxa-file-required-input)
             - [Exons or Full Sequences](#exons-or-full-sequences-required-input)
-            - [Selecting For optimal Transcript Variants](#selecting-for-optimal-transcript-variants-required-input)
+            - [Selecting For Optimal Transcript Variants](#selecting-for-optimal-transcript-variants-required-input)
         - Output
             - [NCBI Exon Pull Results directory](#ncbi-exon-pull-results-output)
     - [Refine gene names and descriptions used to query the NCBI Gene database](#option-2-refine-gene-names-and-descriptions-used-to-query-the-ncbi-gene-database-gene-description-refiner)
         - Input
-            - [Gene Query File](https://github.com/tonyxieuoft/NCBI_Gene_Extraction_Pipeline#gene-query-file-required-input)
-            - [Taxa File](https://github.com/tonyxieuoft/NCBI_Gene_Extraction_Pipeline#taxa-file-required-input)
-            - [Exons or Full Sequences](https://github.com/tonyxieuoft/NCBI_Gene_Extraction_Pipeline#exons-or-full-sequences-required-input)
-            - [Selecting For optimal Transcript Variants](https://github.com/tonyxieuoft/NCBI_Gene_Extraction_Pipeline#selecting-for-optimal-transcript-variants-required-input)
+            - [Directory Containing Query Sequences](#directory-containing-query-sequences-for-homology-search-required-input)
+            - [Original Gene Query FIle](#original-gene-query-file-required-input)
         - Output
-    
+            - [Refined Gene Query File](#refined-gene-query-file-output)
+    - [Generating query files to BLAST whole genomes](#option-3-part-a-generating-query-files-in-preparation-of-blasting-whole-genomes-ncbi-genome-blaster)
+        - Input
+            - [Directory Containing Reference Sequences](#directory-containing-reference-sequences-required-input))
+            - [Automatic or Manual Assignment](#automatic-or-manual-assignment-required-input)
+            - [Manual Assignment File (optional)](#manual-assignment-file-optional-input)
+        - Output
+            - [Query FIle Directory](#query-file-directory-output)
+    - [Run BLAST to pull exons from whole genomes](#option-3-part-a-generating-query-files-in-preparation-of-blasting-whole-genomes-ncbi-genome-blaster)
+        - Input
+            - [Remote or Local BLAST](#remote-or-local-blast-required-input)
+            - [Expect Threshold (optional)](#expect-threshold-optional-input)
+        - Output
+            - [BLAST Results Directory](#blast-results-directory-output)
+    - [Concatenate gene sequences into alignment files](#nepr--blast-result-directories-required-input)
+        - Input
+            - [NEPR / BLAST Result Directories](#remote-or-local-blast-required-input)
+            - [Expect Threshold (optional)](#expect-threshold-optional-input)
+        - Output
+            - [Alignments Directory](#alignments-directory-output)
+- [Methods abd Algorithms](#methods-and-algorithms)
+    - [Automatic assignment of reference species to sub-taxa (option 3 part a)](#automatic-assignment-of-reference-species-to-sub-taxa-in-option-3a)
 
 ## Requirements
 
@@ -238,7 +257,7 @@ The user is asked to choose between blasting remotely on the NCBI server or loca
 
 During the automation of remote BLAST, the program emulates a web user and accesses the NCBI web application to obtain genome accessions and run BLAST processes. At any given moment, approximately ten BLAST processes run parallel to each other. 
 
-In contrast, local BLAST requires the additional installment of the NCBI BLAST+ and NCBI Datasets command line applications. In the local BLAST workflow, subject genomes are sequentially downloaded, blasted against, then immediately deleted one-by-one. The process is slow and laborious, with the main bottleneck being the genome download step. Currently, because of its issues, local BLAST is not supported. Right now, I am working to create a "local server" version of the local BLAST that leverages the increased memory and processing power of local servers to improve upon these weaknesses. 
+In contrast, local BLAST requires the additional installment of the NCBI BLAST+ and NCBI Datasets command line applications. In the local BLAST workflow, subject genomes are sequentially downloaded, blasted against, then immediately deleted one-by-one. The process is slow and laborious, with the main bottleneck being the genome download step. Currently, because of its issues, local BLAST is **not supported**. Right now, I am working to create a "local server" version of the local BLAST that leverages the increased memory and processing power of local servers to improve upon these weaknesses. 
 
 #### Expect Threshold (optional input)
 
