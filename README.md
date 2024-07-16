@@ -68,6 +68,8 @@ g:abca4   d:"ATP binding cassette subfamily A member 4"
 ```
 There is no limit to the number of genes that can be inputted into the gene query file. Note that the file is case-insensitive to query *names* and *descriptions*, but markers must be lowercase. Therefore `g:RHO`, `g:rho`, and `g:Rho` yield the same results, but `G:rho` results in an error.  
 
+As the NCBI exon puller filters results based on **exact** matches, please note that gene names and descriptions must be identical to the ones stored in the NCBI database.
+
 #### Taxa File (required input)
 
 After providing the gene query file, the user will additionally be prompted to provide a path to a file containing **taxa of interest** to pull for. Again, the file must be in *.txt* format, with one taxon per line as follows:
@@ -107,6 +109,19 @@ The directory names at the `Taxon` layer are the names from the input taxa file,
 Each *fasta file* is titled `{transcript_length}_{transcript_accession}.fas` and each *fasta heading* includes the gene, scientific name, transcript accession, genome accession, and interval (relative to +1) of a particular exon/full sequence. 
 
 From here on forth, the structure of the directories produced by the NCBI Exon Puller will be referred to as the **NEPR** format.
+
+### Option 2: Refine gene names and descriptions used to query the NCBI Gene database
+
+Oftentimes, gene names and descriptions for the same gene vary between different taxa. This inconsistent naming is especially prevelant for taxonomic groups that lack sequence annotation (eg. Elasmobranchii, the group containing sharks, rays and skates). 
+
+To demonstrate, the gene description for CNGA3, a visual gene involved in the phototransduction cycle in cones is titled `cyclic nucleotide-gated cation channel alpha 3, cone` for bony fish, but in elasmobranches it is titled `cyclic nucleotide gated channel subunit alpha 1b`. Similarly, the abbreviated gene name for CNGA3 for bony fish is `cnga3`, but in elasmobranchs it is `cnga3a`. Although the differences are slight (missing 'cation', addition of 'subunit', one letter addition), the NCBI exon puller filters based on **exact** gene name and description matches (to avoid pulling extraneous gene sequences), and would fail to pull out the elasmobranch sequences had the gene description for fish been used. 
+
+Considering the above, to make 
+
+
+### Option 3: Run NCBI BLAST to pull exons from whole GENOMES
+
+
 
 
 ## Preparing query files for BLAST.
