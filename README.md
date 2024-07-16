@@ -37,7 +37,7 @@ After the user enters in basic details, a main menu with five options appears:
 4. Concatenate gene sequences into alignment files
 5. Quit the program
 
-The rationale, required input and resultant output for options 1-4 are stated below. 
+As a general rule of thumb, option #1 must be executed first, as all other options (except for 5) depend upon its results. The rationale, required input and resultant output for options 1-4 are stated below. 
 
 ### Option 1. Pull existing sequence data from the NCBI Gene database (NCBI Exon Puller)
 
