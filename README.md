@@ -140,28 +140,96 @@ The refined file produced by the gene description refiner is in the *same format
 
 After the homology search is complete, the refined file should be used as the input gene query file in a **second** iteration of the NCBI exon puller to acquire sequences that were previously missed.  
 
-### Option 3 part (a): Generating query files in preparation of blasting whole GENOMES
+### Option 3 part (a): Generating query files in preparation of blasting whole GENOMES (NCBI Genome Blaster)
 
-NCBI BLAST requires the provision of reference sequences to query subject genomes the user wishes to predict gene-coding regions for. For the current version of the program, these reference sequences must be in NEPR format and acquired from an iteration of the NCBI exon puller.  
+The main purpose of the NCBI Genome Blaster is predict and extract gene sequences from un-annotated whole genomes of species that do not directly have NCBI Gene database sequences.  
 
-Ideally, the phylogenetic distance between the query sequence and subject genome species' should be minimal to maximize the likelihood of accurate coding-region extraction. Therefore, it is unwise to use a single reference sequence to query subject genomes for an entire large taxon; this is especially true for genes under positive selection. Instead, each reference species should be assigned to BLAST subject genomes within a **small** taxon that they are closest to **within** the overarching taxon of interest. 
+BLAST requires the provision of reference sequences to query subject genomes the user wishes to predict gene-coding regions for. For the current version of the program, these reference sequences must be in **NEPR** format and acquired from an iteration of the NCBI exon puller.  
+
+Ideally, the phylogenetic distance between the query sequence and subject genome species' should be minimal to maximize the likelihood of accurate coding-region extraction. Therefore, it is unwise to use a single reference sequence to query subject genomes for an entire large taxon; this is especially true for genes under positive selection. Instead, each reference species should be assigned to BLAST subject genomes for a **small** taxon that they are closest to **within** the overarching taxon of interest. 
 
 The program generates query files for BLAST based on the above considerations. The formats of required input and resultant output files/directories are stated below in greater detail:
 
 #### Directory Containing Reference Sequences (required input)
 
-As stated, 
+As stated, this directory must be in **NEPR** format. If a previous iteration of the NCBI Exon Puller has ran during the program session, the program automatically suggests the path to its results directory as input for the NCBI Genome Blaster. The genes and taxa of interest within the input reference sequence directory will dictate the genes and taxa of interest whose sequences will be pulled out by the NCBI Genome Blaster. 
 
-todo:
-- rationale is big, -> sequences need to be as close as possible
-- algorithms section -> copy off of the progress report
-- auto blast should still be about the same
+To illustrate, suppose a user specified an initial iteration of the NCBI exon puller (option #1) to pull out rhodopsin sequences for the taxon `Chiroptera`. Afterward, suppose they called option #3 and selected the results directory as the reference sequence directory. Then, the NCBI Genome Blaster would BLAST and extract rhodopsin sequences exclusively from Chiroptera subject genomes that did not have results from the NCBI Exon Puller. 
+
+#### Automatic or Manual Assignment (required input)
+
+The program asks for users to choose between automatic or manual assignment of reference species to sub-taxa within the overarching taxa of interest to BLAST. Automatic assignment effectively assigns a reference species to every subject genome with the goal of maximizing query sequence to subject genome similarity. Read more about this method and its rationale in the *Methods and Algorithms* section. Alternatively, the user can choose to manually select the sub-taxa within the overarching taxa of interest that each reference species will BLAST against.  
+
+#### Manual Assignment File (optional input)
+
+The file used to give manual assignment commands must be in *.csv* or *.txt* format as follows:
+```
+reference_species1,sub_taxa1
+reference_species2,sub_taxa2
+reference_species3,sub_taxa3
+...
+```
+The program interprets the file as instructions to blast query sequences for reference_species1 against subject genomes for species in sub_taxa1, then blast query sequences from reference_species2 against subject genomes for species in sub_taxa2, and so on and so forth. *Assignment matters*, in that species whose subject genomes that have been blasted will **not** be blasted again.
+
+The **NCBI taxonomy taxid** of each sub-taxa, **not** their English names, must be provided. They can be obtained by searching the taxonomy browser at this link: https://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi. In contrast, the scientific names of each reference species must be provided (the names matching their names as printed on the NEPR input directory). 
+
+**An Example.** Suppose the user has ran an iteration of the NCBI exon puller to obtain rhodopsin sequences for Chiroptera. As a result, they've obtained references sequences for three species: Molossus molossus, Desmodus rotundus, and Myotis daubentonii. 
+
+They want to BLAST Molossus molossus query sequences against Molossus genomes, Desmodus rotundus query sequences against Phyllostomidae genomes, and Myotis daubentonii query sequences against all other genomes in Chiroptera. 
+
+The NCBI taxonomy taxids for Molossus, Phyllostomidae, and Chiroptera are 27621, 9415, and 9397, respectively. Then, they can create the following manual assignment file:
+```
+Molossus molossus,27621
+Desmodus rotundus,9415
+Myotis daubentonii,9397
+```
+Based on the file, the program first blasts Molossus molossus query sequences against the taxon 27621 (Molossus). Then, the program blasts Desmodus rotundus query sequences against the taxon 9415 (Phyllostomidae). However, when it finally comes time to blast Myotis daubentonii query sequences against 9397 (Chiroptera), as the subject genomes in Molossus and Phyllostomidae have just been blasted, only members of Chiroptera *not* in Molossus and Phyllostomidae will actually be blasted against by Myotis daubentonii. 
+
+**An Alternative Example.** Suppose the user now wishes to blast Myotis daubentonii query againsts against all genomes in Chiroptera first, then blast Molossus molossus query sequences against Molossus genomes. They provide the following 
+
+
 - recommended program flow - since many are dependent, read the recommended program flow.
 
 
 To prepare query files for BLAST, a folder of sequences mirroring the structure of directories outputted after pulling exons from NCBI must be provided. If the user blasts directly after pulling exons, the output folder of pulled exons will be used to compile the query files for BLAST. 
 
-### Automatic assignment of reference species to sub-taxa
+
+### Manual assignment of reference species to sub-taxa
+
+Much more goes into phylogenetic analysis than purely clade and lineage information, and the algorithm only crudely estimates appropriate reference sequence for a given taxon. If the user is willing to spend more time, they can manually specify these assignments to increase accuracy. The format of the file used to give assignment commands is as follows:
+```
+reference_species1,sub_taxa1
+reference_species2,sub_taxa2
+reference_species3,sub_taxa3
+...
+```
+
+### Filling in missing genes
+
+For speed's sake, pulled sequences for all genes for a given reference species are combined into one query file before BLAST occurs. Sometimes, a reference species will be missing some user-specified genes. In cases where this occurs, the user can manually (or automatically) specify alternative species from which the missing gene sequences can be pulled from and used. No file is required to specify this; instead a response system is built directly into the program when a missing gene is detected.
+
+
+Run NCBI BLAST to pull exons from whole GENOMES
+
+## Automatic NCBI BLAST
+
+No input files are required for this part. Everything will ahve been handled by the section of the pipeline right above that handles preparing for BLAST. The user can specify custom BLAST parameters, which include:
+- expect threshold
+- word size
+
+Please note that a Selenium-based webdriver will be used to run this part of the program. A pop-up chrome tab will appear: DO NOT CLOSE IT, unless you wish to terminate the program. THe program emulates a web-user, and accesses NCBI BLAST directly from a web browser. When the program runs to completion, all downloaded files and opened tabs will be automatically closed. 
+
+TODO: accessing BLAST via CLOUD services or locally, after eukaryotic genomes have been downloaded to the local server.
+
+### Concatenate gene sequences into alignment files
+
+No input files are required for this section. Here, results from BLAST are automatically concatenated into gene alignments. 
+
+TODO: automate alignment algorithms like ClustalW
+
+## Methods and Algorithms
+
+### Automatic assignment of reference species to sub-taxa in option 3(a)
 
 To ensure query sequences are as similar to the subject genome as possible yet altogether cover the entire taxa, the user can select the option for the program to automatically assign available reference query sequences to blast against subject genomes only within a sub-branch of the taxa they are most similar to. How the program does this given an overarching taxon to blast and reference species within that taxon is as follows:
 1) Select an arbitary reference species S1 and assign it to the overarching taxon.
@@ -193,38 +261,6 @@ Then, as the genomes of species that have been already blasted are not blasted a
 sequences are used to query against non-Lamniforme Selachii genomes. Finally, Amblyraja radiata sequences query
 non-Lamniforme, non-Selachii (which overlaps) genomes, and are thereby effectively blasted only against Batoidea. 
 ```
-### Manual assignment of reference species to sub-taxa
-
-Much more goes into phylogenetic analysis than purely clade and lineage information, and the algorithm only crudely estimates appropriate reference sequence for a given taxon. If the user is willing to spend more time, they can manually specify these assignments to increase accuracy. The format of the file used to give assignment commands is as follows:
-```
-reference_species1,sub_taxa1
-reference_species2,sub_taxa2
-reference_species3,sub_taxa3
-...
-```
-
-### Filling in missing genes
-
-For speed's sake, pulled sequences for all genes for a given reference species are combined into one query file before BLAST occurs. Sometimes, a reference species will be missing some user-specified genes. In cases where this occurs, the user can manually (or automatically) specify alternative species from which the missing gene sequences can be pulled from and used. No file is required to specify this; instead a response system is built directly into the program when a missing gene is detected.
-
-
-Run NCBI BLAST to pull exons from whole GENOMES
-
-## Automatic NCBI BLAST
-
-No input files are required for this part. Everything will ahve been handled by the section of the pipeline right above that handles preparing for BLAST. The user can specify custom BLAST parameters, which include:
-- expect threshold
-- word size
-
-Please note that a Selenium-based webdriver will be used to run this part of the program. A pop-up chrome tab will appear: DO NOT CLOSE IT, unless you wish to terminate the program. THe program emulates a web-user, and accesses NCBI BLAST directly from a web browser. When the program runs to completion, all downloaded files and opened tabs will be automatically closed. 
-
-TODO: accessing BLAST via CLOUD services or locally, after eukaryotic genomes have been downloaded to the local server.
-
-## After BLAST
-
-No input files are required for this section. Here, results from BLAST are automatically concatenated into gene alignments. 
-
-TODO: automate alignment algorithms like ClustalW
 
 
 
