@@ -10,7 +10,7 @@
     - [Generating query files to BLAST whole genomes](#option-3-part-a-generating-query-files-in-preparation-of-blasting-whole-genomes-ncbi-genome-blaster)
     - [Run BLAST to pull exons from whole genomes](#option-3-part-a-generating-query-files-in-preparation-of-blasting-whole-genomes-ncbi-genome-blaster)
     - [Concatenate gene sequences into alignment files](#nepr--blast-result-directories-required-input)
-- [Methods abd Algorithms](#methods-and-algorithms)
+- [Methods and Algorithms](#methods-and-algorithms)
     - [Automatic assignment of reference species to sub-taxa (option 3 part a)](#automatic-assignment-of-reference-species-to-sub-taxa-in-option-3a)
 
 ## Requirements
