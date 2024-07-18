@@ -52,7 +52,7 @@ def get_genes_needing_refinement(exon_pull_path, temp_homology_directory):
 
         gene_path = os.path.join(exon_pull_path, gene)
 
-        # keeps track of the lacking taxa (different taxa should have different
+        # keeps track of the lacking assigned_taxa (different assigned_taxa should have different
         # query sequences)
         gene_info = {"Gene": gene, "None": [], "Less": [], "Good": []}
 
@@ -88,7 +88,7 @@ def get_genes_needing_refinement(exon_pull_path, temp_homology_directory):
 
                 query_file = open(os.path.join(query_path, "none.fas"), "w")
 
-                # if there's a taxa with a lot of reference sequences
+                # if there's a assigned_taxa with a lot of reference sequences
                 # just pull from available pool
                 if len(gene_info["Good"]) > 0:
                     query_file.write(get_random_query_sequence(

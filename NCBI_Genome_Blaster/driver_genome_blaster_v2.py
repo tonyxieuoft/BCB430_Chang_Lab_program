@@ -11,7 +11,7 @@ from selenium.common import WebDriverException
 from selenium.webdriver import ActionChains, Keys
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
-from NCBI_Genome_Blaster.assemble_blast_result_sequences import parse_blast_xml
+from NCBI_Genome_Blaster.assemble_blast_result_sequences import BlastXMLParser
 from Basic_Tools.driver_tools import get_element, get_elements, try_click, \
     try_get
 
@@ -72,7 +72,7 @@ def driver_genome_blaster_v2(save_path: str, queries_path: str,
 
     driver.get("https://www.ncbi.nlm.nih.gov/")
 
-    # get taxids of taxa in query file source directory
+    # get taxids of assigned_taxa in query file source directory
     taxids_to_taxa = get_taxa_taxids(exon_pull_dir)
     all_info = []
 
@@ -218,8 +218,9 @@ def driver_genome_blaster_v2(save_path: str, queries_path: str,
                 # results in fasta format
                 while True:
                     try:
-                        parse_blast_xml(file_to_analyze, save_path, curr_species['taxon'],
-                                        curr_species['name'])
+                        parser = BlastXMLParser(file_to_analyze, save_path, curr_species['taxon'],
+                                                curr_species['name'])
+                        parser.parse_blast_xml()
                         break
                     except PermissionError:
                         # print("problem with permissions")

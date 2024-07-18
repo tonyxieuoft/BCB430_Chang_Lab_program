@@ -5,7 +5,7 @@ import os
 from Bio import Entrez
 
 from Basic_Tools.basic_dictionaries import json_to_dict
-from NCBI_Genome_Blaster.assemble_blast_result_sequences import parse_blast_xml
+from NCBI_Genome_Blaster.assemble_blast_result_sequences import BlastXMLParser
 
 
 def local_genome_blaster(save_path: str, queries_path: str,
@@ -93,7 +93,8 @@ def local_genome_blaster(save_path: str, queries_path: str,
             os.system("rm -r local_blast_db")
 
             # parse the blast results
-            parse_blast_xml(xml_out_path, save_path, taxa, org["species"])
+            parser = BlastXMLParser(xml_out_path, save_path, taxa, org["species"])
+            parser.parse_blast_xml()
             os.remove(xml_out_path)
 
 

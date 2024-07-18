@@ -15,7 +15,8 @@ from NCBI_Genome_Blaster.driver_genome_blaster import driver_genome_blaster
 from NCBI_Genome_Blaster.driver_genome_blaster_v2 import \
     driver_genome_blaster_v2
 from NCBI_Genome_Blaster.local_genome_blaster import local_genome_blaster
-from Prepare_For_BLAST.prepare_query_files import prepare_query_files
+from Prepare_For_BLAST.prepare_query_files import ExonBlastPreparer, \
+    ExonBlastPreparer, FullBlastPreparer
 from Quality_Checking.get_longest_transcript import \
     optimize_transcripts_by_length
 from User_Interaction.expect_threshold_user_input import \
@@ -110,7 +111,7 @@ class UI:
         discard_taxa_file = 1
         if self.taxa_filepath != "":
             print()
-            print("Path of last taxa file used: " + self.taxa_filepath)
+            print("Path of last assigned_taxa file used: " + self.taxa_filepath)
             print("Enter 1 to use this file, or enter 2 to input the path of a different one.")
             discard_taxa_file = numeric_user_input(1, 2, "")
         if self.taxa_filepath == "" or discard_taxa_file == 2:
@@ -291,10 +292,10 @@ class UI:
         print()
         print("In order for query sequences to be as similar as possible to "
               "the subject genomes they are blasted against, we must assign "
-              "reference species to sub-taxa that they are closest to within "
+              "reference species to sub-assigned_taxa that they are closest to within "
               "the overarching taxon of "
               "interest. Details on how the program "
-              "automatically assigns references species to sub-taxa are "
+              "automatically assigns references species to sub-assigned_taxa are "
               "available in the README on GitHub. Please enter:")
         print("(1) for automatic assignment (RECOMMENDED)")
         print("(2) for manual assignment")
@@ -307,6 +308,18 @@ class UI:
                   "manual taxon assignment file will appear later.")
         auto_fill = 1  # I don't see how this should ever be manual
         print()
+        print("Keep queries as exons, or concatenate into full-length cds "
+              "sequences? Enter:")
+        print("(1) to keep queries as exons")
+        print("(2) to concatenate them into full-length sequences")
+
+        # incorporate this into creating query files
+        exon_or_full_query_choice = numeric_user_input(1, 2, "")
+        if exon_or_full_query_choice == 1:
+            print("Queries will remain as exons.")
+        else:
+            print("Queries will be concatenated into full-length sequences.")
+        print()
         queries_path = make_unique_directory(self.download_dir, "query_files")
         print("Great. Query files will be at the path: " + queries_path)
         print("Enter any key to continue.")
@@ -315,9 +328,14 @@ class UI:
         print("-----------------------------------------------------------------")
         print("Making query files...")
 
-        # TODO what if they don't have exons pulled yet...
-        taxa_blast_order, complete_reference_species = \
-            prepare_query_files(auto_assign, auto_fill, self.exon_pull_dir, queries_path)
+        if exon_or_full_query_choice == 1:
+            bp = ExonBlastPreparer(self.exon_pull_dir, queries_path)
+        else:
+            bp = FullBlastPreparer(self.exon_pull_dir, queries_path)
+
+        bp.prepare_query_files(auto_assign)
+        #print(bp.get_queries_to_genes_to_exons())
+
 
         print("-----------------------------------------------------------------")
         print("Done making query files!")
@@ -328,11 +346,11 @@ class UI:
 
         print("This program can access BLAST through two different methods. First, "
               "it can emulate a web user using Selenium to access NCBI's server to "
-              "BLAST remotely. Secondly, it can run BLAST locally; during this "
+              "BLAST remotely. Secondly (CURRENTLY UNAVAILABLE), it can run BLAST locally; during this "
               "process, the program sequentially downloads genomes then deletes "
               "them immediately after. PLEASE NOTE that local BLAST requires "
               "the NCBI BLAST+ command line application to have been "
-              "previously downloaded. Additionally, it must"
+              "previously downloaded. Additionally, it must "
               "be run in a linux-style command line. ")
         print("Enter:")
         print("(1) for remote BLAST via Selenium")
@@ -366,12 +384,12 @@ class UI:
 
         if remote_or_local == 1:
             NCBIWWW.email = self.email
-            driver_genome_blaster_v2(self.blast_results_path, queries_path, taxa_blast_order,
-                                     complete_reference_species, expect_value, self.exon_pull_dir)
+            driver_genome_blaster_v2(self.blast_results_path, queries_path, bp.taxa_blast_order,
+                                     bp.complete_reference_species, expect_value, self.exon_pull_dir)
 
         else:
-            local_genome_blaster(self.blast_results_path, queries_path, taxa_blast_order,
-                                 complete_reference_species, expect_value)
+            local_genome_blaster(self.blast_results_path, queries_path, bp.taxa_blast_order,
+                                 bp.complete_reference_species, expect_value)
 
 
         print("-----------------------------------------------------------------")

@@ -13,7 +13,7 @@ def auto_assign_taxa_to_ref(lineage_dct: Dict, ref_species: List[str],
 
     :param lineage_dct: a dictionary where keys are species and values are lists
     corresponding to a species' lineage.
-    :param ref_species: a list of reference species to delegate sub-taxa to
+    :param ref_species: a list of reference species to delegate sub-assigned_taxa to
     :param overhead_taxon: the overarching taxon
     :return: a list of tuples each containing a reference species and the
     corresponding sub-taxon in the overhead_taxon it was assigned to. Order
@@ -55,13 +55,13 @@ def get_assignments(auto: int, lineage_dict: Dict[str, List[str]],
     :param auto: '1' for automatic determination of assignments, '0' for
     manually entering assignments.
     :param lineage_dict: a dictionary where keys are species names and values
-    are lists of taxa corresponding to the lineage of a species
-    :param taxid_codes: a dictionary where keys are taxa and values are taxids
-    :param taxa_to_species_dict: a dictionary where keys are taxa and values are
-    reference species in the taxa
-    :return: a list of reference -> taxa assignments
+    are lists of assigned_taxa corresponding to the lineage of a species
+    :param taxid_codes: a dictionary where keys are assigned_taxa and values are taxids
+    :param taxa_to_species_dict: a dictionary where keys are assigned_taxa and values are
+    reference species in the assigned_taxa
+    :return: a list of reference -> assigned_taxa assignments
     """
-    # automatic assignment of reference species to sub-branches of overhead taxa
+    # automatic assignment of reference species to sub-branches of overhead assigned_taxa
     if auto == 1:
         assignments = []
         # for each overhead taxon, get automatic assignments. concatenate them

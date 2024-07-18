@@ -22,7 +22,7 @@ def concatenate_gene_results(paths: List[str], save_path):
                 gene_to_encountered_species[gene] = {}
 
             # this actually also helps negate species duplicates for overlapping
-            # taxa
+            # assigned_taxa
             encountered_species = gene_to_encountered_species[gene]
 
             for taxa in os.listdir(gene_path):
