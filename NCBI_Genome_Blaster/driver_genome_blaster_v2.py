@@ -1,5 +1,6 @@
 import os
 import time
+from abc import abstractmethod
 from typing import List
 
 from Basic_Tools.lists_and_files import list_to_string
@@ -11,7 +12,8 @@ from selenium.common import WebDriverException
 from selenium.webdriver import ActionChains, Keys
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
-from NCBI_Genome_Blaster.assemble_blast_result_sequences import BlastXMLParser
+from NCBI_Genome_Blaster.assemble_blast_result_sequences import BlastXMLParser, \
+    ExonBlastXMLParser, FullBlastXMLParser
 from Basic_Tools.driver_tools import get_element, get_elements, try_click, \
     try_get
 
@@ -47,74 +49,68 @@ def juggle_blast_tabs(driver, num_tabs, sleep_time) -> int:
     return switch_counter
 
 
+# do class dependencies later
+class DriverGenomeBlasterV2:
 
-def driver_genome_blaster_v2(save_path: str, queries_path: str,
-                             taxa_blast_order: List[str],
-                             complete_reference_species: List[str],
-                             expect_value: str, exon_pull_dir: str):
+    def __init__(self, save_path, queries_path, taxa_blast_order,
+                 complete_reference_species):
 
-    # chromedriver initiation
-    chrome_options = webdriver.ChromeOptions()
+        self.save_path = save_path
 
-    chrome_options.add_argument('--headless=new')
-    #chrome_options.add_argument('--disable-gpu')
-    driver = webdriver.Chrome(chrome_options)
-    driver.execute_cdp_cmd("Page.setDownloadBehavior", {
-        "behavior": "allow",
-        "downloadPath": save_path
-    })
+        self.queries_path = queries_path
 
+        self.blast_order_dict = {}
+        self.set_blast_order_dict(taxa_blast_order)
 
-    # blast order from list to dictionary
-    blast_order_dict = {}
-    for i in range(len(taxa_blast_order)):
-        blast_order_dict[taxa_blast_order[i]] = i
+        self.species_so_far = {}
+        self.set_species_so_far(complete_reference_species)
 
-    driver.get("https://www.ncbi.nlm.nih.gov/")
+        self.driver = self.setup_driver()
 
-    # get taxids of assigned_taxa in query file source directory
-    taxids_to_taxa = get_taxa_taxids(exon_pull_dir)
-    all_info = []
+    def setup_driver(self):
 
-    for taxon_taxid in taxids_to_taxa:
+        chrome_options = webdriver.ChromeOptions()
 
-        print("getting genome accessions for '" + taxids_to_taxa[taxon_taxid] + "' ...")
-        driver.execute_script("window.open('https://www.ncbi.nlm.nih.gov/datasets/genome/?taxon=" + taxon_taxid + "&reference_only=true')")
-        driver.switch_to.window(driver.window_handles[-1])
+        chrome_options.add_argument('--headless=new')
+        driver = webdriver.Chrome(chrome_options)
+        driver.execute_cdp_cmd("Page.setDownloadBehavior", {
+            "behavior": "allow",
+            "downloadPath": self.save_path
+        })
+        return driver
 
-        loaded_identifier = get_element(driver, By.XPATH, "//div[text()[. = 'Rows per page']]", 40)
-        table_size_text = get_element(driver, By.XPATH, "//span[@data-testid='table-size']", 40).text
-        table_size = int(table_size_text.split()[0])
+    def set_blast_order_dict(self, taxa_blast_order):
 
-        if table_size > 20:
-            v1.clicking_wrapper(driver, driver, By.CSS_SELECTOR,
-                             ".MuiSelect-select.MuiSelect-outlined.MuiInputBase-"
-                             "input.MuiOutlinedInput-input.css-zcubqt", 40)
-            # selects the maximum number of results that can be displayed (100)
-            v1.clicking_wrapper(driver, driver, By.XPATH, "//li[@data-value='100']", 40)
+        for i in range(len(taxa_blast_order)):
+            self.blast_order_dict[taxa_blast_order[i]] = i
 
-            loaded_identifier = get_element(driver, By.XPATH, "//div[text()[. = 'Rows per page']]", 40)
+    def get_genome_accessions(self, exon_pull_dir):
 
-        species_names = get_elements(driver, By.XPATH, ".//a[@data-ga-label='taxon_name']", 40)
-        accessions = get_elements(driver, By.XPATH, "//td[contains(text(), 'GCA_')]", 40)
+        taxids_to_taxa = get_taxa_taxids(exon_pull_dir)
+        all_info = []
 
-        for i in range(len(species_names)):
-            species = {"name": species_names[i].text,
-                       "acc": accessions[i].text,
-                       "taxon": taxids_to_taxa[taxon_taxid],
-                       "del": None}
-            all_info.append(species)
+        for taxon_taxid in taxids_to_taxa:
 
-        num_checked = 100
-        while num_checked < table_size:
-            status = get_element(driver, By.XPATH, "//div[@data-testid='paging-panel__status']", 40).text
-            v1.clicking_wrapper(driver, driver, By.XPATH, "//button[@data-ga-label='next_page']", 40)
+            print("getting genome accessions for '" + taxids_to_taxa[taxon_taxid] + "' ...")
+            self.driver.execute_script("window.open('https://www.ncbi.nlm.nih.gov/datasets/genome/?taxon=" + taxon_taxid + "&reference_only=true')")
+            self.driver.switch_to.window(self.driver.window_handles[-1])
 
-            while get_element(driver, By.XPATH, "//div[@data-testid='paging-panel__status']", 40).text == status:
-                time.sleep(0.01)
+            loaded_identifier = get_element(self.driver, By.XPATH, "//div[text()[. = 'Rows per page']]", 40)
+            table_size_text = get_element(self.driver, By.XPATH, "//span[@data-testid='table-size']", 40).text
+            table_size = int(table_size_text.split()[0])
 
-            species_names = get_elements(driver, By.XPATH, ".//a[@data-ga-label='taxon_name']", 40)
-            accessions = get_elements(driver, By.XPATH, "//td[contains(text(), 'GCA_')]", 40)
+            if table_size > 20:
+                v1.clicking_wrapper(self.driver, self.driver, By.CSS_SELECTOR,
+                                    ".MuiSelect-select.MuiSelect-outlined.MuiInputBase-"
+                                    "input.MuiOutlinedInput-input.css-zcubqt", 40)
+                # selects the maximum number of results that can be displayed (100)
+                v1.clicking_wrapper(self.driver, self.driver, By.XPATH, "//li[@data-value='100']", 40)
+
+                loaded_identifier = get_element(self.driver, By.XPATH, "//div[text()[. = 'Rows per page']]", 40)
+
+            species_names = get_elements(self.driver, By.XPATH, ".//a[@data-ga-label='taxon_name']", 40)
+            accessions = get_elements(self.driver, By.XPATH, "//td[contains(text(), 'GCA_')]", 40)
+
             for i in range(len(species_names)):
                 species = {"name": species_names[i].text,
                            "acc": accessions[i].text,
@@ -122,137 +118,194 @@ def driver_genome_blaster_v2(save_path: str, queries_path: str,
                            "del": None}
                 all_info.append(species)
 
-            num_checked += 100
+            num_checked = 100
+            while num_checked < table_size:
+                status = get_element(self.driver, By.XPATH, "//div[@data-testid='paging-panel__status']", 40).text
+                v1.clicking_wrapper(self.driver, self.driver, By.XPATH, "//button[@data-ga-label='next_page']", 40)
 
-        driver.close()
+                while get_element(self.driver, By.XPATH, "//div[@data-testid='paging-panel__status']", 40).text == status:
+                    time.sleep(0.01)
 
-    species_so_far = {}
-    for species in complete_reference_species:
-        species_so_far[species] = True
+                species_names = get_elements(self.driver, By.XPATH, ".//a[@data-ga-label='taxon_name']", 40)
+                accessions = get_elements(self.driver, By.XPATH, "//td[contains(text(), 'GCA_')]", 40)
+                for i in range(len(species_names)):
+                    species = {"name": species_names[i].text,
+                               "acc": accessions[i].text,
+                               "taxon": taxids_to_taxa[taxon_taxid],
+                               "del": None}
+                    all_info.append(species)
 
-    novel_species_info = []
-    for i in range(len(all_info)):
-        species = all_info[i]
-        if species["name"] not in species_so_far:
-            novel_species_info.append(species)
-            species_so_far[species["name"]] = True
+                num_checked += 100
 
-    available_species_string = ""
-    if len(novel_species_info) > 0:
-        available_species_string = novel_species_info[0]['name']
-    for i in range(1, len(novel_species_info)):
-        available_species_string += "\n" + novel_species_info[i]['name']
+            self.driver.close()
 
-    print("contacting NCBI regarding taxonomy info...")
-    all_lineage_info = get_taxonomy_lineage(available_species_string)
+        return all_info
 
-    # this actually almost takes instant time
+    def set_species_so_far(self, complete_reference_species):
 
-    for species in novel_species_info:
-        lineage = all_lineage_info[species["name"]]
-        curr_del = None
-        curr_rank = len(taxa_blast_order)
-        for i in range(len(lineage)):
-            if lineage[i] in blast_order_dict:
-                if blast_order_dict[lineage[i]] < curr_rank:
-                    curr_del = lineage[i]
-                    curr_rank = blast_order_dict[lineage[i]]
+        for species in complete_reference_species:
+            self.species_so_far[species] = True
 
-        species["del"] = curr_del
+    def blast_genomes(self, expect_value: str, exon_pull_dir: str):
 
-    filter_out_no_del = []
-    for species in novel_species_info:
-        if species['del'] is not None:
-            filter_out_no_del.append(species)
+        self.driver.get("https://www.ncbi.nlm.nih.gov/")
 
-    novel_species_info = filter_out_no_del
+        all_info = self.get_genome_accessions(exon_pull_dir)
 
-    print("blasting processes have begun...")
+        # get taxids of assigned_taxa in query file source directory
 
-    finished_jobs = 0
-    num_processes = 0
-    s_num = 0
-    species_open = []
-    while finished_jobs < len(novel_species_info):
+        novel_species_info = []
+        for i in range(len(all_info)):
+            species = all_info[i]
+            if species["name"] not in self.species_so_far:
+                novel_species_info.append(species)
+                self.species_so_far[species["name"]] = True
 
-        if num_processes < MAX_NUM_PROCESSES and not s_num == len(novel_species_info):
+        available_species_string = ""
+        if len(novel_species_info) > 0:
+            available_species_string = novel_species_info[0]['name']
+        for i in range(1, len(novel_species_info)):
+            available_species_string += "\n" + novel_species_info[i]['name']
 
-            curr_species = novel_species_info[s_num]
+        print("contacting NCBI regarding taxonomy info...")
+        all_lineage_info = get_taxonomy_lineage(available_species_string)
 
-            driver.switch_to.window(driver.window_handles[-1])
-            driver.execute_script("window.open('https://blast.ncbi.nlm.nih.gov/" +
-                                  "Blast.cgi?PAGE_TYPE=BlastSearch&" +
-                                  "PROG_DEF=blastn&BLAST_SPEC=GDH_" +
-                                  curr_species['acc'] + "')")
-            driver.switch_to.window(driver.window_handles[-1])
+        # this actually almost takes instant time
 
-            reference_filepath = os.path.join(queries_path, curr_species['del'] + ".fas")
-            v1.clicking_wrapper(driver, driver, By.XPATH,
-                             "//*[text()[. = 'Somewhat similar sequences (blastn)']]",
-                             40)
-            file_input = get_element(driver, By.ID, "upl", 40)
-            file_input.send_keys(reference_filepath)
+        for species in novel_species_info:
+            lineage = all_lineage_info[species["name"]]
+            curr_del = None
+            curr_rank = len(self.blast_order_dict)
+            for i in range(len(lineage)):
+                if lineage[i] in self.blast_order_dict:
+                    if self.blast_order_dict[lineage[i]] < curr_rank:
+                        curr_del = lineage[i]
+                        curr_rank = self.blast_order_dict[lineage[i]]
 
-            if expect_value != 0:
-                v1.configure_expect_threshold(driver, expect_value)
+            species["del"] = curr_del
 
-            v1.clicking_wrapper(driver, driver, By.CLASS_NAME,
-                                "blastbutton", 40)
+        filter_out_no_del = []
+        for species in novel_species_info:
+            if species['del'] is not None:
+                filter_out_no_del.append(species)
 
-            species_open.append(curr_species)
-            num_processes += 1
-            s_num += 1
+        novel_species_info = filter_out_no_del
 
-        if num_processes == MAX_NUM_PROCESSES or s_num == len(novel_species_info):
+        print("blasting processes have begun...")
 
-            tab_no = juggle_blast_tabs(driver, num_processes, 1)
+        finished_jobs = 0
+        num_processes = 0
+        s_num = 0
+        species_open = []
+        while finished_jobs < len(novel_species_info):
 
-            curr_species = species_open[tab_no-1]
-            if not try_get(driver, By.CLASS_NAME, "error"):
+            if num_processes < MAX_NUM_PROCESSES and not s_num == len(novel_species_info):
 
-                # download the xml file for the blast results, get its path
-                v1.xml_download_clicker(driver)
-                file_to_analyze = v1.get_downloaded_xml_file(save_path)
+                curr_species = novel_species_info[s_num]
 
-                # parse the xml file, creating files that contain the
-                # results in fasta format
-                while True:
-                    try:
-                        parser = BlastXMLParser(file_to_analyze, save_path, curr_species['taxon'],
-                                                curr_species['name'])
-                        parser.parse_blast_xml()
-                        break
-                    except PermissionError:
-                        # print("problem with permissions")
-                        time.sleep(1)
+                self.driver.switch_to.window(self.driver.window_handles[-1])
+                self.driver.execute_script("window.open('https://blast.ncbi.nlm.nih.gov/" +
+                                      "Blast.cgi?PAGE_TYPE=BlastSearch&" +
+                                      "PROG_DEF=blastn&BLAST_SPEC=GDH_" +
+                                      curr_species['acc'] + "')")
+                self.driver.switch_to.window(self.driver.window_handles[-1])
 
-                os.remove(file_to_analyze)
+                reference_filepath = os.path.join(self.queries_path, curr_species['del'] + ".fas")
+                v1.clicking_wrapper(self.driver, self.driver, By.XPATH,
+                                 "//*[text()[. = 'Somewhat similar sequences (blastn)']]",
+                                 40)
+                file_input = get_element(self.driver, By.ID, "upl", 40)
+                file_input.send_keys(reference_filepath)
 
-                print("(" + str(finished_jobs + 1) + "/" + str(len(novel_species_info))
-                      + ")" + " finished blasting " + curr_species['name'])
-            else:
-                print("(" + str(finished_jobs + 1) + "/" + str(len(novel_species_info))
-                      + ")" + " unexpected error " + curr_species['name'])
+                if expect_value != 0:
+                    v1.configure_expect_threshold(self.driver, expect_value)
 
-            driver.close()
-            num_processes -= 1
-            finished_jobs += 1
-            species_open.pop(tab_no - 1)
+                v1.clicking_wrapper(self.driver, self.driver, By.CLASS_NAME,
+                                    "blastbutton", 40)
 
-# class = "error"
+                species_open.append(curr_species)
+                num_processes += 1
+                s_num += 1
+
+            if num_processes == MAX_NUM_PROCESSES or s_num == len(novel_species_info):
+
+                tab_no = juggle_blast_tabs(self.driver, num_processes, 1)
+
+                curr_species = species_open[tab_no-1]
+                if not try_get(self.driver, By.CLASS_NAME, "error"):
+
+                    # download the xml file for the blast results, get its path
+                    v1.xml_download_clicker(self.driver)
+                    file_to_analyze = v1.get_downloaded_xml_file(self.save_path)
+
+                    # parse the xml file, creating files that contain the
+                    # results in fasta format
+                    while True:
+                        try:
+                            parser = BlastXMLParser(file_to_analyze, self.save_path, curr_species)
+                            parser.parse_blast_xml()
+                            break
+                        except PermissionError:
+                            # print("problem with permissions")
+                            time.sleep(1)
+
+                    os.remove(file_to_analyze)
+
+                    print("(" + str(finished_jobs + 1) + "/" + str(len(novel_species_info))
+                          + ")" + " finished blasting " + curr_species['name'])
+                else:
+                    print("(" + str(finished_jobs + 1) + "/" + str(len(novel_species_info))
+                          + ")" + " unexpected error " + curr_species['name'])
+
+                self.driver.close()
+                num_processes -= 1
+                finished_jobs += 1
+                species_open.pop(tab_no - 1)
+
+    @abstractmethod
+    def parse_blast_xml(self, file_to_analyze, curr_species):
+        pass
+
+
+class DriverExonGenomeBlasterV2(DriverGenomeBlasterV2):
+
+    def parse_blast_xml(self, file_to_analyze, curr_species):
+
+        parser = ExonBlastXMLParser(file_to_analyze, self.save_path,
+                                    curr_species)
+        parser.parse_blast_xml()
+
+
+class DriverFullGenomeBlasterV2(DriverGenomeBlasterV2):
+
+    def __init__(self, save_path, queries_path, taxa_blast_order,
+                 complete_reference_species, queries_to_genes_to_exons):
+        super().__init__(save_path, queries_path, taxa_blast_order,
+                         complete_reference_species)
+        self.queries_to_genes_to_exons = queries_to_genes_to_exons
+
+    def parse_blast_xml(self, file_to_analyze, curr_species):
+
+        parser = FullBlastXMLParser(file_to_analyze, self.save_path,
+                                    curr_species,
+                                    self.queries_to_genes_to_exons)
+        parser.parse_blast_xml()
+
+
+
 
 
 if __name__ == "__main__":
-    save_path = r"C:\Users\tonyx\Downloads"
-    queries_path = ""
-    taxa_blast_order = []
-    complete_reference_species = []
-    expect_value = 0
-    exon_pull_dir = r"C:\Users\tonyx\Downloads\NCBI_exons_bat"
-    driver_genome_blaster_v2(save_path, queries_path, taxa_blast_order,
-                             complete_reference_species, expect_value,
-                             exon_pull_dir)
-
+    #save_path = r"C:\Users\tonyx\Downloads"
+    #queries_path = ""
+    #taxa_blast_order = []
+    #complete_reference_species = []
+    #expect_value = 0
+    #exon_pull_dir = r"C:\Users\tonyx\Downloads\NCBI_exons_bat"
+    #driver_genome_blaster_v2(save_path, queries_path, taxa_blast_order,
+    #                         complete_reference_species, expect_value,
+    #                         exon_pull_dir)
+    pass
 
     # xiaohan.xie@mail.utoronto.ca
     # C:\Users\tonyx\Downloads\main_test

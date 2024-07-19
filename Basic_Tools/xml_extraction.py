@@ -42,3 +42,19 @@ def xml_to_dictionary_recursive(root: object) -> object:
         for child in root:
             new_array.append(xml_to_dictionary_recursive(child))
         return new_array
+
+
+def get_xml_list(item):
+    """
+    If you have a value within a dictionary, and you know that the value is
+    supposed to represent a list (multi-item, one-item, zero-item). Returns
+    the list.
+    :param item:
+    :return:
+    """
+    if isinstance(item, list):
+        return item
+    elif isinstance(item, dict):
+        return [item[list(item.keys())[0]]]
+    else:
+        return []
