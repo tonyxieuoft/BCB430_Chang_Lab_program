@@ -22,6 +22,8 @@ if __name__ == "__main__":
             menu.genome_blaster_view()
         elif menu_choice == 4:
             menu.alignment_creator_view()
+        elif menu_choice == 5:
+            menu.discard_and_reiterate_view()
         else:
             sys.exit(0)
 

@@ -70,12 +70,12 @@ class BlastPreparer:
                         encountered_species[species_folder] = True
                         # if the taxon of the species is already in the output,
                         # just append
-                        if taxon_folder in taxon_to_species:
-                            taxon_to_species[taxon_folder].append(
+                        if taxon_folder.upper() in taxon_to_species:
+                            taxon_to_species[taxon_folder.upper()].append(
                                 species_folder)
                         else:
                             # otherwise, create a new key
-                            taxon_to_species[taxon_folder] = [species_folder]
+                            taxon_to_species[taxon_folder.upper()] = [species_folder]
 
         self.taxa_to_ref_species = taxon_to_species
 
@@ -89,7 +89,9 @@ class BlastPreparer:
         :return:
         """
         # get a list of all assigned_taxa present among reference species
-        taxa_list = list(self.taxa_to_ref_species.keys())
+        taxa_list = []
+        for taxon in self.taxa_to_ref_species:
+            taxa_list.append(taxon.upper())
         # get a list of all reference_species present
         species_list = dict_get_values(self.taxa_to_ref_species)
 
@@ -107,8 +109,8 @@ class BlastPreparer:
         lineage_keys = list(lineage_dict.keys())
         # remove assigned_taxa from the results, we want lineage_dict to just have species
         for key in lineage_keys:
-            if key in taxa_list:  # slightly inefficient, O(T), but T is pretty short
-                taxid_codes[key] = lineage_dict[key][0]
+            if key.upper() in taxa_list:  # slightly inefficient, O(T), but T is pretty short
+                taxid_codes[key.upper()] = lineage_dict[key][0]
                 # only pop if it's not a species...
                 if len(key.split()) == 1:
                     lineage_dict.pop(key, None)

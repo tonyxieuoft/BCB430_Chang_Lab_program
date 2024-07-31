@@ -141,18 +141,23 @@ def xml_download_clicker(driver) -> None:
 
 def get_downloaded_xml_file(path: str) -> str:
     """
-    Waits until the XML file is downloaded then returns its file path
+    Waits until the XML file is downloaded then returns its file path.
+    If it waits for more than 40 secands, return None.
     :param path: the path of the directory that will store the blast results
     (the XML file will be temporary and discorded soon after)
     :return: the file path of the XML file
     """
 
+    time_counter = 0
     downloaded = False
-    while not downloaded:
+    while not downloaded and time_counter < 40:
         for filepath in os.listdir(path):
-            if not os.path.isdir(filepath) and os.path.splitext(filepath)[
-                1] == ".xml":
+            if not os.path.isdir(filepath) and os.path.splitext(filepath)[1] == ".xml":
                 return os.path.join(path, filepath)
+        time_counter += 0.25
+        time.sleep(0.25)
+
+    return ""
 
 
 def juggle_blast_tabs(driver, by_what, description, num_tabs,

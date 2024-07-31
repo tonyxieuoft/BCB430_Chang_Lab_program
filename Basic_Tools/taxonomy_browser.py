@@ -10,7 +10,7 @@ SPECIES_NAME_COLUMN = 1
 CODE_COLUMN = 0
 
 
-def get_taxonomy_lineage(species_string: str) -> Dict:
+def get_taxonomy_lineage_driver(species_string: str) -> Dict:
     """
     Given a string of species, returns complete lineages for each species as
     values in a dictionary, where the names of the species are the keys.
@@ -54,7 +54,7 @@ def get_taxonomy_lineage(species_string: str) -> Dict:
 def get_taxa_taxids(general_dir):
 
     # TODO remove the entrez email
-    Entrez.email = "xiaohan.xie@mail.utoronto"
+    Entrez.email = "xiaohan.xie@mail.utoronto.ca"
 
     genes = os.listdir(general_dir)
     taxa = os.listdir(os.path.join(general_dir, genes[0]))
@@ -68,6 +68,49 @@ def get_taxa_taxids(general_dir):
     return taxids
 
 
+def get_taxonomy_lineage(species_string: str):
+    """
+    Given a string of species, returns complete lineages for each species as
+    values in a dictionary, where the names of the species are the keys.
+
+    :param species_string: a string of species names, separated by newlines
+    :return: a dictionary, where keys are species names and values are lists of
+    lineages.
+    """
+    Entrez.email = "xiaohan.xie@mail.utoronto.ca"
+
+    ids = ""
+    all_species = species_string.split("\n")
+    for species in all_species:
+        handle = Entrez.esearch(db="taxonomy", term=species)
+        taxid = Entrez.read(handle)['IdList'][0]
+        ids += taxid + ","
+
+    phylo_dict = {}
+
+    handle2 = Entrez.efetch(db="taxonomy", id=ids)
+    results = Entrez.read(handle2)
+    for org in results:
+        name = org["ScientificName"]
+        phylo_dict[name] = []
+        lineage = org["LineageEx"]
+        for i in range(len(lineage)-1, -1, -1):
+            phylo_dict[name].append(lineage[i]["TaxId"])
+
+    return phylo_dict
+
+
 if __name__ == "__main__":
-    general_dir = r"C:\Users\tonyx\Downloads\NCBI_exons_bat"
-    print(get_taxa_taxids(general_dir))
+    #general_dir = r"C:\Users\tonyx\Downloads\NCBI_exons_bat"
+    #print(get_taxa_taxids(general_dir))
+    species_string = "Tursiops truncatus\nOrcinus orca\n" \
+                     "Balaenoptera acutorostrata\nBalaenoptera musculus\n" \
+                     "Balaenoptera ricei\nDelphinapterus leucas\n" \
+                     "Delphinus delphis\nEubalaena glacialis\n" \
+                     "Globicephala melas\nKogia breviceps\n" \
+                     "Lagenorhynchus albirostris\nLagenorhynchus obliquidens\n" \
+                     "Mesoplodon densirostris\nMonodon monoceros\n" \
+                     "Neophocaena asiaeorientalis asiaeorientalis\n" \
+                     "Phocoena phocoena\nPhocoena sinus\n" \
+                     "Physeter catodon"
+    print(get_taxonomy_lineage(species_string))

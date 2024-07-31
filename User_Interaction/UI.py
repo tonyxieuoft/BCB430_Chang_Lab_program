@@ -13,12 +13,13 @@ from Gene_Description_Refiner.gene_description_refiner import \
 from NCBI_Exon_Puller.handle_ncbi_exon_puller import handle_ncbi_exon_puller
 from NCBI_Genome_Blaster.driver_genome_blaster import driver_genome_blaster
 from NCBI_Genome_Blaster.driver_genome_blaster_v2 import \
-    driver_genome_blaster_v2
+    DriverExonGenomeBlasterV2, DriverFullGenomeBlasterV2, DriverGenomeBlasterV2
 from NCBI_Genome_Blaster.local_genome_blaster import local_genome_blaster
 from Prepare_For_BLAST.prepare_query_files import ExonBlastPreparer, \
     ExonBlastPreparer, FullBlastPreparer
 from Quality_Checking.get_longest_transcript import \
     optimize_transcripts_by_length
+from Quality_Checking.quality_analysis import QualityAnalyser
 from User_Interaction.expect_threshold_user_input import \
     expect_threshold_user_input
 from User_Interaction.user_exon_pulling import enter_gene_filepath, \
@@ -38,6 +39,8 @@ class UI:
         self.exon_pull_dir = ""
 
         self.blast_results_path = ""
+
+        self.alignments_path = ""
 
     def email_view(self):
 
@@ -80,10 +83,11 @@ class UI:
               "GENE database.")
         print("(3) Run NCBI BLAST to pull exons from whole GENOMES.")
         print("(4) Concatenate gene sequences into alignment files.")
-        print("(5) Quit the program")
-        print("Enter a number from 1-5 to select from one of the above options:")
+        print("(5) Discard defects and reiterate")
+        print("(6) Quit the program")
+        print("Enter a number from 1-6 to select from one of the above options:")
 
-        return numeric_user_input(1, 5, "")
+        return numeric_user_input(1, 6, "")
 
     def exon_puller_view(self):
 
@@ -384,8 +388,14 @@ class UI:
 
         if remote_or_local == 1:
             NCBIWWW.email = self.email
-            driver_genome_blaster_v2(self.blast_results_path, queries_path, bp.taxa_blast_order,
-                                     bp.complete_reference_species, expect_value, self.exon_pull_dir)
+            if exon_or_full_query_choice == 1:
+                gb = DriverExonGenomeBlasterV2(self.blast_results_path, queries_path, bp.taxa_blast_order,
+                                          bp.complete_reference_species)
+            else:
+                gb = DriverFullGenomeBlasterV2(self.blast_results_path, queries_path, bp.taxa_blast_order,
+                                          bp.complete_reference_species, bp.queries_to_genes_to_exons)
+                print(bp.queries_to_genes_to_exons)
+            gb.blast_genomes(expect_value, self.exon_pull_dir)
 
         else:
             local_genome_blaster(self.blast_results_path, queries_path, bp.taxa_blast_order,
@@ -458,20 +468,88 @@ class UI:
                 else:
                     add_more_dirs = (add_more_choice == 1)
         print()
-        alignments_path = make_unique_directory(self.download_dir, "alignments")
-        print("Directories selected! Gene alignments will be at the path: " + alignments_path)
+        self.alignments_path = make_unique_directory(self.download_dir, "alignments")
+        print("Directories selected! Gene alignments will be at the path: " + self.alignments_path)
         print("Enter any key to continue")
         input()
         print("-----------------------------------------------------------------")
         print("Organizing sequences into alignments...")
 
-        concatenate_gene_results(dirs_to_align, alignments_path)
+        concatenate_gene_results(dirs_to_align, self.alignments_path)
 
         print("-----------------------------------------------------------------")
         print("Finished!")
         print()
         print("Enter any key to return to the main menu.")
         input()
+
+    def discard_and_reiterate_view(self):
+
+        print("======================= DISCARDING ==============================")
+
+        iteration_path = make_unique_directory(self.download_dir, "iteration")
+
+        if self.exon_pull_dir == "":
+            print("We need an exon pull dir:")
+            self.exon_pull_dir = get_generic_directory()
+
+        if self.blast_results_path == "":
+            print("We need blast results:")
+            self.blast_results_path = get_generic_directory()
+
+        if self.alignments_path == "":
+            print("We need alignments path:")
+            self.alignments_path = get_generic_directory()
+
+        for gene_alignment in os.listdir(self.alignments_path):
+
+            gene_name = os.path.splitext(gene_alignment)[0]
+
+            iteration_gene_path = os.path.join(iteration_path, gene_name)
+            os.mkdir(iteration_gene_path)
+
+            q = QualityAnalyser(os.path.join(self.alignments_path, gene_alignment))
+            defects = (q.detect_non_meth_starts() | q.detect_gaps() |
+                       q.detect_non_stop_ends() | q.detect_non_three_multiples() |
+                       q.detect_premature_stops())
+            print(defects)
+
+            for gene in os.listdir(self.exon_pull_dir):
+                if gene == gene_name:
+                    gene_path = os.path.join(self.exon_pull_dir, gene)
+
+                    for taxon in os.listdir(gene_path):
+                        taxon_path = os.path.join(gene_path, taxon)
+
+                        iteration_taxon_path = os.path.join(iteration_gene_path, taxon)
+                        os.mkdir(iteration_taxon_path)
+
+                        for species in os.listdir(taxon_path):
+                            species_path = os.path.join(taxon_path, species)
+                            if species not in defects:
+                                iteration_species_path = os.path.join(iteration_taxon_path, species)
+                                shutil.copytree(species_path, iteration_species_path)
+                    break
+
+            for gene in os.listdir(self.blast_results_path):
+                if gene == gene_name:
+                    gene_path = os.path.join(self.blast_results_path, gene)
+
+                    for taxon in os.listdir(gene_path):
+                        taxon_path = os.path.join(gene_path, taxon)
+
+                        iteration_taxon_path = os.path.join(iteration_gene_path, taxon)
+
+                        for species in os.listdir(taxon_path):
+                            species_path = os.path.join(taxon_path, species)
+                            if species not in defects and species not in os.listdir(iteration_taxon_path):
+                                iteration_species_path = os.path.join(iteration_taxon_path, species)
+                                shutil.copytree(species_path, iteration_species_path)
+                    break
+
+        self.exon_pull_dir = iteration_path
+
+
 
 
 

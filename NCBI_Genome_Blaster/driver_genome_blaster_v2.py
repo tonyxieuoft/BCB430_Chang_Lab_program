@@ -1,5 +1,6 @@
 import os
 import time
+import xml.etree.ElementTree
 from abc import abstractmethod
 from typing import List
 
@@ -18,7 +19,6 @@ from Basic_Tools.driver_tools import get_element, get_elements, try_click, \
     try_get
 
 MAX_NUM_PROCESSES = 10
-
 
 def juggle_blast_tabs(driver, num_tabs, sleep_time) -> int:
     """
@@ -71,7 +71,7 @@ class DriverGenomeBlasterV2:
 
         chrome_options = webdriver.ChromeOptions()
 
-        chrome_options.add_argument('--headless=new')
+        #chrome_options.add_argument('--headless=new')
         driver = webdriver.Chrome(chrome_options)
         driver.execute_cdp_cmd("Page.setDownloadBehavior", {
             "behavior": "allow",
@@ -92,6 +92,7 @@ class DriverGenomeBlasterV2:
         for taxon_taxid in taxids_to_taxa:
 
             print("getting genome accessions for '" + taxids_to_taxa[taxon_taxid] + "' ...")
+            self.driver.switch_to.window(self.driver.window_handles[-1])
             self.driver.execute_script("window.open('https://www.ncbi.nlm.nih.gov/datasets/genome/?taxon=" + taxon_taxid + "&reference_only=true')")
             self.driver.switch_to.window(self.driver.window_handles[-1])
 
@@ -235,24 +236,31 @@ class DriverGenomeBlasterV2:
                 if not try_get(self.driver, By.CLASS_NAME, "error"):
 
                     # download the xml file for the blast results, get its path
-                    v1.xml_download_clicker(self.driver)
-                    file_to_analyze = v1.get_downloaded_xml_file(self.save_path)
+                    file_to_analyze = ""
+                    while file_to_analyze == "":
+                        v1.xml_download_clicker(self.driver)
+                        file_to_analyze = v1.get_downloaded_xml_file(self.save_path)
+
+                    time.sleep(0.3)
 
                     # parse the xml file, creating files that contain the
                     # results in fasta format
                     while True:
                         try:
-                            parser = BlastXMLParser(file_to_analyze, self.save_path, curr_species)
-                            parser.parse_blast_xml()
+                            self.parse_blast_xml(file_to_analyze, curr_species)
                             break
                         except PermissionError:
                             # print("problem with permissions")
                             time.sleep(1)
+                        except xml.etree.ElementTree.ParseError:
+                            time.sleep(1)
+                            print("parse error")
+
 
                     os.remove(file_to_analyze)
 
                     print("(" + str(finished_jobs + 1) + "/" + str(len(novel_species_info))
-                          + ")" + " finished blasting " + curr_species['name'])
+                          + ")" + " finished blasting " + curr_species['name'] + " " + curr_species['del'])
                 else:
                     print("(" + str(finished_jobs + 1) + "/" + str(len(novel_species_info))
                           + ")" + " unexpected error " + curr_species['name'])

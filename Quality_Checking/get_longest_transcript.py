@@ -1,6 +1,5 @@
 import os
 
-
 def get_longest_transcript(species_dir: str):
     """
 
@@ -12,10 +11,21 @@ def get_longest_transcript(species_dir: str):
     mx = 0
     mx_name = ""
     for t_name in os.listdir(species_dir):
-        t_length = int(t_name.split("_")[0])
-        if t_length > mx:
-            mx = t_length
+        t_length = t_name.split("_")[0]
+
+        if t_length.isnumeric():
+            if int(t_length) > mx:
+                mx = int(t_length)
+                mx_name = t_name
+
+        else: # it's a blast transcript
             mx_name = t_name
+            f = open(os.path.join(species_dir, t_name), "r")
+            line = f.readline()
+            while line != "":
+                if line and line[0] == ">":
+                    mx = int(line.split()[-1].split("-")[1])
+                line = f.readline()
 
     return {"length": mx, "file_name": mx_name}
 
