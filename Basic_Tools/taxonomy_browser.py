@@ -1,4 +1,5 @@
 import os
+import time
 
 from Bio import Entrez
 #from selenium import webdriver
@@ -83,6 +84,7 @@ def get_taxonomy_lineage(species_string: str):
     all_species = species_string.split("\n")
     for species in all_species:
         handle = Entrez.esearch(db="taxonomy", term=species)
+        time.sleep(0.02)
         taxid = Entrez.read(handle)['IdList'][0]
         ids += taxid + ","
 
