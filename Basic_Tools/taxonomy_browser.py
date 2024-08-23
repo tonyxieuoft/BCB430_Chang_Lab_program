@@ -1,15 +1,15 @@
 import os
 
 from Bio import Entrez
-from selenium import webdriver
-from selenium.webdriver.common.by import By
+#from selenium import webdriver
+#from selenium.webdriver.common.by import By
 from typing import Dict
 
 PHYLOGENY_COLUMN = 3
 SPECIES_NAME_COLUMN = 1
 CODE_COLUMN = 0
 
-
+'''
 def get_taxonomy_lineage_driver(species_string: str) -> Dict:
     """
     Given a string of species, returns complete lineages for each species as
@@ -49,7 +49,7 @@ def get_taxonomy_lineage_driver(species_string: str) -> Dict:
         i += 4
 
     return phylo_dict
-
+'''
 
 def get_taxa_taxids(general_dir):
 
