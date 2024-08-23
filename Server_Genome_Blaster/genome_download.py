@@ -54,7 +54,7 @@ class ServerGenomeDownloader:
             return None
 
         for species in species_data:
-            self.existing_accessions[species["species"]] = True
+            self.existing_accessions[species["name"]] = True
 
     def get_accessions_to_download(self):
 
