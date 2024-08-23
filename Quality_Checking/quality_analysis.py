@@ -1,4 +1,5 @@
 import os
+import sys
 
 from Basic_Tools.lists_and_files import file_to_list, list_to_string
 
@@ -28,6 +29,8 @@ class QualityAnalyser:
         self.sequences = {}
         self.species_no = 0
         self.read_fasta_alignment(filepath)
+
+        self.gene_name = os.path.splitext(os.path.basename(filepath))[0]
 
         self.STOP_CODONS = {"TAA": "stop", "TGA": "stop", "TAG": "stop"}
 
@@ -129,8 +132,50 @@ class QualityAnalyser:
 
         return defects
 
+    def detect_identical_sequences(self, other):
+        total = 0
+        match_num = 0
+        for species in self.sequences:
+            if species in other.sequences:
+                total += 1
+                i = 0
+                match = True
+                while match and i < len(self.sequences[species]) and i < len(other.sequences[species]):
+                    if self.sequences[species][i] != other.sequences[species][i] and self.sequences[species][i] != "-" and other.sequences[species][i] != "-":
+                        print(self.gene_name + " " + species + " " + str(i))
+                        match = False
+                    i += 1
+                if match:
+                    match_num += 1
+
+        return match_num / total
+
+
+
 
 if __name__ == "__main__":
+
+    csv_filepath = r"C:\Users\tonyx\Downloads\seq_similarity.csv"
+    f = open(csv_filepath, "w")
+
+    alignment_dir1 = r"C:\Users\tonyx\Downloads\main_test4\alignments1"
+    alignment_dir2 = r"C:\Users\tonyx\Downloads\main_test4\alignments2"
+
+    csv_dct = {}
+
+    for gene in os.listdir(alignment_dir1):
+        gene_name = os.path.splitext(gene)[0].upper()
+
+        filepath1 = os.path.join(alignment_dir1, gene)
+        filepath2 = os.path.join(alignment_dir2, gene)
+
+        q1 = QualityAnalyser(filepath1)
+        q2 = QualityAnalyser(filepath2)
+
+        match_ratio = q1.detect_identical_sequences(q2)
+        f.write(gene_name + "," + str(match_ratio) + "\n")
+
+    sys.exit()
 
     csv_filepath = r"C:\Users\tonyx\Downloads\gaps_all.csv"
     f = open(csv_filepath, "w")
@@ -165,6 +210,8 @@ if __name__ == "__main__":
     for gene_name in csv_dct:
         for value in csv_dct[gene_name]:
             f.write(gene_name + "," + str(value) + "," + "Full CDS BLAST" + "\n")
+
+
 
     #file = r"C:\Users\tonyx\Downloads\main_test3\alignments_1e-5_all_hits\GNAT1.fas"
     #q = QualityAnalyser(file)
