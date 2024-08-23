@@ -1,4 +1,5 @@
 import os
+import subprocess
 
 from Basic_Tools.basic_dictionaries import json_to_dict
 
@@ -53,7 +54,7 @@ class ServerGenomeDownloader:
             return None
 
         for species in species_data:
-            self.existing_accessions[species["acc"]] = True
+            self.existing_accessions[species["species"]] = True
 
     def get_accessions_to_download(self):
 
@@ -76,7 +77,7 @@ class ServerGenomeDownloader:
 
                     species_so_far[blast_organism_dct["species"]] = True
 
-                    if blast_organism_dct["accession"] not in self.existing_accessions:
+                    if blast_organism_dct["species"] not in self.existing_accessions:
                         self.accessions_to_download.append(blast_organism_dct)
 
     def write_to_species_data_file(self):
@@ -102,11 +103,61 @@ class ServerGenomeDownloader:
 
         f.close()
 
+    def download_genomes(self):
+
+        for org in self.accessions_to_download:
+
+            # download the genome zip file
+            os.system(r"datasets download genome accession " +
+                      org["accession"] + " --dehydrated")
+
+            # unzip it into a generic, temporary directory called ncbi_dataset
+            os.system("unzip ncbi_dataset.zip")
+
+            # remove zip file
+            os.system("rm ncbi_dataset.zip")
+            os.system("rm README.md")
+
+            working_path = subprocess.check_output(["pwd"], shell=True). \
+                decode("utf-8").strip()
+            os.system("datasets rehydrate --directory " + working_path)
+
+            # get genome fasta file path nested within the temp directory
+            genome_file_directory = os.path. \
+                join("ncbi_dataset", "data", org["accession"])
+            genome_filename = subprocess. \
+                check_output(["ls", genome_file_directory]). \
+                decode("utf-8").strip()
+            genome_filepath = os.path. \
+                join(genome_file_directory, genome_filename)
+
+            # create local blast database using the genome file
+            blast_db_path = os.path.join(self.genome_storage_path, "blast_db")
+            if not os.path.isdir(blast_db_path):
+                os.system("mkdir " + blast_db_path)
+
+            species_db = ""
+            first = True
+            for word in org["species"].split():
+                if first:
+                    species_db = word.lower()
+                    first = False
+                else:
+                    species_db += "_" + word.lwoer()
+
+            new_blast_db_name = os.path.join(blast_db_path, species_db)
+
+            os.system("makeblastdb -dbtype nucl -in " + genome_filepath +
+                      " -out " + new_blast_db_name)
+
+            # remove original genome file
+            os.system("rm -r ncbi_dataset")
+
 
 if __name__ == "__main__":
 
     save_path = "/crun/tony.xie/Downloads"
-    taxa_list = ["batoidea", "elasmobranchii"]
+    taxa_list = ["Hemiscylliidae", "Orectolobiformes"]
     genome_storage = "/crun/tony.xie/GenomeStorage"
 
     downloader = ServerGenomeDownloader(save_path, taxa_list, genome_storage)
