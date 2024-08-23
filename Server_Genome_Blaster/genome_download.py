@@ -156,6 +156,7 @@ class ServerGenomeDownloader:
 
 if __name__ == "__main__":
 
+    """
     save_path = "/crun/tony.xie/Downloads"
     taxa_list = ["Hemiscylliidae", "Orectolobiformes"]
     genome_storage = "/crun/tony.xie/GenomeStorage"
@@ -168,4 +169,8 @@ if __name__ == "__main__":
     print(len(downloader.accessions_to_download))
 
     downloader.download_genomes()
+    
+    """
+
+    print(read_species_data("/crun/tony.xie/GenomeStorage"))
 
