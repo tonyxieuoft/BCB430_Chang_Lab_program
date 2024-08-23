@@ -167,3 +167,5 @@ if __name__ == "__main__":
     print(downloader.accessions_to_download)
     print(len(downloader.accessions_to_download))
 
+    downloader.download_genomes()
+
