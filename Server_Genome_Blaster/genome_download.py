@@ -109,7 +109,7 @@ class ServerGenomeDownloader:
 
             # download the genome zip file
             os.system(r"datasets download genome accession " +
-                      org["accession"] + " --dehydrated")
+                      org["accession"])
 
             # unzip it into a generic, temporary directory called ncbi_dataset
             os.system("unzip ncbi_dataset.zip")
@@ -118,9 +118,9 @@ class ServerGenomeDownloader:
             os.system("rm ncbi_dataset.zip")
             os.system("rm README.md")
 
-            working_path = subprocess.check_output(["pwd"], shell=True). \
-                decode("utf-8").strip()
-            os.system("datasets rehydrate --directory " + working_path)
+            #working_path = subprocess.check_output(["pwd"], shell=True). \
+            #    decode("utf-8").strip()
+            #os.system("datasets rehydrate --directory " + working_path)
 
             # get genome fasta file path nested within the temp directory
             genome_file_directory = os.path. \
@@ -143,7 +143,7 @@ class ServerGenomeDownloader:
                     species_db = word.lower()
                     first = False
                 else:
-                    species_db += "_" + word.lwoer()
+                    species_db += "_" + word.lower()
 
             new_blast_db_name = os.path.join(blast_db_path, species_db)
 
