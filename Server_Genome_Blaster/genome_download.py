@@ -84,6 +84,9 @@ class ServerGenomeDownloader:
 
     def write_to_species_data_file(self):
 
+        if not self.accessions_to_download:
+            return None
+
         species_data_path = os.path.join(self.genome_storage_path, "species_data.csv")
         f = open(species_data_path, "a")
 
