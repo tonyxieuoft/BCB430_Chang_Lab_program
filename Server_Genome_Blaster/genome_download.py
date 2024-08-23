@@ -111,6 +111,7 @@ if __name__ == "__main__":
 
     downloader = ServerGenomeDownloader(save_path, taxa_list, genome_storage)
     downloader.get_accessions_to_download()
+    downloader.write_to_species_data_file()
 
     print(downloader.accessions_to_download)
     print(len(downloader.accessions_to_download))
