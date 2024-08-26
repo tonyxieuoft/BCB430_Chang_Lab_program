@@ -145,10 +145,10 @@ class ServerGenomeDownloader:
             first = True
             for word in org["species"].split():
                 if first:
-                    species_db = word.lower()
+                    species_db = word
                     first = False
                 else:
-                    species_db += "_" + word.lower()
+                    species_db += "_" + word
 
             new_blast_db_name = os.path.join(blast_db_path, species_db)
 
