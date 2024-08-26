@@ -59,7 +59,11 @@ class ServerGenomeBlaster:
 
         species_data_path = os.path.join(self.genome_storage_path,
                                          SPECIES_DATA_FILENAME)
+
         available_genome_data = read_species_data(species_data_path)
+
+        print(species_data_path)
+        print(available_genome_data)
 
         for genome in available_genome_data:
 
