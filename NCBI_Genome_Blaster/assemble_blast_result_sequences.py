@@ -107,7 +107,7 @@ class ExonBlastXMLParser(BlastXMLParser):
                 # get the top hit for the exon
                 top_hit = hits_list[0]
 
-                if on_server:
+                if self.on_server:
                     # TODO this only works for NCBI, be careful
                     accession = top_hit['Hit_def'].split(" ")[0]
                 else:
