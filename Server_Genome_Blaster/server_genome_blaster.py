@@ -57,13 +57,7 @@ class ServerGenomeBlaster:
 
     def blast_genomes(self, expect_value: str):
 
-        species_data_path = os.path.join(self.genome_storage_path,
-                                         SPECIES_DATA_FILENAME)
-
-        available_genome_data = read_species_data(species_data_path)
-
-        print(species_data_path)
-        print(available_genome_data)
+        available_genome_data = read_species_data(self.genome_storage_path)
 
         for genome in available_genome_data:
 
@@ -85,7 +79,7 @@ class ServerGenomeBlaster:
 
                 reference_filepath = os.path.join(self.queries_path, curr_ref_taxon + ".fas")
                 xml_out_path = os.path.join(self.save_path, "temp.xml")
-                print("blasting...")
+                print("blasting" + genome["name"] + "...")
                 os.system("blastn -db " + list_to_string(genome["name"].split(), "_") +
                           " -outfmt 5 -evalue " + str(expect_value) +
                           " -word_size 11 -gapopen 5 -gapextend 2 -reward 2 "
