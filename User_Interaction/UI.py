@@ -386,9 +386,11 @@ class UI:
               "(1) to proceed\n"
               "(2) to enter a custom expect threshold")
         expect_choice = numeric_user_input(1, 2, "", "Incorrect. Enter 1 or 2.")
-        expect_value = 0
+        if expect_choice == 1:
+            expect_value = 0.05
 
         if expect_choice == 2:
+            expect_value = 0
             print("Enter an expect threshold value (0 < e-value <= 1):")
             expect_value = expect_threshold_user_input()
         print()
