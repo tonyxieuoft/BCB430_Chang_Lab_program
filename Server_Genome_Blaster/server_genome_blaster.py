@@ -81,7 +81,7 @@ class ServerGenomeBlaster:
 
                 reference_filepath = os.path.join(self.queries_path, curr_ref_taxon + ".fas")
                 xml_out_path = os.path.join(self.save_path, "temp.xml")
-                print("blasting" + genome["name"] + "...")
+                print("blasting " + genome["name"] + " against " + curr_ref_taxon + "...")
                 os.system("blastn -db " + blast_db +
                           " -outfmt 5 -evalue " + str(expect_value) +
                           " -word_size 11 -gapopen 5 -gapextend 2 -reward 2 "
