@@ -3,18 +3,23 @@ import subprocess
 
 from Basic_Tools.basic_dictionaries import json_to_dict
 
-######### species_data file constants #########
 from Basic_Tools.lists_and_files import list_to_string
 from Basic_Tools.taxonomy_browser import get_taxonomy_lineage
+
+
+######### species_data file constants #########
+SPECIES_DATA_FILENAME = "species_data.csv"
 
 NAME_COL = 0
 ACC_COL = 1
 LINEAGE_COL = 2
 
 
+
+
 def read_species_data(genome_storage_path):
 
-    species_data_path = os.path.join(genome_storage_path, "species_data.csv")
+    species_data_path = os.path.join(genome_storage_path, SPECIES_DATA_FILENAME)
 
     if not os.path.isfile(species_data_path):
         return None
@@ -28,7 +33,7 @@ def read_species_data(genome_storage_path):
 
         split_line = line.strip().split(",")
         genome = {"name": split_line[NAME_COL], "acc": split_line[ACC_COL],
-                  "lineage": split_line[LINEAGE_COL]}
+                  "lineage": split_line[LINEAGE_COL].split()}
 
         species_data.append(genome)
         line = f.readline()
@@ -59,6 +64,9 @@ class ServerGenomeDownloader:
             self.existing_accessions[species["name"]] = True
 
     def get_accessions_to_download(self):
+        return self.accessions_to_download
+
+    def set_accessions_to_download(self):
 
         # need this for local, multiple species actually
         species_so_far = {}
@@ -167,7 +175,7 @@ if __name__ == "__main__":
     genome_storage = "/crun/tony.xie/GenomeStorage"
 
     downloader = ServerGenomeDownloader(save_path, taxa_list, genome_storage)
-    downloader.get_accessions_to_download()
+    downloader.set_accessions_to_download()
     downloader.write_to_species_data_file()
 
     print(downloader.accessions_to_download)

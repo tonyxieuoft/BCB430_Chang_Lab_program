@@ -92,6 +92,7 @@ def local_genome_blaster(save_path: str, queries_path: str,
             # delete the local blast database
             os.system("rm -r local_blast_db")
 
+            # this needs to be updated with exon vs full
             # parse the blast results
             parser = BlastXMLParser(xml_out_path, save_path, org)
             parser.parse_blast_xml()

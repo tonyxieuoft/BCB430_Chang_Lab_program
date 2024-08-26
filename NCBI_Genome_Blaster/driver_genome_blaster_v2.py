@@ -280,7 +280,7 @@ class DriverExonGenomeBlasterV2(DriverGenomeBlasterV2):
     def parse_blast_xml(self, file_to_analyze, curr_species):
 
         parser = ExonBlastXMLParser(file_to_analyze, self.save_path,
-                                    curr_species)
+                                    curr_species, on_server=False)
         parser.parse_blast_xml()
 
 

@@ -8,18 +8,20 @@ from Bio.Blast import NCBIWWW
 from After_BLAST.concatenate_gene_results import concatenate_gene_results
 from Basic_Tools.lists_and_files import make_unique_directory, unique_filepath
 from Basic_Tools.numeric_user_input import numeric_user_input
-from Gene_Description_Refiner.gene_description_refiner import \
-    gene_description_refiner
+#from Gene_Description_Refiner.gene_description_refiner import \
+#    gene_description_refiner
 from NCBI_Exon_Puller.handle_ncbi_exon_puller import handle_ncbi_exon_puller
 from NCBI_Genome_Blaster.driver_genome_blaster import driver_genome_blaster
-from NCBI_Genome_Blaster.driver_genome_blaster_v2 import \
-    DriverExonGenomeBlasterV2, DriverFullGenomeBlasterV2, DriverGenomeBlasterV2
+#from NCBI_Genome_Blaster.driver_genome_blaster_v2 import \
+#    DriverExonGenomeBlasterV2, DriverFullGenomeBlasterV2, DriverGenomeBlasterV2
 from NCBI_Genome_Blaster.local_genome_blaster import local_genome_blaster
 from Prepare_For_BLAST.prepare_query_files import ExonBlastPreparer, \
     ExonBlastPreparer, FullBlastPreparer
 from Quality_Checking.get_longest_transcript import \
     optimize_transcripts_by_length
 from Quality_Checking.quality_analysis import QualityAnalyser
+from Server_Genome_Blaster.server_genome_blaster import ServerExonGenomeBlaster, \
+    ServerFullGenomeBlaster
 from User_Interaction.expect_threshold_user_input import \
     expect_threshold_user_input
 from User_Interaction.user_exon_pulling import enter_gene_filepath, \
@@ -242,8 +244,9 @@ class UI:
         print("Enter any key to begin the refining process.")
         input()
 
-        gene_description_refiner(self.exon_pull_dir, temp_homology_directory,
-                                 self.gene_query_filepath, self.refined_gene_query_filepath)
+        # TODO Selenium disabled
+        #gene_description_refiner(self.exon_pull_dir, temp_homology_directory,
+        #                         self.gene_query_filepath, self.refined_gene_query_filepath)
 
         shutil.rmtree(temp_homology_directory)
 
@@ -333,12 +336,12 @@ class UI:
         print("Making query files...")
 
         if exon_or_full_query_choice == 1:
-            bp = ExonBlastPreparer(self.exon_pull_dir, queries_path)
+            blast_preparer = ExonBlastPreparer(self.exon_pull_dir, queries_path)
         else:
-            bp = FullBlastPreparer(self.exon_pull_dir, queries_path)
+            blast_preparer = FullBlastPreparer(self.exon_pull_dir, queries_path)
 
-        bp.prepare_query_files(auto_assign)
-        #print(bp.get_queries_to_genes_to_exons())
+        blast_preparer.prepare_query_files(auto_assign)
+        #print(blast_preparer.get_queries_to_genes_to_exons())
 
 
         print("-----------------------------------------------------------------")
@@ -359,15 +362,25 @@ class UI:
         print("Enter:")
         print("(1) for remote BLAST via Selenium")
         print("(2) for local BLAST")
+        print("(3) for server BLAST")
 
-        remote_or_local = numeric_user_input(1, 2, "")
+        remote_or_local_or_server = numeric_user_input(1, 3, "")
 
+        # throwaway variable for server blast only, might change later
+        genome_storage_path = ""
         print()
-        if remote_or_local == 1:
+        if remote_or_local_or_server == 1:
             print("Remote BLAST selected.")
-        else:
+        elif remote_or_local_or_server == 2:
             print("Local BLAST selected. Please note that up to 5 GB of space may "
                   "be required for genome download.")
+        else:
+            print("Server BLAST selected.")
+            print()
+            print("Please enter the directory to which the server's genomes are"
+                  " currently stored (at the level containing the species data"
+                  " file).")
+            genome_storage_path = get_generic_directory()
 
         print("Default expect threshold is 0.05. Enter:\n"
               "(1) to proceed\n"
@@ -386,20 +399,34 @@ class UI:
         print("-----------------------------------------------------------------")
         print("Starting BLAST...")
 
-        if remote_or_local == 1:
+        if remote_or_local_or_server == 1:
             NCBIWWW.email = self.email
             if exon_or_full_query_choice == 1:
-                gb = DriverExonGenomeBlasterV2(self.blast_results_path, queries_path, bp.taxa_blast_order,
-                                          bp.complete_reference_species)
+                pass
+                # TODO Selenium disabled
+                #genome_blaster = DriverExonGenomeBlasterV2(self.blast_results_path, queries_path, blast_preparer.taxa_blast_order,
+                #                                           blast_preparer.complete_reference_species)
             else:
-                gb = DriverFullGenomeBlasterV2(self.blast_results_path, queries_path, bp.taxa_blast_order,
-                                          bp.complete_reference_species, bp.queries_to_genes_to_exons)
-                print(bp.queries_to_genes_to_exons)
-            gb.blast_genomes(expect_value, self.exon_pull_dir)
+                pass
+                # TODO Selenium disabled
+                #genome_blaster = DriverFullGenomeBlasterV2(self.blast_results_path, queries_path, blast_preparer.taxa_blast_order,
+                #                                           blast_preparer.complete_reference_species, blast_preparer.queries_to_genes_to_exons)
+                print(blast_preparer.queries_to_genes_to_exons)
+            #genome_blaster.blast_genomes(expect_value, self.exon_pull_dir)
+
+        elif remote_or_local_or_server == 2:
+            local_genome_blaster(self.blast_results_path, queries_path, blast_preparer.taxa_blast_order,
+                                 blast_preparer.complete_reference_species, expect_value)
 
         else:
-            local_genome_blaster(self.blast_results_path, queries_path, bp.taxa_blast_order,
-                                 bp.complete_reference_species, expect_value)
+            if exon_or_full_query_choice == 1:
+                genome_blaster = ServerExonGenomeBlaster(self.blast_results_path, queries_path, blast_preparer.taxa_blast_order,
+                                                         blast_preparer.complete_reference_species, genome_storage_path, self.exon_pull_dir)
+            else:
+                genome_blaster = ServerFullGenomeBlaster(self.blast_results_path, queries_path, blast_preparer.taxa_blast_order,
+                                                         blast_preparer.complete_reference_species, genome_storage_path, self.exon_pull_dir, blast_preparer.queries_to_genes_to_exons)
+            genome_blaster.download_new_genomes()
+            genome_blaster.blast_genomes(expect_value)
 
 
         print("-----------------------------------------------------------------")

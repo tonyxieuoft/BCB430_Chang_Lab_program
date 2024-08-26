@@ -75,6 +75,10 @@ class BlastXMLParser:
 
 class ExonBlastXMLParser(BlastXMLParser):
 
+    def __init__(self, file, save_dir, curr_species, on_server):
+        super().__init__(file, save_dir, curr_species)
+        self.on_server = on_server
+
     def parse_blast_xml(self):
 
         results_dict = file_xml_to_dictionary(self.xml_filepath)
@@ -103,8 +107,12 @@ class ExonBlastXMLParser(BlastXMLParser):
                 # get the top hit for the exon
                 top_hit = hits_list[0]
 
-                accession = top_hit['Hit_accession']
-                # accession = top_hit['Hit_def'].split(" ")[0]
+                if on_server:
+                    # TODO this only works for NCBI, be careful
+                    accession = top_hit['Hit_def'].split(" ")[0]
+                else:
+                    accession = top_hit['Hit_accession']
+
                 hit_max = int(top_hit['Hit_len'])
 
                 # if hit, there exists at least one hsp
