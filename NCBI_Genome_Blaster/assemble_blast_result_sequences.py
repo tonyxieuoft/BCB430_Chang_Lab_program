@@ -213,7 +213,7 @@ class ExonBlastXMLParser(BlastXMLParser):
 
                     result_sequence = result_sequence + string
 
-                transcript_file = self.create_transcript_file(ref_transcript_var, gene_name, ref_sequence_range)
+                transcript_file = self.create_transcript_file(ref_transcript_var, gene_name)
 
                 fasta_heading = ">" + gene_name + " " + self.species_name + \
                                 " reference_mrna:" + ref_transcript_var + \
