@@ -341,6 +341,7 @@ class UI:
             blast_preparer = FullBlastPreparer(self.exon_pull_dir, queries_path)
 
         blast_preparer.prepare_query_files(auto_assign)
+        print(blast_preparer.taxa_blast_order)
         #print(blast_preparer.get_queries_to_genes_to_exons())
 
 
