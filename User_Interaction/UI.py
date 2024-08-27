@@ -8,12 +8,12 @@ from Bio.Blast import NCBIWWW
 from After_BLAST.concatenate_gene_results import concatenate_gene_results
 from Basic_Tools.lists_and_files import make_unique_directory, unique_filepath
 from Basic_Tools.numeric_user_input import numeric_user_input
-#from Gene_Description_Refiner.gene_description_refiner import \
-#    gene_description_refiner
+from Gene_Description_Refiner.gene_description_refiner import \
+    gene_description_refiner
 from NCBI_Exon_Puller.handle_ncbi_exon_puller import handle_ncbi_exon_puller
 from NCBI_Genome_Blaster.driver_genome_blaster import driver_genome_blaster
-#from NCBI_Genome_Blaster.driver_genome_blaster_v2 import \
-#    DriverExonGenomeBlasterV2, DriverFullGenomeBlasterV2, DriverGenomeBlasterV2
+from NCBI_Genome_Blaster.driver_genome_blaster_v2 import \
+    DriverExonGenomeBlasterV2, DriverFullGenomeBlasterV2, DriverGenomeBlasterV2
 from NCBI_Genome_Blaster.local_genome_blaster import local_genome_blaster
 from Prepare_For_BLAST.prepare_query_files import ExonBlastPreparer, \
     ExonBlastPreparer, FullBlastPreparer
@@ -95,8 +95,6 @@ class UI:
 
         print()
         print("======================== NCBI EXON PULLER =======================")
-
-        # TODO option to pull exons or complete cds
 
         discard_gene_query = 1
         if self.refined_gene_query_filepath != "":
@@ -245,8 +243,8 @@ class UI:
         input()
 
         # TODO Selenium disabled
-        #gene_description_refiner(self.exon_pull_dir, temp_homology_directory,
-        #                         self.gene_query_filepath, self.refined_gene_query_filepath)
+        gene_description_refiner(self.exon_pull_dir, temp_homology_directory,
+                                 self.gene_query_filepath, self.refined_gene_query_filepath)
 
         shutil.rmtree(temp_homology_directory)
 
@@ -341,7 +339,6 @@ class UI:
             blast_preparer = FullBlastPreparer(self.exon_pull_dir, queries_path)
 
         blast_preparer.prepare_query_files(auto_assign)
-        print(blast_preparer.taxa_blast_order)
         #print(blast_preparer.get_queries_to_genes_to_exons())
 
 
@@ -407,15 +404,15 @@ class UI:
             if exon_or_full_query_choice == 1:
                 pass
                 # TODO Selenium disabled
-                #genome_blaster = DriverExonGenomeBlasterV2(self.blast_results_path, queries_path, blast_preparer.taxa_blast_order,
-                #                                           blast_preparer.complete_reference_species)
+                genome_blaster = DriverExonGenomeBlasterV2(self.blast_results_path, queries_path, blast_preparer.taxa_blast_order,
+                                                           blast_preparer.complete_reference_species)
             else:
                 pass
                 # TODO Selenium disabled
-                #genome_blaster = DriverFullGenomeBlasterV2(self.blast_results_path, queries_path, blast_preparer.taxa_blast_order,
-                #                                           blast_preparer.complete_reference_species, blast_preparer.queries_to_genes_to_exons)
+                genome_blaster = DriverFullGenomeBlasterV2(self.blast_results_path, queries_path, blast_preparer.taxa_blast_order,
+                                                           blast_preparer.complete_reference_species, blast_preparer.queries_to_genes_to_exons)
                 print(blast_preparer.queries_to_genes_to_exons)
-            #genome_blaster.blast_genomes(expect_value, self.exon_pull_dir)
+            genome_blaster.blast_genomes(expect_value, self.exon_pull_dir)
 
         elif remote_or_local_or_server == 2:
             local_genome_blaster(self.blast_results_path, queries_path, blast_preparer.taxa_blast_order,
