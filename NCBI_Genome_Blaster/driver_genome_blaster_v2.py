@@ -71,7 +71,7 @@ class DriverGenomeBlasterV2:
 
         chrome_options = webdriver.ChromeOptions()
 
-        #chrome_options.add_argument('--headless=new')
+        chrome_options.add_argument('--headless=new')
         driver = webdriver.Chrome(chrome_options)
         driver.execute_cdp_cmd("Page.setDownloadBehavior", {
             "behavior": "allow",
