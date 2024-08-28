@@ -1,4 +1,10 @@
+import json
 import os
+
+from Bio import Entrez
+
+from Basic_Tools.lists_and_files import list_to_string
+
 
 def get_longest_transcript(species_dir: str):
     """
@@ -62,7 +68,7 @@ def remove_non_three_multiples(species_dir):
         if t_length % 3 != 0:
             os.remove(os.path.join(species_dir, t_name))
 
-
+# add the ey filter detection here
 def optimize_transcripts_by_length(general_dir):
     """
 
@@ -102,12 +108,60 @@ def optimize_transcripts_by_length(general_dir):
                 filter_closest_length_transcript(species_path, median_length)
 
 
+def get_transcript_tissue_origin(exon_pull_dir):
+
+    for gene in os.listdir(exon_pull_dir):
+
+        gene_path = os.path.join(exon_pull_dir, gene)
+        for taxon in os.listdir(gene_path):
+
+            taxon_path = os.path.join(gene_path, taxon)
+            for species in os.listdir(taxon_path):
+
+                species_path = os.path.join(taxon_path, species)
+                for transcript_name in os.listdir(species_path):
+                    transcript_name = os.path.splitext(transcript_name)[0]
+                    acc = list_to_string(transcript_name.split("_")[1:], "_")
+
+                    print(gene + " " + species)
+                    print_tissue_origin(acc)
+
+
+def print_tissue_origin(acc):
+
+    # XM_048540187.2,XM_059967774.1
+    Entrez.email = "xiaohan.xie@mail.utoronto.ca"
+
+    tissue_typing_handle = Entrez.esummary(db="nuccore", id=acc, version="2.0")
+    records = Entrez.read(tissue_typing_handle)
+    for record in records["DocumentSummarySet"]:
+        i = 0
+        found = False
+        acc = ""
+        while i < len(record) and not found:
+            if i == 0:
+                acc = record[i]
+            else:
+                if isinstance(record[i], str):
+                    line = record[i].split("|")
+                    for j in range(len(line)):
+                        if line[j] == "tissue_type":
+                            tissue_type = record[i+1].split("|")[j]
+                            print(tissue_type)
+                            found = True
+                            break
+            i += 1
+        if not found:
+            print("not found")
+        print("acc: " + acc)
+
+
 if __name__ == "__main__":
-    exons_path = r"C:\Users\tonyx\Downloads\NCBI_length - Copy"
-    optimize_transcripts_by_length(exons_path)
+    #exons_path = r"C:\Users\tonyx\Downloads\NCBI_length - Copy"
+    #optimize_transcripts_by_length(exons_path)
 
-
-
+    exon_pull_dir = r"C:\Users\tonyx\Downloads\main_test4\NCBI_exon_pull_results"
+    get_transcript_tissue_origin(exon_pull_dir)
 
 
 
