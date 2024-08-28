@@ -112,6 +112,7 @@ def get_transcript_tissue_origin(exon_pull_dir):
 
     for gene in os.listdir(exon_pull_dir):
 
+        acc_list = []
         gene_path = os.path.join(exon_pull_dir, gene)
         for taxon in os.listdir(gene_path):
 
@@ -122,15 +123,21 @@ def get_transcript_tissue_origin(exon_pull_dir):
                 for transcript_name in os.listdir(species_path):
                     transcript_name = os.path.splitext(transcript_name)[0]
                     acc = list_to_string(transcript_name.split("_")[1:], "_")
+                    acc_list.append(acc)
 
-                    print(gene + " " + species)
-                    print_tissue_origin(acc)
+                    #print(gene + " " + species)
+
+        acc_string = list_to_string(acc_list, ",")
+        print(gene)
+        print_tissue_origin(acc_string)
 
 
 def print_tissue_origin(acc):
 
     # XM_048540187.2,XM_059967774.1
     Entrez.email = "xiaohan.xie@mail.utoronto.ca"
+
+    tissues = {}
 
     tissue_typing_handle = Entrez.esummary(db="nuccore", id=acc, version="2.0")
     records = Entrez.read(tissue_typing_handle)
@@ -147,13 +154,17 @@ def print_tissue_origin(acc):
                     for j in range(len(line)):
                         if line[j] == "tissue_type":
                             tissue_type = record[i+1].split("|")[j]
-                            print(tissue_type)
+                            #print(tissue_type)
+                            if tissue_type not in tissues:
+                                tissues[tissue_type] = ""
                             found = True
                             break
             i += 1
-        if not found:
-            print("not found")
-        print("acc: " + acc)
+        #if not found:
+        #    print("not found")
+        #print("acc: " + acc)
+
+    print(tissues)
 
 
 if __name__ == "__main__":
