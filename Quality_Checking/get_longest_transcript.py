@@ -160,7 +160,7 @@ if __name__ == "__main__":
     #exons_path = r"C:\Users\tonyx\Downloads\NCBI_length - Copy"
     #optimize_transcripts_by_length(exons_path)
 
-    exon_pull_dir = r"C:\Users\tonyx\Downloads\main_test4\NCBI_exon_pull_results"
+    exon_pull_dir = r"/crun/tony.xie/Downloads/NCBI_exon_pull_results2"
     get_transcript_tissue_origin(exon_pull_dir)
 
 
