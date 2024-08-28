@@ -128,9 +128,10 @@ def get_transcript_tissue_origin(exon_pull_dir):
                     #print(gene + " " + species)
 
         acc_string = list_to_string(acc_list, ",")
-        print(acc_string)
+
         print(gene)
-        print_tissue_origin(acc_string)
+        if acc_string:
+            print_tissue_origin(acc_string)
 
 
 def print_tissue_origin(acc):
