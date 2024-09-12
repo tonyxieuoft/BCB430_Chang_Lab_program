@@ -171,7 +171,7 @@ if __name__ == "__main__":
 
 
     save_path = "/crun/tony.xie/Downloads"
-    taxa_list = ["elasmobranchii"]
+    taxa_list = ["cetacea"]
     genome_storage = "/crun/tony.xie/GenomeStorage"
 
     downloader = ServerGenomeDownloader(save_path, taxa_list, genome_storage)
