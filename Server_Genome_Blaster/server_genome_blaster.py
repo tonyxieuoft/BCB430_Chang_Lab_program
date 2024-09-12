@@ -90,7 +90,9 @@ class ServerGenomeBlaster:
 
                 # parse the blast results
                 taxon_and_name = {"taxon": overarching_taxon, "name": genome["name"]}
+                print("parsing...")
                 self.parse_blast_xml(xml_out_path, taxon_and_name)
+                print("done parsing")
                 os.remove(xml_out_path)
 
     @abstractmethod
