@@ -172,7 +172,7 @@ class ExonBlastXMLParser(BlastXMLParser):
                         to_salvage = lower_bound - upper_bound + 1
 
                     string = ""
-                    if False: # 0 < to_salvage < 4: # TODO change it back to 0-5 later
+                    if 0 < to_salvage < 4: # TODO change it back to 0-5 later
                         print("getting gene sequence")
                         arr = ncbi_get_gene_sequence(accession, lower_bound,
                                                  upper_bound, strand)
@@ -200,7 +200,7 @@ class ExonBlastXMLParser(BlastXMLParser):
                         to_salvage = lower_bound - upper_bound + 1
 
                     string = ""
-                    if False: # 4 > to_salvage > 0: # change it back later
+                    if 4 > to_salvage > 0: # change it back later
                         print("getting gene seqnece")
                         arr = ncbi_get_gene_sequence(accession, lower_bound, upper_bound, strand)
 
