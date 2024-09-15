@@ -153,6 +153,8 @@ class BlastPreparer:
         self.taxa_blast_order = []
         self.complete_reference_species = []
 
+        print(assignments)
+
         for assignment in assignments:
             if self.single_query_assembly(assignment[0], assignment[1]):
                 self.complete_reference_species.append(assignment[0])
