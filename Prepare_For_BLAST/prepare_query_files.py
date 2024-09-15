@@ -90,7 +90,6 @@ class BlastPreparer:
         """
         # get a list of all assigned_taxa present among reference species
 
-        print("taxa to ref species" + str(self.taxa_to_ref_species))
         taxa_list = []
         for taxon in self.taxa_to_ref_species:
             taxa_list.append(taxon.upper())
@@ -107,7 +106,6 @@ class BlastPreparer:
         # a dictionary where keys are assigned_taxa and values are taxids corresponding to
         # the assigned_taxa
 
-        print("lienage_dict" + str(lineage_dict))
         taxid_codes = {}
         lineage_keys = list(lineage_dict.keys())
         # remove assigned_taxa from the results, we want lineage_dict to just have species
