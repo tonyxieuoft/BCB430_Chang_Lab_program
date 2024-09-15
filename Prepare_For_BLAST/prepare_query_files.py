@@ -143,7 +143,6 @@ class BlastPreparer:
         # get assignments for the reference species. this is based on the
         # lineage
         # dictionary if automatic
-        print("lineage dict: " + str(self.lineage_dict))
         assignments = get_assignments(auto_assign, self.lineage_dict,
                                       self.taxid_codes,
                                       self.taxa_to_ref_species)
@@ -154,8 +153,6 @@ class BlastPreparer:
         # available species is offered.
         self.taxa_blast_order = []
         self.complete_reference_species = []
-
-        print(assignments)
 
         for assignment in assignments:
             if self.single_query_assembly(assignment[0], assignment[1]):
