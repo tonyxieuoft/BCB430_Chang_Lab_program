@@ -43,6 +43,7 @@ def auto_assign_taxa_to_ref(lineage_dct: Dict, ref_species: List[str],
             result.insert(0, [ref, ref_lineage[depth-1]])
             # insert at the front
 
+    print("results: " + str(result))
     return result
 
 
@@ -66,6 +67,7 @@ def get_assignments(auto: int, lineage_dict: Dict[str, List[str]],
         assignments = []
         # for each overhead taxon, get automatic assignments. concatenate them
         # at the end as a list of entries to BLAST.
+        print("taxid_codes" + str(taxid_codes))
         for taxon in taxid_codes.keys():
             taxid = taxid_codes[taxon]
             assignments += auto_assign_taxa_to_ref(lineage_dict, taxa_to_species_dict[taxon], taxid)
