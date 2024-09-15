@@ -73,7 +73,7 @@ class ServerGenomeDownloader:
         for taxa in self.taxa_list:
 
             temp_summary_path = os.path.join(self.save_path, "temp_summary.txt")
-            os.system("datasets summary genome taxon " + taxa + " > '" + temp_summary_path + "'")
+            os.system("datasets summary genome taxon \"" + taxa + "\" > '" + temp_summary_path + "'")
             genome_summary_dict = json_to_dict(temp_summary_path)
             os.remove(temp_summary_path)
 
