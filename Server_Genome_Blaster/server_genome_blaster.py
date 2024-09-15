@@ -58,6 +58,7 @@ class ServerGenomeBlaster:
     def blast_genomes(self, expect_value: str):
 
         available_genome_data = read_species_data(self.genome_storage_path)
+        print("blast_order_dict: " + str(self.blast_order_dict))
 
         for genome in available_genome_data:
 

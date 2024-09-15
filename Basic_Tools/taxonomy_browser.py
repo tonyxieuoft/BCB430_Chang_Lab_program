@@ -93,14 +93,11 @@ def get_taxonomy_lineage(species_string: str):
     handle2 = Entrez.efetch(db="taxonomy", id=ids)
     results = Entrez.read(handle2)
     for org in results:
-        print(org)
         name = org["ScientificName"]
         phylo_dict[name] = [org['TaxId']]
         lineage = org["LineageEx"]
         for i in range(len(lineage)-1, -1, -1):
             phylo_dict[name].append(lineage[i]["TaxId"])
-
-        print()
 
     return phylo_dict
 
