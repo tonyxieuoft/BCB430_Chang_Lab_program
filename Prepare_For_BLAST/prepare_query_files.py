@@ -257,12 +257,16 @@ class ExonBlastPreparer(BlastPreparer):
                     available_species.append({"taxon": taxa_folder,
                                               "species": species_folder})
                     # if the species is the one we are looking for
-                    print("species_folder: " + species_folder.upper())
-                    print("ref species name: " + ref_species_name.upper())
+
                     if species_folder.upper() == ref_species_name.upper():
 
                         self.write_to_query(species_path, query_file)
                         species_found = True
+                    else:
+                        print("species_folder: " + species_folder.upper())
+                        print("ref species name: " + ref_species_name.upper())
+
+            print(species_found)
 
             if not species_found:
 
