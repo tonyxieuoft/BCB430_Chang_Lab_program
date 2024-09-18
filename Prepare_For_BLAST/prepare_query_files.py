@@ -250,8 +250,9 @@ class ExonBlastPreparer(BlastPreparer):
 
             for taxa_folder in os.listdir(gene_path):
                 taxa_path = os.path.join(gene_path, taxa_folder)
-
+                print("got into taxa")
                 for species_folder in os.listdir(taxa_path):
+                    print("got into species")
                     species_path = os.path.join(taxa_path, species_folder)
 
                     available_species.append({"taxon": taxa_folder,
@@ -262,6 +263,7 @@ class ExonBlastPreparer(BlastPreparer):
 
                         self.write_to_query(species_path, query_file)
                         species_found = True
+                        print("huh")
                     else:
                         print("species_folder: " + species_folder.upper())
                         print("ref species name: " + ref_species_name.upper())
