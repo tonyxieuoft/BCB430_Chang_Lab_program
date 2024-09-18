@@ -250,7 +250,7 @@ class ExonBlastPreparer(BlastPreparer):
 
             for taxa_folder in os.listdir(gene_path):
                 taxa_path = os.path.join(gene_path, taxa_folder)
-                print("got into taxa")
+                print("got into taxa " + taxa_path)
                 for species_folder in os.listdir(taxa_path):
                     print("got into species")
                     species_path = os.path.join(taxa_path, species_folder)
