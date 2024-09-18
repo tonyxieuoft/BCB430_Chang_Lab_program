@@ -87,8 +87,8 @@ class ServerGenomeDownloader:
 
                     species_so_far[blast_organism_dct["species"]] = True
 
-                    if blast_organism_dct["species"] not in self.existing_accessions:
-                        self.accessions_to_download.append(blast_organism_dct)
+                    #if blast_organism_dct["species"] not in self.existing_accessions:
+                    self.accessions_to_download.append(blast_organism_dct)
 
     def write_to_species_data_file(self):
 
