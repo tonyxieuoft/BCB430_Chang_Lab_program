@@ -94,7 +94,7 @@ def get_taxonomy_lineage(species_string: str):
     results = Entrez.read(handle2)
     for org in results:
         name = org["ScientificName"]
-        phylo_dict[name] = [org['TaxId']]
+        phylo_dict[name] = [org['TaxId']] # add the organism's own first
         lineage = org["LineageEx"]
         for i in range(len(lineage)-1, -1, -1):
             phylo_dict[name].append(lineage[i]["TaxId"])

@@ -4,7 +4,7 @@ from Basic_Tools.lists_and_files import file_to_list
 
 def get_longest_transcript(directory):
     """
-    Return the filename of the longest transcript within a specified directory.
+    Return the f_read_name of the longest transcript within a specified directory.
 
     :param directory: a directory containing transcripts in fasta format, where
     each transcript is separated into exon chunks and the length of each

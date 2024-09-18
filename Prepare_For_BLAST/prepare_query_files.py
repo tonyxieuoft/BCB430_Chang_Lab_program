@@ -265,9 +265,10 @@ class ExonBlastPreparer(BlastPreparer):
             if not species_found:
 
                 complete_species = False
+                print(ref_species_name)
                 to_select = self.select_fill_in(ref_species_name,
                                                 available_species)
-
+                print(to_select)
                 species_path = os.path.join(gene_path, to_select["taxon"],
                                             to_select["species"])
                 self.write_to_query(species_path, query_file)

@@ -46,14 +46,14 @@ def list_to_string(lst: Iterable[object], delim) -> str:
 
 def unique_filepath(file_path: str) -> str:
     """
-    Return a unique filename by adding an increment version to the end of the
-    provided filename. For example, if the file 'filename' exists, this function
-    will check to see if 'filename (1)' exists as a name and return it if not.
-    Otherwise, will keep incrementing the version to 'filename (2)',
-    'filename (3)', etc.
+    Return a unique f_read_name by adding an increment version to the end of the
+    provided f_read_name. For example, if the file 'f_read_name' exists, this function
+    will check to see if 'f_read_name (1)' exists as a name and return it if not.
+    Otherwise, will keep incrementing the version to 'f_read_name (2)',
+    'f_read_name (3)', etc.
 
     :param file_path: name of the file to find a unique name for
-    :return: the filename with a unique increment version attached to the end
+    :return: the f_read_name with a unique increment version attached to the end
     """
     if not os.path.exists(file_path):
         return file_path
