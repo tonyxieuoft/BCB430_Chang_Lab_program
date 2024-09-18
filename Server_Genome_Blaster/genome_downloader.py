@@ -171,10 +171,11 @@ if __name__ == "__main__":
 
 
     save_path = "/crun/tony.xie/Downloads"
-    taxa_list = ["Tursiops aduncus"]
+    taxa_list = ["Testudines"]
     genome_storage = "/crun/tony.xie/GenomeStorage"
 
     downloader = ServerGenomeDownloader(save_path, taxa_list, genome_storage)
     downloader.set_accessions_to_download()
-    downloader.download_genomes()
+    downloader.write_to_species_data_file()
+    # downloader.download_genomes()
 
