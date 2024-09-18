@@ -171,11 +171,19 @@ if __name__ == "__main__":
 
 
     save_path = "/crun/tony.xie/Downloads"
-    taxa_list = ["Testudines"]
+    taxa_list = ["Pelodiscus sinensis",
+                 "Pelusios castaneus",
+                 "Platysternon megacephalum",
+                 "Podocnemis expansa",
+                 "Rafetus swinhoei",
+                 "Sternotherus odoratus",
+                 "Terrapene triunguis",
+                 "Testudo graeca",
+                 "Trachemys scripta elegans"]
     genome_storage = "/crun/tony.xie/GenomeStorage"
 
     downloader = ServerGenomeDownloader(save_path, taxa_list, genome_storage)
     downloader.set_accessions_to_download()
-    downloader.write_to_species_data_file()
-    # downloader.download_genomes()
+    #downloader.write_to_species_data_file()
+    downloader.download_genomes()
 
