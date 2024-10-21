@@ -287,6 +287,7 @@ class ExonBlastPreparer(BlastPreparer):
 
         transcript_file = get_longest_transcript(species_path)['file_name']
         transcript_path = os.path.join(species_path, transcript_file)
+        print("transcript file: " + transcript_file)
         query_file.write(open(transcript_path, "r").read() + "\n")
 
 
