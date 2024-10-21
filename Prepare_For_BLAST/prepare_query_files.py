@@ -284,7 +284,7 @@ class ExonBlastPreparer(BlastPreparer):
         return complete_species
 
     def write_to_query(self, species_path, query_file):
-
+        print("species path: " + species_path)
         transcript_file = get_longest_transcript(species_path)['file_name']
         transcript_path = os.path.join(species_path, transcript_file)
         print("transcript file: " + transcript_file)
