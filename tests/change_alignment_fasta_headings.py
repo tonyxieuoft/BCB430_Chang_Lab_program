@@ -3,7 +3,7 @@ import os
 if __name__ == "__main__":
 
     alignments_path = r"C:\Users\tonyx\Downloads\alignments5\alignments8"
-    renamed_path = r"C:\Users\tonyx\Downloads\renamed_fasta"
+    renamed_path = r"C:\Users\tonyx\Downloads\renamed_fasta_2"
 
     os.mkdir(renamed_path)
 
@@ -21,7 +21,7 @@ if __name__ == "__main__":
                 print(split_heading[1] + " " + split_heading[2])
                 last_abbrev_length = min(3, len(split_heading[2]))
                 f_write.write(">" +
-                              split_heading[1][0] + " " +
+                              split_heading[1][0] +
                               split_heading[2][:last_abbrev_length] +
                               "\n")
             else:

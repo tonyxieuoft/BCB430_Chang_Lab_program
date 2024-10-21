@@ -82,10 +82,13 @@ def read_gene_table_v2(text: str, id_to_org: Dict[str, str]) -> Dict:
                 if cds_column_no != -1 and exon_column_no != -1:
                     break
 
-            # if there exists both the exon and cds column
-            if cds_column_no != -1 and exon_column_no != -1:
+            acc_name = line_keywords[4]
+            acc_quality = acc_name[:2]
 
-                transcript = Transcript(line_keywords[4])
+            # if there exists both the exon and cds column
+            if cds_column_no != -1 and exon_column_no != -1 and acc_quality != "XM":
+
+                transcript = Transcript(acc_name)
 
                 line_no += 2
                 table_data = table[line_no].split("\t\t")
