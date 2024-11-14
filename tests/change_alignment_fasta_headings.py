@@ -2,8 +2,8 @@ import os
 
 if __name__ == "__main__":
 
-    alignments_path = r"C:\Users\tonyx\Downloads\alignments5\alignments8"
-    renamed_path = r"C:\Users\tonyx\Downloads\renamed_fasta_2"
+    alignments_path = r"C:\Users\tonyx\Downloads\alignments10"
+    renamed_path = r"C:\Users\tonyx\Downloads\bovine_reference_cetacean_fastas"
 
     os.mkdir(renamed_path)
 

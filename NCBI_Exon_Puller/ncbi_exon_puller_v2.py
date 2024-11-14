@@ -86,7 +86,7 @@ def read_gene_table_v2(text: str, id_to_org: Dict[str, str]) -> Dict:
             acc_quality = acc_name[:2]
 
             # if there exists both the exon and cds column
-            if cds_column_no != -1 and exon_column_no != -1 and acc_quality != "XM":
+            if cds_column_no != -1 and exon_column_no != -1: # and acc_quality != "XM":
 
                 transcript = Transcript(acc_name)
 
