@@ -50,7 +50,7 @@ if __name__ == "__main__":
         tax = Entrez.parse(tax_fetch)
         first, last = None, None
         for t in tax:
-            first, last = t["ScientificName"].split()
+            first, last = t["ScientificName"].split()[:2]
 
         # get CDS range
         success, attempts = False, 0
