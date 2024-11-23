@@ -20,7 +20,7 @@ if __name__ == "__main__":
     print("max: " + str(max(arr)))
     print("min: " + str(min(arr)))
 
-    x = numpy.quantile(arr, [0, 0.25, 0.5, 0.75, 1])
+    x = numpy.quantile(arr, [0, 0.25, 0.5, 0.75, 0.95, 1])
     print(x)
 
     f2 = open(r"C:\Users\tonyx\Downloads\new_introns.txt", "w")

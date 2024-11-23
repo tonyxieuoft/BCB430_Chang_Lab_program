@@ -8,7 +8,7 @@ from NCBI_Genome_Blaster.assemble_blast_result_sequences import \
     ExonBlastXMLParser, SEQUENCE_INDICES_FROM_MRNA_TAG
 
 MAX_INTRON_LENGTH = 10000000
-MAX_CONTIG_GAP = 1000
+MAX_CONTIG_GAP = 11000
 
 def extract_query_title(title_str):
 
@@ -138,7 +138,7 @@ class ImprovedExonParser(ExonBlastXMLParser):
                     dp_table[k][i] = (max_coverage + hits[i]["seq_range"],
                                       prev_exon, prev_hit)
 
-        # print(dp_table)
+        print(dp_table)
         best_last_hsp = (-1, -1)
         best_last_score = 0
         for i in range(len(dp_table)):
@@ -156,9 +156,9 @@ class ImprovedExonParser(ExonBlastXMLParser):
 
             exon_no, hsp_no = dp_table[exon_no][hsp_no][1], dp_table[exon_no][hsp_no][2]
 
-        #print(picked)
-        f = open(r"/crun/tony.xie/Downloads/intron_lengths2.txt", "a")
-        #f = open(r"C:\Users\tonyx\Downloads\intron_lengths2.txt", "a")
+        print(picked)
+        #f = open(r"/crun/tony.xie/Downloads/intron_lengths2.txt", "a")
+        f = open(r"C:\Users\tonyx\Downloads\intron_lengths2.txt", "a")
         f.write(self.species_name + "\n")
 
         for i in range(1, len(picked)):
@@ -309,7 +309,7 @@ if __name__ == "__main__":
     #path = r"C:\Users\tonyx\Downloads\KGMVRFG9013-Alignment.xml"
     #path = r"C:\Users\tonyx\Downloads\M2GBJPF2013-Alignment.xml"
     #path = r"C:\Users\tonyx\Downloads\M2HJANYT016-Alignment.xml"
-    path = r"C:\Users\tonyx\Downloads\M31XBSJV016-Alignment.xml"
+    path = r"C:\Users\tonyx\Downloads\M3DS2H6D013-Alignment.xml"
     save_dir = r"C:\Users\tonyx\Downloads"
 
     Entrez.email = "xiaohan.xie@mail.utoronto.ca"
