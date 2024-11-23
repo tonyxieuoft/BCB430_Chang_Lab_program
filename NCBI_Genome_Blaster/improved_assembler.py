@@ -7,7 +7,7 @@ from NCBI_Exon_Puller.ncbi_exon_puller import ncbi_get_gene_sequence
 from NCBI_Genome_Blaster.assemble_blast_result_sequences import \
     ExonBlastXMLParser, SEQUENCE_INDICES_FROM_MRNA_TAG
 
-MAX_INTRON_LENGTH = 100000
+MAX_INTRON_LENGTH = 10000000
 MAX_CONTIG_GAP = 1000
 
 def extract_query_title(title_str):
@@ -130,7 +130,7 @@ class ImprovedExonParser(ExonBlastXMLParser):
                             # print(str(k) + " " + str(i) + " " + str(a) + " " + str(b))
 
                             if dp_table[a][b][0] > max_coverage and \
-                                    self._is_compatible(exons[a][b], exons[k][i]):
+                                    self._is_compatible(exons[a][b], exons[k][i], k-a):
                                 max_coverage = dp_table[a][b][0]
                                 prev_exon = a
                                 prev_hit = b
@@ -156,16 +156,34 @@ class ImprovedExonParser(ExonBlastXMLParser):
 
             exon_no, hsp_no = dp_table[exon_no][hsp_no][1], dp_table[exon_no][hsp_no][2]
 
-        # print(picked)
+        #print(picked)
+        f = open(r"/crun/tony.xie/Downloads/intron_lengths.txt", "a")
+        f.write(self.species_name + "\n")
+
+        for i in range(1, len(picked)):
+            before_hsp = exons[picked[i-1][0]][picked[i-1][1]]
+            latter_hsp = exons[picked[i][0]][picked[i][1]]
+
+            before_exon = picked[i-1][0]
+            after_exon = picked[i][0]
+            exon_diff = after_exon - before_exon
+
+            if (latter_hsp["ref_acc"] == before_hsp["ref_acc"]):
+                f.write(str((abs(latter_hsp["h_start"]-before_hsp["h_end"])-1) // exon_diff) + "\n")
+
+        f.close()
+
         for coord in picked:
             self._length_force_and_print(exons[coord[0]][coord[1]])
 
 
-    def _is_compatible(self, x, y):
+
+    def _is_compatible(self, x, y, exon_diff):
         """
 
         :param x: hsp with earlier exon prio
         :param y: hsp with later exon prio
+        :param exon_diff: number of exons in between
         :return:
         """
 
@@ -180,7 +198,7 @@ class ImprovedExonParser(ExonBlastXMLParser):
             if x["h_start"] > x["h_end"] and y["h_start"] >= x["h_end"]:
                 return False
 
-            if abs(y["h_start"] - x["h_end"])-1 > MAX_INTRON_LENGTH:
+            if abs(y["h_start"] - x["h_end"])-1 > MAX_INTRON_LENGTH*exon_diff:
                 return False
 
         else: # x["contig_acc"] != y["contig_acc"]
@@ -289,7 +307,7 @@ if __name__ == "__main__":
     #path = r"C:\Users\tonyx\Downloads\KGMVRFG9013-Alignment.xml"
     #path = r"C:\Users\tonyx\Downloads\M2GBJPF2013-Alignment.xml"
     #path = r"C:\Users\tonyx\Downloads\M2HJANYT016-Alignment.xml"
-    path = r"C:\Users\tonyx\Downloads\M2KWB8VP016-Alignment.xml"
+    path = r"C:\Users\tonyx\Downloads\M31XBSJV016-Alignment.xml"
     save_dir = r"C:\Users\tonyx\Downloads"
 
     Entrez.email = "xiaohan.xie@mail.utoronto.ca"
