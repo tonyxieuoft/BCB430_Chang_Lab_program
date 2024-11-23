@@ -158,6 +158,7 @@ class ImprovedExonParser(ExonBlastXMLParser):
 
         #print(picked)
         f = open(r"/crun/tony.xie/Downloads/intron_lengths.txt", "a")
+        #f = open(r"C:\Users\tonyx\Downloads\intron_lengths2.txt", "a")
         f.write(self.species_name + "\n")
 
         for i in range(1, len(picked)):
@@ -169,6 +170,7 @@ class ImprovedExonParser(ExonBlastXMLParser):
             exon_diff = after_exon - before_exon
 
             if (latter_hsp["ref_acc"] == before_hsp["ref_acc"]):
+                f.write(before_hsp["gene_name"] + "_" + str(before_exon) + "_" + str(after_exon) + "\n")
                 f.write(str((abs(latter_hsp["h_start"]-before_hsp["h_end"])-1) // exon_diff) + "\n")
 
         f.close()
