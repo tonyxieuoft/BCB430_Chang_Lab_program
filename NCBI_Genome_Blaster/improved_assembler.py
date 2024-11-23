@@ -8,7 +8,7 @@ from NCBI_Genome_Blaster.assemble_blast_result_sequences import \
     ExonBlastXMLParser, SEQUENCE_INDICES_FROM_MRNA_TAG
 
 MAX_INTRON_LENGTH = 10000000
-MAX_CONTIG_GAP = 11000
+MAX_CONTIG_GAP = 20000
 
 def extract_query_title(title_str):
 
