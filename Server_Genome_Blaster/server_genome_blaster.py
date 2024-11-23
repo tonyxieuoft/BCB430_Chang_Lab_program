@@ -5,6 +5,7 @@ from Basic_Tools.lists_and_files import list_to_string
 from Basic_Tools.taxonomy_browser import get_taxa_taxids
 from NCBI_Genome_Blaster.assemble_blast_result_sequences import BlastXMLParser, \
     ExonBlastXMLParser, FullBlastXMLParser
+from NCBI_Genome_Blaster.improved_assembler import ImprovedExonParser
 from Server_Genome_Blaster.genome_downloader import SPECIES_DATA_FILENAME, \
     ServerGenomeDownloader, \
     read_species_data
@@ -102,12 +103,19 @@ class ServerGenomeBlaster:
     def parse_blast_xml(self, file_to_analyze, curr_species):
         pass
 
-
 class ServerExonGenomeBlaster(ServerGenomeBlaster):
 
     def parse_blast_xml(self, file_to_analyze, curr_species):
 
         parser = ExonBlastXMLParser(file_to_analyze, self.save_path,
+                                    curr_species, on_server=True)
+        parser.parse_blast_xml()
+
+class ServerImprovedExonGenomeBlaster(ServerGenomeBlaster):
+
+    def parse_blast_xml(self, file_to_analyze, curr_species):
+
+        parser = ImprovedExonParser(file_to_analyze, self.save_path,
                                     curr_species, on_server=True)
         parser.parse_blast_xml()
 

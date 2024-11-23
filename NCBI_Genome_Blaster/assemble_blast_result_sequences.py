@@ -48,6 +48,8 @@ def gap_corrector(q_seq, h_seq):
     return h_corrected_gaps
 
 
+
+
 class BlastXMLParser:
 
     def __init__(self, file, save_dir, curr_species):
