@@ -138,7 +138,7 @@ class ImprovedExonParser(ExonBlastXMLParser):
                     dp_table[k][i] = (max_coverage + hits[i]["seq_range"],
                                       prev_exon, prev_hit)
 
-        print(dp_table)
+        # print(dp_table)
         best_last_hsp = (-1, -1)
         best_last_score = 0
         for i in range(len(dp_table)):
@@ -156,7 +156,7 @@ class ImprovedExonParser(ExonBlastXMLParser):
 
             exon_no, hsp_no = dp_table[exon_no][hsp_no][1], dp_table[exon_no][hsp_no][2]
 
-        print(picked)
+        # print(picked)
         #f = open(r"/crun/tony.xie/Downloads/intron_lengths2.txt", "a")
         f = open(r"C:\Users\tonyx\Downloads\intron_lengths2.txt", "a")
         f.write(self.species_name + "\n")

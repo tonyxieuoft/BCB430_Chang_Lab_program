@@ -2,8 +2,8 @@ import os
 
 if __name__ == "__main__":
 
-    dir_path = r"C:\Users\tonyx\Downloads\alignments12"
-    save_path = r"C:\Users\tonyx\Downloads\to_double_check"
+    dir_path = r"C:\Users\tonyx\Downloads\alignments15"
+    save_path = r"C:\Users\tonyx\Downloads\intermediate2"
 
     for alignment in os.listdir(dir_path):
 

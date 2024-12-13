@@ -1,41 +1,28 @@
+import os
 import time
 from os import path
 
 from Bio import Entrez
 
+
 def string_empty(str):
     return str != ""
 
+def extract_cds_from_accession(file, out_dirpath):
 
-if __name__ == "__main__":
-
-    Entrez.email = input("Please enter your email. This is required to access "
-                         "NCBI Genbank via the API.")
-
-    accession_filepath = input("Please enter the complete filepath to a file "
-                                "containing the accessions. The file should be "
-                                "in .txt format, with only one accession per "
-                                "line.")
-
-    accession_dirpath = input("Please enter the complete path to a "
-                               "directory you wish the file to the outputted "
-                               "to. ")
-    while not path.isdir(accession_dirpath):
-        accession_dirpath = input("Invalid directory path, please enter again.")
-
-    out_path_name = "cds_output"
+    out_path_name = path.splitext(path.basename(file))[0]
 
     file_num = 1
-    out_path = path.join(accession_dirpath, out_path_name + ".fas")
+    out_path = path.join(out_dirpath, out_path_name + ".fas")
     while path.isfile(out_path):
 
-        out_path = path.join(accession_dirpath, out_path_name +
+        out_path = path.join(out_dirpath, out_path_name +
                              " (" + str(file_num) + ").fas")
         file_num += 1
 
     output_f = open(out_path, "w")
 
-    accessions = filter(string_empty, open(accession_filepath).read().split())
+    accessions = filter(string_empty, open(file).read().split())
 
     for acc in accessions:
 
@@ -73,11 +60,22 @@ if __name__ == "__main__":
         output = str(sequence_handle.read()).split()
         start = None
         end = None
+        ge = False
         for i in range(len(output)):
-            if (i - 2 >= 0) and output[i] == "CDS" and output[i-1].isnumeric() and \
-                    output[i-2].isnumeric() and int(output[i-2]) < int(output[i-1]):
+            if (i - 2 >= 0) and output[i] == "CDS" and \
+                    output[i-1].isnumeric() and \
+                    output[i-2].isnumeric() and \
+                    int(output[i-2]) < int(output[i-1]):
                 start = output[i-2]
                 end = output[i-1]
+            if (i - 2 >= 0) and output[i] == "CDS" and \
+                    len(output[i-1]) > 0 and \
+                    output[i-1][1:].isnumeric() and \
+                    output[i-2].isnumeric() and \
+                    int(output[i-2]) < int(output[i-1][1:]) and \
+                    output[i-1][0] == ">":
+                start = output[i-2]
+                end = output[i-1][1:]
 
         # get sequence
         if start is None:
@@ -101,14 +99,36 @@ if __name__ == "__main__":
             if attempts == 5:
                 raise Exception("Failure to retrieve sequence with accession: " + acc)
 
-            #output_f.write(">" + first[0] + last[:3] + "\n" + "\n".join(sequence_handle.read().split("\n")[1:]))
-            output_f.write(sequence_handle.read())
+            output_f.write(">" + first[0] + last[:3] + "\n" + "\n".join(sequence_handle.read().split("\n")[1:]))
+            #output_f.write(sequence_handle.read())
             print("success for accession: " + acc)
 
 
+if __name__ == "__main__":
+
+    Entrez.email = input("Please enter your email. This is required to access "
+                         "NCBI Genbank via the API.")
+
+    in_dir = input("Please enter the complete path to a directory of .txt files "
+                               "containing the accessions. The files should only have one accession per "
+                               "line.")
+
+    out_dir = input("Please enter the complete path to a "
+                    "directory you wish the files to be outputted "
+                    "to. It is recommended that you create a new directory "
+                    "first, then specify its path here. ")
+
+    while not path.isdir(out_dir):
+        accession_dirpath = input("Invalid directory path, please enter again.")
+
+    for file_name in os.listdir(in_dir):
+        file_path = os.path.join(in_dir, file_name)
+        extract_cds_from_accession(file_path, out_dir)
+
+    print("done")
 
 
 # testing
 # 1) xiaohan.xie@mail.utoronto.ca
-# 2) C:\Users\tonyx\Downloads\sample_acc.txt
+# 2) C:\Users\tonyx\Downloads\extract_in
 # 3) C:\Users\tonyx\Downloads
