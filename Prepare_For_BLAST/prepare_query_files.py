@@ -276,6 +276,7 @@ class ExonBlastPreparer(BlastPreparer):
                 print(ref_species_name)
                 to_select = self.select_fill_in(ref_species_name,
                                                 available_species)
+                print("potential error here:")
                 print(to_select)
                 species_path = os.path.join(gene_path, to_select["taxon"],
                                             to_select["species"])
