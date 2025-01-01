@@ -13,3 +13,5 @@ if __name__ == "__main__":
         f2 = open(os.path.join(out_path, os.path.splitext(file)[0] + ".txt"), "w")
 
         f2.write(f1.read())
+
+    print("test")
