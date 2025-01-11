@@ -83,6 +83,13 @@ def get_taxonomy_lineage(species_string: str):
     ids = ""
     all_species = species_string.split("\n")
     for species in all_species:
+
+        if species == "Sagmatias obliquidens":
+            species = "Lagenorhynchus obliquidens"
+
+        if species == "":
+            species = "Lagenorhynchus acutus"
+
         handle = Entrez.esearch(db="taxonomy", term=species)
         time.sleep(0.02)
         taxid = Entrez.read(handle)['IdList'][0]
@@ -93,6 +100,7 @@ def get_taxonomy_lineage(species_string: str):
     handle2 = Entrez.efetch(db="taxonomy", id=ids)
     results = Entrez.read(handle2)
     for org in results:
+
         name = org["ScientificName"]
         phylo_dict[name] = [org['TaxId']] # add the organism's own first
         lineage = org["LineageEx"]
@@ -105,14 +113,20 @@ def get_taxonomy_lineage(species_string: str):
 if __name__ == "__main__":
     #general_dir = r"C:\Users\tonyx\Downloads\NCBI_exons_bat"
     #print(get_taxa_taxids(general_dir))
-    species_string = "Tursiops truncatus\nOrcinus orca\n" \
-                     "Balaenoptera acutorostrata\nBalaenoptera musculus\n" \
-                     "Balaenoptera ricei\nDelphinapterus leucas\n" \
-                     "Delphinus delphis\nEubalaena glacialis\n" \
-                     "Globicephala melas\nKogia breviceps\n" \
-                     "Lagenorhynchus albirostris\nLagenorhynchus obliquidens\n" \
-                     "Mesoplodon densirostris\nMonodon monoceros\n" \
-                     "Neophocaena asiaeorientalis asiaeorientalis\n" \
-                     "Phocoena phocoena\nPhocoena sinus\n" \
-                     "Physeter catodon"
+    # species_string = "Tursiops truncatus\nOrcinus orca\n" \
+    #                 "Balaenoptera acutorostrata\nBalaenoptera musculus\n" \
+    #                 "Balaenoptera ricei\nDelphinapterus leucas\n" \
+    #                 "Delphinus delphis\nEubalaena glacialis\n" \
+    #                 "Globicephala melas\nKogia breviceps\n" \
+    #                 "Lagenorhynchus albirostris\nLagenorhynchus obliquidens\n" \
+    #                 "Mesoplodon densirostris\nMonodon monoceros\n" \
+    #                 "Neophocaena asiaeorientalis asiaeorientalis\n" \
+    #                 "Phocoena phocoena\nPhocoena sinus\n" \
+    #                 "Physeter catodon"
+
+    Entrez.email = "xiaohan.xie@mail.utoronto.ca"
+    species_string = "Lagenorhynchus obliquidens"
+    handle = Entrez.esearch(db="taxonomy", term=species_string)
+    time.sleep(0.02)
+    print(Entrez.read(handle))
     print(get_taxonomy_lineage(species_string))

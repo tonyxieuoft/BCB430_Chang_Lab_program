@@ -50,7 +50,7 @@ def extract_cds_from_accession(file, out_dirpath):
                                                 retmode='text')
                 success = True
             except:
-                time.sleep(0.5)
+                time.sleep(1)
                 attempts += 1
                 print("attempting to fetch sequence ")
 
@@ -76,6 +76,14 @@ def extract_cds_from_accession(file, out_dirpath):
                     output[i-1][0] == ">":
                 start = output[i-2]
                 end = output[i-1][1:]
+            if (i -2 >= 0) and output[i] == "CDS" and \
+                    len(output[i-2]) > 0 and \
+                    output[i-2][1:].isnumeric() and \
+                    output[i-1].isnumeric() and \
+                    int(output[i-2][1:]) < int(output[i-1]) and \
+                    output[i-2][0] == "<":
+                start = output[i-2][1:]
+                end = output[i-1]
 
         # get sequence
         if start is None:
@@ -92,7 +100,7 @@ def extract_cds_from_accession(file, out_dirpath):
                                                     seq_stop = end)
                     success = True
                 except:
-                    time.sleep(0.5)
+                    time.sleep(1)
                     attempts += 1
                     print("attempting to fetch sequence " + acc)
 
