@@ -2,8 +2,10 @@ import os
 
 if __name__ == "__main__":
 
-    dir_path = r"C:\Users\tonyx\Downloads\alignments15"
-    save_path = r"C:\Users\tonyx\Downloads\intermediate2"
+    dir_path = r"/Users/tonyx/Documents/chang_lab/1e-5_final"
+    save_path = r"/Users/tonyx/Documents/chang_lab/1e-5_ambigs_added"
+
+    os.mkdir(save_path)
 
     for alignment in os.listdir(dir_path):
 
