@@ -39,11 +39,18 @@ def concatenate_gene_results(paths: List[str], save_path):
                         else:
                             encountered_species[species][gene] = True
 
-                        file_to_use = get_longest_transcript(species_path)
-                        if file_to_use != "":
-                            to_write = concatenate_exons(
-                                os.path.join(species_path, file_to_use))
+                        # IF ALL REFERENCE TRANSCRIPTS ARE TO BE INCLUDED
+
+                        for transcript in os.listdir(species_path):
+                            to_write = concatenate_exons(os.path.join(species_path, transcript))
                             gene_save_file.write(to_write)
+
+                        # IF ONLY THE LONGEST ONE IS TO BE INCLUDED
+                        # file_to_use = get_longest_transcript(species_path)
+                        # if file_to_use != "":
+                        #    to_write = concatenate_exons(
+                        #         os.path.join(species_path, file_to_use))
+                        #    gene_save_file.write(to_write)
 
             gene_save_file.close()
 
