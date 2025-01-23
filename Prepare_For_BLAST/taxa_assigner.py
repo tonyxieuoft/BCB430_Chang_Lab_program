@@ -40,15 +40,17 @@ def auto_assign_taxa_to_ref(lineage_dct: Dict, ref_species: List[str],
         else:
             # this happens after bumping into an already assigned subject_taxa
             # therefore, its subject_taxa is the one just below it
-            result.insert(0, [ref, ref_lineage[depth-1]])
+            if depth-1 >= 0:
+                # if statement covers the edge case of a species duplicate in the taxon file
+                # which would cause an index out of bounds error
+                result.insert(0, [ref, ref_lineage[depth-1]])
             # insert at the front
 
     return result
 
 
 def get_assignments(auto: int, lineage_dict: Dict[str, List[str]],
-                    taxid_codes: Dict[str, str],
-                    taxa_to_species_dict: Dict[str, List[str]]) -> List:
+                    taxa_to_codes: Dict[str, str]) -> List:
     """
     Get the sub-branch assignments for each reference species.
 
@@ -56,19 +58,46 @@ def get_assignments(auto: int, lineage_dict: Dict[str, List[str]],
     manually entering assignments.
     :param lineage_dict: a dictionary where keys are species names and values
     are lists of assigned_taxa corresponding to the lineage of a species
-    :param taxid_codes: a dictionary where keys are assigned_taxa and values are taxids
-    :param taxa_to_species_dict: a dictionary where keys are assigned_taxa and values are
+    :param taxa_to_codes: a dictionary where keys are assigned_taxa and values are taxids
+    :param ref_species: a dictionary where keys are assigned_taxa and values are
     reference species in the assigned_taxa
     :return: a list of reference -> assigned_taxa assignments
     """
     # automatic assignment of reference species to sub-branches of overhead assigned_taxa
     if auto == 1:
-        assignments = []
+
+        # dictionary mapping taxids to the reference species contained within them
+        code_to_ref_species = {}
+        for ref_org in lineage_dict:
+            for code in lineage_dict[ref_org]:
+                if code not in code_to_ref_species:
+                    code_to_ref_species[code] = [ref_org]
+                else:
+                    code_to_ref_species[code].append(ref_org)
+
+        assignments = {}
         # for each overhead taxon, get automatic assignments. concatenate them
         # at the end as a list of entries to BLAST.
-        for taxon in taxid_codes.keys():
-            taxid = taxid_codes[taxon]
-            assignments += auto_assign_taxa_to_ref(lineage_dict, taxa_to_species_dict[taxon], taxid)
+        for taxon in taxa_to_codes:
+            taxid = taxa_to_codes[taxon][0]
+
+            # if no reference species are a part of the taxon
+            if taxid not in code_to_ref_species:
+
+                i = 1
+                parent_id = taxa_to_codes[taxon][i]
+                while parent_id not in code_to_ref_species:
+                    i += 1
+                    parent_id = taxa_to_codes[taxon][i]
+
+                # find the ref species that's closest and assign it to the taxon
+                assignments += [[code_to_ref_species[parent_id][0], taxid]]
+
+            else:
+                assignments += auto_assign_taxa_to_ref(lineage_dict,
+                                                       code_to_ref_species[taxid],
+                                                       taxid)
+
         return assignments
 
     # user themselves inputs a file, where it's reference sequence + taxon for

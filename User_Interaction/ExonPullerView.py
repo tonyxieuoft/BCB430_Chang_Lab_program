@@ -1,5 +1,5 @@
 from Basic_Tools.numeric_user_input import numeric_user_input
-from User_Interaction.user_exon_pulling import enter_gene_filepath
+from User_Interaction.file_acceptors import enter_gene_filepath
 
 
 class ExonPullerView:

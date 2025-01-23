@@ -17,13 +17,13 @@ if __name__ == "__main__":
         if menu_choice == 1:
             menu.exon_puller_view()
         elif menu_choice == 2:
-            menu.gene_description_refiner_view()
+            menu.convert_NEPR_to_BR_view()
         elif menu_choice == 3:
             menu.genome_blaster_view()
         elif menu_choice == 4:
             menu.alignment_creator_view()
         elif menu_choice == 5:
-            menu.discard_and_reiterate_view()
+            menu.gene_description_refiner_view()
         else:
             sys.exit(0)
 

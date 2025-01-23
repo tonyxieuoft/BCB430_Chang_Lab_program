@@ -15,6 +15,7 @@ from NCBI_Genome_Blaster.driver_genome_blaster import driver_genome_blaster
 from NCBI_Genome_Blaster.driver_genome_blaster_v2 import \
     DriverExonGenomeBlasterV2, DriverFullGenomeBlasterV2, DriverGenomeBlasterV2
 from NCBI_Genome_Blaster.local_genome_blaster import local_genome_blaster
+from Prepare_For_BLAST.NEPR_convert import convert_NEPR_directory
 from Prepare_For_BLAST.prepare_query_files import ExonBlastPreparer, \
     ExonBlastPreparer, FullBlastPreparer
 from Quality_Checking.get_longest_transcript import \
@@ -24,8 +25,8 @@ from Server_Genome_Blaster.server_genome_blaster import ServerExonGenomeBlaster,
     ServerFullGenomeBlaster, ServerImprovedExonGenomeBlaster
 from User_Interaction.expect_threshold_user_input import \
     expect_threshold_user_input
-from User_Interaction.user_exon_pulling import enter_gene_filepath, \
-    get_generic_directory, get_generic_filepath
+from User_Interaction.file_acceptors import enter_gene_filepath, \
+    get_generic_directory, get_generic_filepath, enter_taxa_filepath
 
 
 class UI:
@@ -39,6 +40,8 @@ class UI:
         self.refined_gene_query_filepath = ""
 
         self.exon_pull_dir = ""
+
+        self.blast_reference_dir = ""
 
         self.blast_results_path = ""
 
@@ -81,11 +84,11 @@ class UI:
         print()
         print("========================= MAIN MENU =============================")
         print("(1) Pull existing sequence data from the NCBI GENE database.")
-        print("(2) Refine gene names and descriptions used to query the NCBI "
-              "GENE database.")
+        print("(2) Create a new BR directory containing the contents of an NEPR directory")
         print("(3) Run NCBI BLAST to pull exons from whole GENOMES.")
         print("(4) Concatenate gene sequences into alignment files.")
-        print("(5) Discard defects and reiterate")
+        print("(5) Refine gene names and descriptions used to query the NCBI "
+              "GENE database.")
         print("(6) Quit the program")
         print("Enter a number from 1-6 to select from one of the above options:")
 
@@ -120,8 +123,7 @@ class UI:
             discard_taxa_file = numeric_user_input(1, 2, "")
         if self.taxa_filepath == "" or discard_taxa_file == 2:
             print()
-            print("Enter a valid file path containing TAXA of interest to pull for.")
-            self.taxa_filepath = get_generic_filepath()
+            self.taxa_filepath = enter_taxa_filepath()
 
         print()
         print("The program can pull the sequences either as separate exons or "
@@ -261,16 +263,49 @@ class UI:
         print()
         print("====================== PREPARING FOR BLAST ======================")
 
+        if self.taxa_filepath != "":
+            print("Please enter a file path to taxa of interest you will like to pull BLAST results for.")
+            print("Last taxa file path entered: " + self.taxa_filepath)
+            print("Enter:\n"
+                  "(1) to use this file\n"
+                  "(2) to enter a different file"
+                  "(3) to return to the main menu")
+
+            taxapath_choice = numeric_user_input(1, 3, "")
+            if taxapath_choice == 3:
+                return None
+            elif taxapath_choice == 2:
+                self.taxa_filepath = enter_taxa_filepath()
+
+        else:
+            print("Please enter a file path to taxa of interest you will like to pull results for.")
+            self.taxa_filepath = enter_taxa_filepath()
+            print()
+
         print("NCBI BLAST requires query sequences to identify "
               "homologous regions in genomic subject sequences. For this "
               "program, the directory containing query sequences must be "
-              "in the format of results created by the NCBI exon puller.")
+              "in the Blast Reference (BR) format (see readme for details).")
         print()
-        if self.exon_pull_dir != "":
-            print("Last accessed directory created by the NCBI exon puller: " + self.exon_pull_dir)
+
+        if self.blast_reference_dir != "":
+            print("Last BR directory created during this session: " + self.blast_reference_dir)
             print("Enter:")
             print("(1) to use this directory")
-            print("(2) to use a different directory")
+            print("(2) to use a different directory (must also be in BR format!)")
+            print("(3) to exit and return to the main menu")
+
+            blast_reference_choice = 0
+            if blast_reference_choice == 3:
+                return None
+            elif blast_reference_choice == 2:
+                self.blast_reference_dir = get_generic_directory()
+
+        elif self.exon_pull_dir != "":
+            print("Last accessed directory created by the NCBI exon puller: " + self.exon_pull_dir)
+            print("Enter:")
+            print("(1) to use this directory (which will be copied and automatically converted to BR format)")
+            print("(2) to use a different directory (must be in BR format!)")
             print("(3) to exit and return to the main menu")
 
             exon_dir_choice = numeric_user_input(1, 3, "")
@@ -278,19 +313,25 @@ class UI:
             if exon_dir_choice == 3:
                 return None
             elif exon_dir_choice == 2:
-                self.exon_pull_dir = get_generic_directory()
+                self.blast_reference_dir = get_generic_directory()
+            elif exon_dir_choice == 1:
+                self.blast_reference_dir = convert_NEPR_directory(self.exon_pull_dir, self.download_dir)
+                print()
+                print("New Blast Reference directory created at: " + self.blast_reference_dir)
+                print()
         else:
-            print("No previous iteration of the NCBI exon puller has been ran "
+            print("No previous BR directory creation or NCBI exon puller iteration has been ran "
                   "during this program session.")
             print("Enter:")
             print("(1) to enter a path to a directory containing reference sequences\n"
-                  "    (must be in the format of results outputted by the NCBI exon puller)")
+                  "    (must be in Blast Reference (BR) format! Select option 2 in the main menu"
+                  "     if you wish to use results from the program's exon pulling feature)")
             print("(2) to exit and return to the main menu")
 
             directory_choice = numeric_user_input(1, 2, "")
 
             if directory_choice == 1:
-                self.exon_pull_dir = get_generic_directory()
+                self.blast_reference_dir = get_generic_directory()
             else:
                 return None
 
@@ -422,10 +463,13 @@ class UI:
             if exon_or_full_query_choice == 1:
                 #genome_blaster = ServerExonGenomeBlaster(self.blast_results_path, queries_path, blast_preparer.taxa_blast_order,
                 #                                         blast_preparer.complete_reference_species, genome_storage_path, self.exon_pull_dir)
-                genome_blaster = ServerImprovedExonGenomeBlaster(self.blast_results_path, queries_path, blast_preparer.taxa_blast_order,blast_preparer.complete_reference_species, genome_storage_path, self.exon_pull_dir)
+                genome_blaster = ServerImprovedExonGenomeBlaster(self.blast_results_path, queries_path,
+                                                                 blast_preparer.taxa_blast_order, blast_preparer.complete_reference_species,
+                                                                 genome_storage_path, blast_preparer.taxa_to_codes)
             else:
                 genome_blaster = ServerFullGenomeBlaster(self.blast_results_path, queries_path, blast_preparer.taxa_blast_order,
-                                                         blast_preparer.complete_reference_species, genome_storage_path, self.exon_pull_dir, blast_preparer.queries_to_genes_to_exons)
+                                                         blast_preparer.complete_reference_species, genome_storage_path,
+                                                         blast_preparer.taxa_to_codes, blast_preparer.queries_to_genes_to_exons)
             genome_blaster.download_new_genomes()
             genome_blaster.blast_genomes(expect_value)
 
@@ -511,71 +555,23 @@ class UI:
         print("Enter any key to return to the main menu.")
         input()
 
-    def discard_and_reiterate_view(self):
+    def convert_NEPR_to_BR_view(self):
 
-        print("======================= DISCARDING ==============================")
+        print("Please enter a NEPR directory, whose contents will be copied and stored in "
+              "in a BR directory. (Note that NEPR directories created during this program's "
+              "instance will automatically be converted.")
+        print()
+        to_convert = get_generic_directory()
+        self.blast_reference_dir = convert_NEPR_directory(to_convert, self.download_dir)
 
-        iteration_path = make_unique_directory(self.download_dir, "iteration")
+        print("Finished.")
 
-        if self.exon_pull_dir == "":
-            print("We need an exon pull dir:")
-            self.exon_pull_dir = get_generic_directory()
+        print("Enter any key to return to the main menu.")
+        input()
 
-        if self.blast_results_path == "":
-            print("We need blast results:")
-            self.blast_results_path = get_generic_directory()
 
-        if self.alignments_path == "":
-            print("We need alignments path:")
-            self.alignments_path = get_generic_directory()
 
-        for gene_alignment in os.listdir(self.alignments_path):
 
-            gene_name = os.path.splitext(gene_alignment)[0]
-
-            iteration_gene_path = os.path.join(iteration_path, gene_name)
-            os.mkdir(iteration_gene_path)
-
-            q = QualityAnalyser(os.path.join(self.alignments_path, gene_alignment))
-            defects = (q.detect_non_meth_starts() | q.detect_gaps() |
-                       q.detect_non_stop_ends() | q.detect_non_three_multiples() |
-                       q.detect_premature_stops())
-            print(defects)
-
-            for gene in os.listdir(self.exon_pull_dir):
-                if gene == gene_name:
-                    gene_path = os.path.join(self.exon_pull_dir, gene)
-
-                    for taxon in os.listdir(gene_path):
-                        taxon_path = os.path.join(gene_path, taxon)
-
-                        iteration_taxon_path = os.path.join(iteration_gene_path, taxon)
-                        os.mkdir(iteration_taxon_path)
-
-                        for species in os.listdir(taxon_path):
-                            species_path = os.path.join(taxon_path, species)
-                            if species not in defects:
-                                iteration_species_path = os.path.join(iteration_taxon_path, species)
-                                shutil.copytree(species_path, iteration_species_path)
-                    break
-
-            for gene in os.listdir(self.blast_results_path):
-                if gene == gene_name:
-                    gene_path = os.path.join(self.blast_results_path, gene)
-
-                    for taxon in os.listdir(gene_path):
-                        taxon_path = os.path.join(gene_path, taxon)
-
-                        iteration_taxon_path = os.path.join(iteration_gene_path, taxon)
-
-                        for species in os.listdir(taxon_path):
-                            species_path = os.path.join(taxon_path, species)
-                            if species not in defects and species not in os.listdir(iteration_taxon_path):
-                                iteration_species_path = os.path.join(iteration_taxon_path, species)
-                                shutil.copytree(species_path, iteration_species_path)
-                    break
-
-        self.exon_pull_dir = iteration_path
 
 
 

@@ -1,7 +1,36 @@
 import os
 
 from Basic_Tools.lists_and_files import file_to_list
+from Basic_Tools.taxonomy_browser import get_single_taxid
 
+def enter_taxa_filepath() -> str:
+    print("Enter a valid file path containing TAXA of interest. These"
+          " taxa must be recognized by the NCBI database")
+
+    valid_taxa_file = False
+    taxa_filepath = ""
+
+    while not valid_taxa_file:
+        print("Filepath:")
+        taxa_filepath = input()
+        if not os.path.isfile(taxa_filepath):
+            print("Invalid filepath/ Please enter again.")
+        else:
+            valid_gene_query_file = True
+            taxa_arr = file_to_list(taxa_filepath)
+
+            for taxa in taxa_arr:
+                taxid = get_single_taxid(taxa)
+
+                if taxid == "":
+                    valid_gene_query_file = False
+                    break
+
+            if not valid_gene_query_file:
+                print("Invalid input. One or more taxa are not recognized by the NCBI "
+                      "taxonomy database.")
+
+    return taxa_filepath
 
 def enter_gene_filepath() -> str:
 

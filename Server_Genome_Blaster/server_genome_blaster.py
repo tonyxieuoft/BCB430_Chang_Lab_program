@@ -15,7 +15,7 @@ class ServerGenomeBlaster:
 
     # TODO make a Genome Blaster class?
     def __init__(self, save_path, queries_path, taxa_blast_order,
-                 complete_reference_species, genome_storage_path, exon_pull_dir):
+                 complete_reference_species, genome_storage_path, taxa_to_codes):
 
         self.save_path = save_path
 
@@ -27,7 +27,9 @@ class ServerGenomeBlaster:
         self.species_so_far = {}
         self.set_species_so_far(complete_reference_species)
 
-        self.taxids_to_taxa = get_taxa_taxids(exon_pull_dir)
+        self.taxids_to_taxa = []
+        for taxon in taxa_to_codes:
+            self.taxids_to_taxa[taxa_to_codes[taxon][0]] = taxon
 
         self.genome_storage_path = genome_storage_path
 
@@ -124,10 +126,10 @@ class ServerFullGenomeBlaster(ServerGenomeBlaster):
 
     def __init__(self, save_path, queries_path, taxa_blast_order,
                  complete_reference_species, genome_storage_path,
-                 exon_pull_dir, queries_to_genes_to_exons):
+                 taxa_to_codes, queries_to_genes_to_exons):
         super().__init__(save_path, queries_path, taxa_blast_order,
                          complete_reference_species, genome_storage_path,
-                         exon_pull_dir)
+                         taxa_to_codes)
         self.queries_to_genes_to_exons = queries_to_genes_to_exons
 
     def parse_blast_xml(self, file_to_analyze, curr_species):
