@@ -16,6 +16,7 @@ def enter_taxa_filepath() -> str:
         if not os.path.isfile(taxa_filepath):
             print("Invalid filepath/ Please enter again.")
         else:
+            print("Validating taxa...")
             valid_taxa_file = True
             taxa_arr = file_to_list(taxa_filepath)
 

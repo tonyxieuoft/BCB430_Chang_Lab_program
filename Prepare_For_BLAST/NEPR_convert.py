@@ -37,6 +37,8 @@ def convert_NEPR_directory(dir_path, save_path):
                     shutil.copyfile(os.path.join(old_species_path, picked_file),
                                     os.path.join(new_gene_dir, species + ".fas"))
 
+    return converted_path
+
 if __name__ == "__main__":
     dir_path = "/Users/tonyx/Documents/chang_lab/NCBI_exon_pull_results24"
     save_path = "/Users/tonyx/Documents/chang_lab"

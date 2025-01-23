@@ -268,7 +268,7 @@ class UI:
             print("Last taxa file path entered: " + self.taxa_filepath)
             print("Enter:\n"
                   "(1) to use this file\n"
-                  "(2) to enter a different file"
+                  "(2) to enter a different file\n"
                   "(3) to return to the main menu")
 
             taxapath_choice = numeric_user_input(1, 3, "")
@@ -281,6 +281,9 @@ class UI:
             print("Please enter a file path to taxa of interest you will like to pull results for.")
             self.taxa_filepath = enter_taxa_filepath()
             print()
+
+        print()
+        print("-------------------------------------------------------------------")
 
         print("NCBI BLAST requires query sequences to identify "
               "homologous regions in genomic subject sequences. For this "
