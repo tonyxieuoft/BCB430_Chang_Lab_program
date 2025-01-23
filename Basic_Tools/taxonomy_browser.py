@@ -103,7 +103,7 @@ def get_taxonomy_lineage(species_string: str):
             species = "Lagenorhynchus acutus"
 
         handle = Entrez.esearch(db="taxonomy", term=species)
-        time.sleep(0.02)
+        time.sleep(0.1)
         taxid = Entrez.read(handle)['IdList'][0]
         ids += taxid + ","
 

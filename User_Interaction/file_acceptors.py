@@ -20,6 +20,7 @@ def enter_taxa_filepath() -> str:
             valid_taxa_file = True
             taxa_arr = file_to_list(taxa_filepath)
 
+            """
             for taxa in taxa_arr:
                 taxid = get_single_taxid(taxa)
 
@@ -30,6 +31,7 @@ def enter_taxa_filepath() -> str:
             if not valid_taxa_file:
                 print("Invalid input. One or more taxa are not recognized by the NCBI "
                       "taxonomy database.")
+            """
 
     return taxa_filepath
 
