@@ -32,7 +32,7 @@ def read_species_data(genome_storage_path):
     while line != "":
 
         split_line = line.strip().split(",")
-        genome = {"name": split_line[NAME_COL], "acc": split_line[ACC_COL],
+        genome = {"name": split_line[NAME_COL].strip(), "acc": split_line[ACC_COL].strip(),
                   "lineage": split_line[LINEAGE_COL].split()}
 
         species_data.append(genome)

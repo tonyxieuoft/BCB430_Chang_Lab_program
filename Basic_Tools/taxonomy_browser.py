@@ -74,6 +74,7 @@ def get_single_taxid(taxon: str):
     Entrez.email = "xiaohan.xie@mail.utoronto.ca"
     handle = Entrez.esearch(db="taxonomy", term=taxon)
     search_results = Entrez.read(handle)
+    time.sleep(0.01)
     if len(search_results["IdList"]) > 0:
         return search_results["IdList"][0]
     else:

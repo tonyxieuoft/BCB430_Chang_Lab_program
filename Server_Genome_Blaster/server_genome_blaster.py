@@ -90,7 +90,7 @@ class ServerGenomeBlaster:
                           " -outfmt 5 -evalue " + str(expect_value) +
                           " -word_size 11 -gapopen 5 -gapextend 2 -reward 2 "
                           "-penalty -3 "
-                          "-num_threads 10 "
+                          "-num_threads 16 "
                           "-query " + reference_filepath +
                           " > " + xml_out_path)
 
