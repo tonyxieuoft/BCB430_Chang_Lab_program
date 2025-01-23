@@ -257,9 +257,9 @@ class ExonBlastPreparer(BlastPreparer):
 
 class FullBlastPreparer(BlastPreparer):
 
-    def __init__(self, ref_seq_path, save_path):
+    def __init__(self, ref_seq_path, taxa_path, save_path):
 
-        super().__init__(ref_seq_path, save_path)
+        super().__init__(ref_seq_path, taxa_path, save_path)
         self.queries_to_genes_to_exons = {}
 
     def get_queries_to_genes_to_exons(self):

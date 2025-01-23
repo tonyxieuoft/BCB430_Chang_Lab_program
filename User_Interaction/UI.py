@@ -298,7 +298,7 @@ class UI:
             print("(2) to use a different directory (must also be in BR format!)")
             print("(3) to exit and return to the main menu")
 
-            blast_reference_choice = 0
+            blast_reference_choice = numeric_user_input(1, 3, "")
             if blast_reference_choice == 3:
                 return None
             elif blast_reference_choice == 2:
@@ -378,9 +378,9 @@ class UI:
         print("Making query files...")
 
         if exon_or_full_query_choice == 1:
-            blast_preparer = ExonBlastPreparer(self.exon_pull_dir, queries_path)
+            blast_preparer = ExonBlastPreparer(self.blast_reference_dir, self.taxa_filepath, queries_path)
         else:
-            blast_preparer = FullBlastPreparer(self.exon_pull_dir, queries_path)
+            blast_preparer = FullBlastPreparer(self.blast_reference_dir, self.taxa_filepath, queries_path)
 
         blast_preparer.prepare_query_files(auto_assign)
         #print(blast_preparer.get_queries_to_genes_to_exons())
