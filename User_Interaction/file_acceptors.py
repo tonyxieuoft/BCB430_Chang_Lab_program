@@ -16,17 +16,17 @@ def enter_taxa_filepath() -> str:
         if not os.path.isfile(taxa_filepath):
             print("Invalid filepath/ Please enter again.")
         else:
-            valid_gene_query_file = True
+            valid_taxa_file = True
             taxa_arr = file_to_list(taxa_filepath)
 
             for taxa in taxa_arr:
                 taxid = get_single_taxid(taxa)
 
                 if taxid == "":
-                    valid_gene_query_file = False
+                    valid_taxa_file = False
                     break
 
-            if not valid_gene_query_file:
+            if not valid_taxa_file:
                 print("Invalid input. One or more taxa are not recognized by the NCBI "
                       "taxonomy database.")
 
