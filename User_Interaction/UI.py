@@ -567,7 +567,10 @@ class UI:
         to_convert = get_generic_directory()
         self.blast_reference_dir = convert_NEPR_directory(to_convert, self.download_dir)
 
-        print("Finished.")
+        print()
+        print("Finished. The new directory is at: " + self.blast_reference_dir)
+
+        print()
 
         print("Enter any key to return to the main menu.")
         input()

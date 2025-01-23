@@ -75,7 +75,7 @@ def get_assignments(auto: int, lineage_dict: Dict[str, List[str]],
                 else:
                     code_to_ref_species[code].append(ref_org)
 
-        assignments = {}
+        assignments = []
         # for each overhead taxon, get automatic assignments. concatenate them
         # at the end as a list of entries to BLAST.
         for taxon in taxa_to_codes:
