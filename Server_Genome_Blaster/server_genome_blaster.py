@@ -27,7 +27,7 @@ class ServerGenomeBlaster:
         self.species_so_far = {}
         self.set_species_so_far(complete_reference_species)
 
-        self.taxids_to_taxa = []
+        self.taxids_to_taxa = {}
         for taxon in taxa_to_codes:
             self.taxids_to_taxa[taxa_to_codes[taxon][0]] = taxon
 

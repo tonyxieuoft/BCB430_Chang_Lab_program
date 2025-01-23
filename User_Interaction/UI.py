@@ -323,7 +323,7 @@ class UI:
                 print("New Blast Reference directory created at: " + self.blast_reference_dir)
                 print()
         else:
-            print("No previous BR directory creation or NCBI exon puller iteration has been ran "
+            print("No previous BR directory creation or NCBI exon puller iteration has occurred"
                   "during this program session.")
             print("Enter:")
             print("(1) to enter a path to a directory containing reference sequences\n"
