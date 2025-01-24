@@ -126,38 +126,41 @@ class ServerGenomeDownloader:
             # get genome fasta file path nested within the temp directory
             genome_file_directory = os.path. \
                 join("ncbi_dataset", "data", org["accession"])
-            genome_filename = subprocess. \
-                check_output(["ls", genome_file_directory]). \
-                decode("utf-8").strip()
-            genome_filepath = os.path. \
-                join(genome_file_directory, genome_filename)
 
-            # create local blast database using the genome file
-            blast_db_path = os.path.join(self.genome_storage_path, "blast_db")
-            if not os.path.isdir(blast_db_path):
-                os.system("mkdir " + blast_db_path)
+            if os.path.isdir(genome_file_directory):
 
-            species_db = ""
-            first = True
-            for word in org["species"].split():
-                if first:
-                    species_db = word
-                    first = False
-                else:
-                    species_db += "_" + word
+                genome_filename = subprocess. \
+                    check_output(["ls", genome_file_directory]). \
+                    decode("utf-8").strip()
+                genome_filepath = os.path. \
+                    join(genome_file_directory, genome_filename)
 
-            new_blast_db_name = os.path.join(blast_db_path, species_db)
+                # create local blast database using the genome file
+                blast_db_path = os.path.join(self.genome_storage_path, "blast_db")
+                if not os.path.isdir(blast_db_path):
+                    os.system("mkdir " + blast_db_path)
 
-            os.system("makeblastdb -dbtype nucl -in " + genome_filepath +
-                      " -out " + new_blast_db_name)
+                species_db = ""
+                first = True
+                for word in org["species"].split():
+                    if first:
+                        species_db = word
+                        first = False
+                    else:
+                        species_db += "_" + word
+
+                new_blast_db_name = os.path.join(blast_db_path, species_db)
+
+                os.system("makeblastdb -dbtype nucl -in " + genome_filepath +
+                          " -out " + new_blast_db_name)
+
+                self.write_to_species_data_file(org)
 
             # remove original genome file
             os.system("rm -r ncbi_dataset")
 
             # remove md5sum file as well
             os.system("rm md5sum.txt")
-
-            self.write_to_species_data_file(org)
 
 
 
