@@ -56,7 +56,6 @@ class ServerGenomeBlaster:
             print("No new accessions to download!")
         else:
             downloader.download_genomes()
-            downloader.write_to_species_data_file()
 
     def blast_genomes(self, expect_value: str):
 

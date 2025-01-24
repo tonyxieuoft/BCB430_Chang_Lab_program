@@ -1,5 +1,6 @@
 import os
 import subprocess
+from typing import Dict
 
 from Basic_Tools.basic_dictionaries import json_to_dict
 
@@ -91,28 +92,14 @@ class ServerGenomeDownloader:
                     if blast_organism_dct["species"] not in self.existing_accessions:
                         self.accessions_to_download.append(blast_organism_dct)
 
-    def write_to_species_data_file(self):
-
-        if not self.accessions_to_download:
-            return None
+    def write_to_species_data_file(self, org: Dict[str: str]):
 
         species_data_path = os.path.join(self.genome_storage_path, "species_data.csv")
         f = open(species_data_path, "a")
 
-        species_string = ""
-        first = True
-        for species in self.accessions_to_download:
-            if first:
-                species_string = species["species"]
-                first = False
-            else:
-                species_string += "\n" + species["species"]
-
-        name_to_lineage = get_taxonomy_lineage(species_string)
-
-        for species in self.accessions_to_download:
-            lineage = list_to_string(name_to_lineage[species["species"]], " ")
-            f.write(species["species"] + "," + species["accession"] + "," +
+        name_to_lineage = get_taxonomy_lineage(org["species"])
+        lineage = list_to_string(name_to_lineage[org["species"]], " ")
+        f.write(org["species"] + "," + org["accession"] + "," +
                     lineage + "\n")
 
         f.close()
@@ -166,6 +153,12 @@ class ServerGenomeDownloader:
 
             # remove original genome file
             os.system("rm -r ncbi_dataset")
+
+            # remove md5sum file as well
+            os.system("rm md5sum.txt")
+
+            self.write_to_species_data_file(org)
+
 
 
 if __name__ == "__main__":
