@@ -92,7 +92,7 @@ class ServerGenomeDownloader:
                     if blast_organism_dct["species"] not in self.existing_accessions:
                         self.accessions_to_download.append(blast_organism_dct)
 
-    def write_to_species_data_file(self, org: Dict[str: str]):
+    def write_to_species_data_file(self, org):
 
         species_data_path = os.path.join(self.genome_storage_path, "species_data.csv")
         f = open(species_data_path, "a")
