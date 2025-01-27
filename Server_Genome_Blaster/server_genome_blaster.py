@@ -90,6 +90,7 @@ class ServerGenomeBlaster:
                           " -word_size 11 -gapopen 5 -gapextend 2 -reward 2 "
                           "-penalty -3 "
                           "-num_threads 10 "
+                          "-task dc-megablast "
                           "-query " + reference_filepath +
                           " > " + xml_out_path)
 
