@@ -6,7 +6,7 @@ def expect_threshold_user_input() -> float:
     :return: the user-specified expect threshold
     """
     user_input = float(input())
-    while user_input <= 0 or user_input > 1:
+    while user_input <= 0:
         user_input = float(input("Incorrect. Please enter a value greater"
                                  "than 0 and less than or equal to 1"))
 
