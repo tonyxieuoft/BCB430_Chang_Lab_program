@@ -4,8 +4,8 @@ from Basic_Tools.lists_and_files import file_to_list
 
 if __name__ == "__main__":
 
-    dir_path = r"/Users/tonyx/Documents/chang_lab/ordered_elasmobranchs_2_ref"
-    save_path = r"/Users/tonyx/Documents/chang_lab/2_ref_ordered_elasmobranchs_80_coverage"
+    dir_path = r"/Users/tonyx/Documents/chang_lab/ordered_elasmobranchs3"
+    save_path = r"/Users/tonyx/Documents/chang_lab/80coverage_elasmobranchs"
 
     os.mkdir(save_path)
 

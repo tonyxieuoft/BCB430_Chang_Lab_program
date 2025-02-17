@@ -20,7 +20,8 @@ def ncbi_get_gene_features_v2(ids: str, id_to_org: Dict[str, str]) -> Dict:
                                             retmode="text")
             table_in_text = str(gene_table_file.read())
             success = True
-        except:
+        except Exception as e:
+            print(e)
             time.sleep(0.5)
             attempts += 1
             print("attempting to fetch table of gene features...")
