@@ -27,33 +27,45 @@ def extract_query_title(title_str):
 
     return gene_name, acc, q_range
 
-
 class ImprovedExonParser(ExonBlastXMLParser):
 
     def parse_blast_xml(self):
 
+        # track the last gene name (so we know at which iteration we begin at a new gene)
         past_gene_name = ""
         dp_gene_tracker = None
 
+        # convert XML file to dictionary
         results_dict = file_xml_to_dictionary(self.xml_filepath)
+
+        # get iterations (each corresponding to a fasta entry in the query file)
+        # this means each iteration corresponds to an exon query
         exon_iterations = results_dict['BlastOutput']['BlastOutput_iterations']
 
         for exon_iteration in exon_iterations:
 
+            # from the query title, extract gene name, transcript version, reference sequence range
             gene_name, ref_transcript_var, ref_sequence_range = \
                 extract_query_title(exon_iteration['Iteration_query-def'])
 
+            # if we've moved onto a new gene
             if gene_name != past_gene_name:
+
+                # if the current gene we just finished iterating through has hsps to parse
                 if dp_gene_tracker is not None:
                     self._identify_best_hsps(dp_gene_tracker)
+
+                # reset to the new gene
                 dp_gene_tracker = []
                 past_gene_name = gene_name
 
+            # go through the hits for that single exon query
             dp_hits_tracker = []
             hits_list = get_xml_list(exon_iteration['Iteration_hits'])
 
             for hit in hits_list:
 
+                # get the highest scoring HSP in the hit (it is assumed that there aren't multiple relevant hits)
                 top_hsp = get_xml_list(hit["Hit_hsps"])[0]
                 hsp_attributes = {}
 
@@ -62,15 +74,10 @@ class ImprovedExonParser(ExonBlastXMLParser):
                 else:
                     hsp_attributes["contig_acc"] = hit['Hit_accession']
 
-                qseq_gaps = top_hsp["Hsp_qseq"].count("-")
-                hseq_gaps = top_hsp["Hsp_hseq"].count("-")
+                # get attributes for the hsp
 
-                if qseq_gaps == hseq_gaps and qseq_gaps > 0:
-                    hsp_attributes["qseq"] = top_hsp["Hsp_qseq"].replace("-", "")
-                    hsp_attributes["hseq"] = top_hsp["Hsp_hseq"].replace("-", "")
-                else:
-                    hsp_attributes["qseq"] = top_hsp["Hsp_qseq"]
-                    hsp_attributes["hseq"] = top_hsp["Hsp_hseq"]
+                hsp_attributes["qseq"] = top_hsp["Hsp_qseq"]
+                hsp_attributes["hseq"] = top_hsp["Hsp_hseq"]
 
                 hsp_attributes["q_start"] = int(top_hsp["Hsp_query-from"])
                 hsp_attributes["q_end"] = int(top_hsp["Hsp_query-to"])

@@ -4,9 +4,9 @@ from Basic_Tools.lists_and_files import file_to_list
 
 if __name__ == "__main__":
 
-    exon_file = "/Users/tonyx/Documents/chang_lab/good_batoid_references/AIPL1/batoidea/Hypanus sabinus/990_XM_059971408.1.fas"
-    gff_file = "/Users/tonyx/Documents/chang_lab/gffs/aipl.gff"
-    fasta_file = "/Users/tonyx/Documents/chang_lab/gffs/aipl.fas"
+    exon_file = "/Users/tonyx/Documents/chang_lab/good_shark_references/GUCY2F/Carcharodon carcharias/Carcharodon carcharias/3249_XM_041199335.1.fas"
+    gff_file = "/Users/tonyx/Documents/chang_lab/gffs/gucy2f.gff"
+    fasta_file = "/Users/tonyx/Documents/chang_lab/gffs/gucy2f.fas"
 
     exon_file_array = file_to_list(exon_file)
     if len(exon_file_array) < 2:

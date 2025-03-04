@@ -4,8 +4,8 @@ from Basic_Tools.lists_and_files import file_to_list
 
 if __name__ == "__main__":
 
-    alignment_dir = "/Users/tonyx/Documents/chang_lab/alignments30"
-    save_dir = "/Users/tonyx/Documents/chang_lab/ordered_elasmobranchs3"
+    alignment_dir = "/Users/tonyx/Documents/chang_lab/alignments31"
+    save_dir = "/Users/tonyx/Documents/chang_lab/ordered_elasmobranchs4"
 
     order = file_to_list("/Users/tonyx/Documents/chang_lab/Elasmobranch_species_in_order.txt")
 

@@ -22,7 +22,7 @@ from Quality_Checking.get_longest_transcript import \
     optimize_transcripts_by_length
 from Quality_Checking.quality_analysis import QualityAnalyser
 from Server_Genome_Blaster.server_genome_blaster import ServerExonGenomeBlaster, \
-    ServerFullGenomeBlaster, ServerImprovedExonGenomeBlaster
+    ServerFullGenomeBlaster, ServerImprovedExonGenomeBlaster, ServerImprovedFullGenomeBlaster
 from User_Interaction.expect_threshold_user_input import \
     expect_threshold_user_input
 from User_Interaction.file_acceptors import enter_gene_filepath, \
@@ -470,9 +470,13 @@ class UI:
                                                                  blast_preparer.taxa_blast_order, blast_preparer.complete_reference_species,
                                                                  genome_storage_path, blast_preparer.taxa_to_codes)
             else:
-                genome_blaster = ServerFullGenomeBlaster(self.blast_results_path, queries_path, blast_preparer.taxa_blast_order,
-                                                         blast_preparer.complete_reference_species, genome_storage_path,
-                                                         blast_preparer.taxa_to_codes, blast_preparer.queries_to_genes_to_exons)
+                genome_blaster = ServerImprovedFullGenomeBlaster(self.blast_results_path, queries_path,
+                                                                 blast_preparer.taxa_blast_order,
+                                                                 blast_preparer.complete_reference_species,
+                                                                 genome_storage_path, blast_preparer.taxa_to_codes)
+                #genome_blaster = ServerFullGenomeBlaster(self.blast_results_path, queries_path, blast_preparer.taxa_blast_order,
+                #                                         blast_preparer.complete_reference_species, genome_storage_path,
+                #                                         blast_preparer.taxa_to_codes, blast_preparer.queries_to_genes_to_exons)
             genome_blaster.download_new_genomes()
             genome_blaster.blast_genomes(expect_value)
 

@@ -83,15 +83,23 @@ class ExonBlastXMLParser(BlastXMLParser):
 
     def parse_blast_xml(self):
 
+        # convert xml to dictionary
         results_dict = file_xml_to_dictionary(self.xml_filepath)
 
+        # each iteration corresponds to blast results for a single exon
         exon_iterations = results_dict['BlastOutput']['BlastOutput_iterations']
+
+        # iterate through the exon iterations
         for exon_iteration in exon_iterations:
 
+            # get the title of the query as an array split by words
             query_title = exon_iteration['Iteration_query-def'].split(" ")
-            query_seq_length = int(exon_iteration['Iteration_query-len'])
-            gene_name = query_title[0]
+            gene_name = query_title[0] # gene name is the first (based on my naming conventions)
 
+            # query length
+            query_seq_length = int(exon_iteration['Iteration_query-len'])
+
+            # get the index of the query title array corresponding to the mRNA section
             mrna_section_no = 1
             while (len(query_title[mrna_section_no]) < len("mRNA") or \
                     query_title[mrna_section_no][:len("mRNA")] != "mRNA") and \

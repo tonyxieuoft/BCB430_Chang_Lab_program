@@ -1,7 +1,22 @@
 from Basic_Tools.lists_and_files import file_to_list
 
+def concatenate_exons(fasta_path: str):
 
-def concatenate_exons(fasta_path: str) -> str:
+    # get the exons file into a list
+    fasta_list = file_to_list(fasta_path)
+    # this is the fasta title, split into sections
+    fasta_heading = fasta_list[0]
+    seq = ""
+    for i in range(1, len(fasta_list)):
+        if fasta_list[i][0] != ">":
+            for ch in fasta_list[i]:
+                if ch != "-":
+                    seq += ch
+
+    return fasta_heading + "\n" + seq + "\n"
+
+
+def concatenate_exons2(fasta_path: str) -> str:
     """
     Concatenates the exons pointed to in fasta_path into one transcript
 
