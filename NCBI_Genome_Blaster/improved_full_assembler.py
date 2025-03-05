@@ -308,16 +308,14 @@ class ImprovedFullParser(ExonBlastXMLParser):
                 return False
 
             if x["h_start"] > x["h_end"] and y["h_start"] >= x["h_end"]:
-                print(str(x["h_start"]) + " " + str(x["h_end"]) + " " + str(y["h_start"]) + " " + str(y["h_end"]))
-                print(str(x["q_start"]) + " " + str(x["q_end"]) + " " + str(y["q_start"]) + " " + str(y["q_end"]))
-                return False
+                 return False
 
             # intron length
             if abs(y["h_start"] - x["h_end"]) - 1 > MAX_INTRON_LENGTH:
                 return False
 
             # x completely overlaps y in parts of the query
-            if x["q_end"] > y["q_end"]:
+            if x["q_end"] >= y["q_end"]:
                 print("e")
                 return False
 
