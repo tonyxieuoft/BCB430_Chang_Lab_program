@@ -246,7 +246,7 @@ class ImprovedExonParser(ExonBlastXMLParser):
         else:
             strand = "2"
 
-        if missing_left > 0:
+        if False and missing_left > 0:
 
             if strand == "1":
                 lower_bound = max(hit_bound1 - missing_left, 1)
@@ -274,7 +274,7 @@ class ImprovedExonParser(ExonBlastXMLParser):
 
             result_sequence = string + result_sequence
 
-        if missing_right > 0:
+        if False and missing_right > 0:
 
             if strand == "1":
                 lower_bound = hit_bound2 + 1

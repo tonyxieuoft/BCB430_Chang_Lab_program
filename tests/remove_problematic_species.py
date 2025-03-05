@@ -1,12 +1,13 @@
 import os
 
 if __name__ == "__main__":
-    red_problems = ["Pbla", "Pgan", "Zcav"]
-    orange_problems = ["Pbla", "Pgan", "Zcav", "Pmin", "Bbon", "Ejap", "Cmar"]
-    middle = ["Pbla", "Pgan", "Zcav", "Pmin", "Bbon"]
 
-    alignment_dir = r"/Users/tonyx/Documents/chang_lab/1e-5_name_change"
-    save_dir = r"/Users/tonyx/Documents/chang_lab/1e-5_top_5_gone"
+    red_problems = ["Malacoraja senta",
+                    "Torpedo suessii",
+                    "Squatina squatina"]
+
+    alignment_dir = r"/Users/tonyx/Documents/chang_lab/alignments1"
+    save_dir = r"/Users/tonyx/Documents/chang_lab/1-1-4-1-e0.5-full-filtered"
 
     os.mkdir(save_dir)
 
@@ -21,7 +22,7 @@ if __name__ == "__main__":
         while line != "":
             while line != "" and line[0] != ">":
                 line = f1.readline()
-            if line.strip()[1:] not in middle:
+            if line.split()[1] + " " + line.split()[2] not in red_problems:
                 f2.write(line)
                 line = f1.readline()
                 while line != "" and line[0] != ">":
