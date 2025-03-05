@@ -8,7 +8,7 @@ from NCBI_Genome_Blaster.assemble_blast_result_sequences import \
     ExonBlastXMLParser, SEQUENCE_INDICES_FROM_MRNA_TAG
 
 MAX_INTRON_LENGTH = 10000000
-MAX_CONTIG_GAP = 20000
+#MAX_CONTIG_GAP = 20000
 MAX_OVERLAP = 50
 
 
@@ -50,7 +50,6 @@ class ImprovedFullParser(ExonBlastXMLParser):
 
             # go through each hit (which will produce the best possible assembly from that hit)
             hits_list = get_xml_list(full_iteration['Iteration_hits'])
-            print(len(hits_list))
 
             for hit in hits_list:
 
@@ -168,9 +167,6 @@ class ImprovedFullParser(ExonBlastXMLParser):
         building_array = self._convert_hsp_to_array(last_hsp)[1]
         build_start = last_hsp["q_start"]
 
-        for hsp in hsp_data:
-            print(hsp)
-
         for index in range(1, len(traceback_chain)):
 
             hsp_to_add = hsp_data[traceback_chain[index]]
@@ -178,9 +174,9 @@ class ImprovedFullParser(ExonBlastXMLParser):
             query_to_compare, array_to_add = self._convert_hsp_to_array(hsp_to_add)
             to_add_end = hsp_to_add["q_end"]
 
-            print("===")
-            print(build_start)
-            print(to_add_end)
+            #print("===")
+            #print(build_start)
+            #print(to_add_end)
             if to_add_end >= build_start:
 
                 overlap = to_add_end - build_start + 1
@@ -189,12 +185,12 @@ class ImprovedFullParser(ExonBlastXMLParser):
                 to_add_overlap = array_to_add[len(array_to_add)-overlap:]
                 overlap_query_section = query_to_compare[len(query_to_compare)-overlap:]
 
-                print(build_overlap)
-                print(to_add_overlap)
-                print(overlap_query_section)
+                #print(build_overlap)
+                #print(to_add_overlap)
+                #print(overlap_query_section)
 
                 best_overlap = self._sort_overlap(overlap_query_section, to_add_overlap, build_overlap)
-                print(best_overlap)
+                #print(best_overlap)
                 building_array = array_to_add[:len(array_to_add)-overlap] + best_overlap + building_array[overlap:]
 
             else:
@@ -220,23 +216,15 @@ class ImprovedFullParser(ExonBlastXMLParser):
             while to_add_overlap[j] == build_overlap[j]:
                 j -= 1
 
-            print(i)
-            print(j)
-
             best_partition = i
             max_score = -float("inf")
             for k in range(i, j + 2):
-                print("overlap_usage")
-                print(to_add_overlap[i:k] + build_overlap[k:j+1])
                 score = self._perform_global_alignment(query_section[i:j+1], to_add_overlap[i:k] + build_overlap[k:j+1])
-                print(score)
-                print(k)
 
                 if score > max_score:
                     max_score = score
                     best_partition = k
 
-            print(best_partition)
             return to_add_overlap[:best_partition] + build_overlap[best_partition:]
 
     def _perform_global_alignment(self, seq1, seq2):
@@ -313,23 +301,19 @@ class ImprovedFullParser(ExonBlastXMLParser):
         if x["contig_acc"] == y["contig_acc"]:
 
             if x["strand"] != y["strand"]:
-                print("a")
                 return False
 
             # subject sequence considerations
             if x["h_start"] < x["h_end"] and y["h_start"] <= x["h_end"]:
-                print("b")
                 return False
 
             if x["h_start"] > x["h_end"] and y["h_start"] >= x["h_end"]:
                 print(str(x["h_start"]) + " " + str(x["h_end"]) + " " + str(y["h_start"]) + " " + str(y["h_end"]))
                 print(str(x["q_start"]) + " " + str(x["q_end"]) + " " + str(y["q_start"]) + " " + str(y["q_end"]))
-                print("c")
                 return False
 
             # intron length
             if abs(y["h_start"] - x["h_end"]) - 1 > MAX_INTRON_LENGTH:
-                print("d")
                 return False
 
             # x completely overlaps y in parts of the query
