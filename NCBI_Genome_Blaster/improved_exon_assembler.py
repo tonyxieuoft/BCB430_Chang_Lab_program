@@ -270,7 +270,7 @@ class ImprovedExonParser(ExonBlastXMLParser):
                     arr = ncbi_get_gene_sequence(hsp["contig_acc"], lower_bound - 2,
                                                  lower_bound - 1, strand)
                     for ch in arr:
-                        string += ch
+                        splice_site += ch
                     print(hsp["ref_range"])
                     print("right splice site: " + splice_site)
             else:
@@ -283,7 +283,7 @@ class ImprovedExonParser(ExonBlastXMLParser):
                     arr = ncbi_get_gene_sequence(hsp["contig_acc"], lower_bound + 2,
                                                  lower_bound + 1, strand)
                     for ch in arr:
-                        string += ch
+                        splice_site += ch
                     print(hsp["ref_range"])
                     print("right splice site: " + splice_site)
 
@@ -317,7 +317,7 @@ class ImprovedExonParser(ExonBlastXMLParser):
                     arr = ncbi_get_gene_sequence(hsp["contig_acc"], upper_bound+1,
                                                  upper_bound+2, strand)
                     for ch in arr:
-                        string += ch
+                        splice_site += ch
                     print(hsp["ref_range"])
                     print("left splice site: " + splice_site)
 
@@ -332,7 +332,7 @@ class ImprovedExonParser(ExonBlastXMLParser):
                     arr = ncbi_get_gene_sequence(hsp["contig_acc"], upper_bound - 1,
                                                  upper_bound - 2, strand)
                     for ch in arr:
-                        string += ch
+                        splice_site += ch
                     print(hsp["ref_range"])
                     print("left splice site: " + splice_site)
 
