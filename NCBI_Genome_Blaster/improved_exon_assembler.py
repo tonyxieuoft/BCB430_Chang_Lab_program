@@ -7,7 +7,7 @@ from NCBI_Exon_Puller.ncbi_exon_puller import ncbi_get_gene_sequence
 from NCBI_Genome_Blaster.assemble_blast_result_sequences import \
     ExonBlastXMLParser, SEQUENCE_INDICES_FROM_MRNA_TAG
 
-MAX_INTRON_LENGTH = 10000000
+MAX_INTRON_LENGTH = 1000000
 MAX_CONTIG_GAP = 20000
 
 def extract_query_title(title_str):
@@ -40,7 +40,7 @@ class ImprovedExonParser(ExonBlastXMLParser):
 
         # get iterations (each corresponding to a fasta entry in the query file)
         # this means each iteration corresponds to an exon query
-        exon_iterations = results_dict['BlastOutput']['BlastOutput_iterations']
+        exon_iterations = get_xml_list(results_dict['BlastOutput']['BlastOutput_iterations'])
 
         for exon_iteration in exon_iterations:
 
@@ -212,7 +212,9 @@ class ImprovedExonParser(ExonBlastXMLParser):
 
         else: # x["contig_acc"] != y["contig_acc"]
 
+            return False
 
+            """
             if x["strand"] == "Plus":
                 x_dist = x["contig_len"] - x["h_end"]
             else:
@@ -225,6 +227,8 @@ class ImprovedExonParser(ExonBlastXMLParser):
 
             if x_dist + y_dist > MAX_CONTIG_GAP:
                 return False
+                
+            """
 
         return True
 
@@ -246,19 +250,45 @@ class ImprovedExonParser(ExonBlastXMLParser):
         else:
             strand = "2"
 
-        if False and missing_left > 0:
+        string = ""
+        arr = ncbi_get_gene_sequence(hsp["contig_acc"], hit_bound1,
+                                     hit_bound2, strand)
+        for ch in arr:
+            string += ch
+
+        print(string)
+
+        if missing_left > 0:
 
             if strand == "1":
                 lower_bound = max(hit_bound1 - missing_left, 1)
                 upper_bound = hit_bound1 - 1
                 to_salvage = upper_bound - lower_bound + 1
+
+                splice_site = ""
+                if lower_bound - 2 >= 1:
+                    arr = ncbi_get_gene_sequence(hsp["contig_acc"], lower_bound - 2,
+                                                 lower_bound - 1, strand)
+                    for ch in arr:
+                        string += ch
+                    print(hsp["ref_range"])
+                    print("right splice site: " + splice_site)
             else:
                 lower_bound = min(hit_bound1 + missing_left, hsp["contig_len"])
                 upper_bound = hit_bound1 + 1
                 to_salvage = lower_bound - upper_bound + 1
 
+                splice_site = ""
+                if lower_bound + 2 <= hsp["contig_len"]:
+                    arr = ncbi_get_gene_sequence(hsp["contig_acc"], lower_bound + 2,
+                                                 lower_bound + 1, strand)
+                    for ch in arr:
+                        string += ch
+                    print(hsp["ref_range"])
+                    print("right splice site: " + splice_site)
+
             string = ""
-            if 0 < to_salvage < 10: # TODO change it back to 0-5 later
+            if 0 < to_salvage: # TODO change it back to 0-5 later (< 10)
                 print("getting gene sequence")
                 arr = ncbi_get_gene_sequence(hsp["contig_acc"], lower_bound,
                                              upper_bound, strand)
@@ -274,19 +304,41 @@ class ImprovedExonParser(ExonBlastXMLParser):
 
             result_sequence = string + result_sequence
 
-        if False and missing_right > 0:
+        if missing_right > 0:
 
             if strand == "1":
                 lower_bound = hit_bound2 + 1
                 upper_bound = min(hit_bound2 + missing_right, hsp["contig_len"])
                 to_salvage = upper_bound - lower_bound + 1
+
+                #TODO splice site test
+                splice_site = ""
+                if upper_bound + 2 <= hsp["contig_len"]:
+                    arr = ncbi_get_gene_sequence(hsp["contig_acc"], upper_bound+1,
+                                                 upper_bound+2, strand)
+                    for ch in arr:
+                        string += ch
+                    print(hsp["ref_range"])
+                    print("left splice site: " + splice_site)
+
             else:
                 lower_bound = hit_bound2 - 1
                 upper_bound = max(hit_bound2 - missing_right, 1)
                 to_salvage = lower_bound - upper_bound + 1
 
+                # TODO
+                splice_site = ""
+                if upper_bound - 2 >= 1:
+                    arr = ncbi_get_gene_sequence(hsp["contig_acc"], upper_bound - 1,
+                                                 upper_bound - 2, strand)
+                    for ch in arr:
+                        string += ch
+                    print(hsp["ref_range"])
+                    print("left splice site: " + splice_site)
+
             string = ""
-            if 10 > to_salvage > 0: # change it back later
+            # 10 >
+            if to_salvage > 0: # change it back later
                 print("getting gene seqnece")
                 arr = ncbi_get_gene_sequence(hsp["contig_acc"], lower_bound, upper_bound, strand)
 
@@ -316,8 +368,8 @@ if __name__ == "__main__":
     #path = r"C:\Users\tonyx\Downloads\KGMVRFG9013-Alignment.xml"
     #path = r"C:\Users\tonyx\Downloads\M2GBJPF2013-Alignment.xml"
     #path = r"C:\Users\tonyx\Downloads\M2HJANYT016-Alignment.xml"
-    path = r"C:\Users\tonyx\Downloads\M3DS2H6D013-Alignment.xml"
-    save_dir = r"C:\Users\tonyx\Downloads"
+    path = r"/Users/tonyx/Downloads/WPXVH7AK016-Alignment.xml"
+    save_dir = r"/Users/tonyx/Downloads"
 
     Entrez.email = "xiaohan.xie@mail.utoronto.ca"
     obj = ImprovedExonParser(path, save_dir,

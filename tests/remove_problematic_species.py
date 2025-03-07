@@ -6,8 +6,8 @@ if __name__ == "__main__":
                     "Torpedo suessii",
                     "Squatina squatina"]
 
-    alignment_dir = r"/Users/tonyx/Documents/chang_lab/alignments1"
-    save_dir = r"/Users/tonyx/Documents/chang_lab/1-1-4-1-e0.5-full-filtered"
+    alignment_dir = r"/Users/tonyx/Documents/chang_lab/alignments2"
+    save_dir = r"/Users/tonyx/Documents/chang_lab/1-1-4-1-e0.5-exon-filtered"
 
     os.mkdir(save_dir)
 
