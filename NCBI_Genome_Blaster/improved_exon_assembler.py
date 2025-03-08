@@ -103,11 +103,12 @@ class ImprovedExonParser(ExonBlastXMLParser):
 
             dp_gene_tracker.append(dp_hits_tracker)
 
+        splice_site_file = open("/Users/tonyx/Documents/chang_lab/splice_site_1-1-4-1-e0.5.csv", "w")
+        splice_site_file.write("gene,species,query_junction,splice_seq,left_or_right,fill\n")
+        self._identify_best_hsps(dp_gene_tracker, splice_site_file) # do it for the last one
 
-        self._identify_best_hsps(dp_gene_tracker) # do it for the last one
 
-
-    def _identify_best_hsps(self, exons):
+    def _identify_best_hsps(self, exons, splice_site_file):
 
         num_exons = len(exons)
         dp_table = []
@@ -182,9 +183,18 @@ class ImprovedExonParser(ExonBlastXMLParser):
 
         f.close()
 
+        splice_site_dict = {}
         for coord in picked:
-            self._length_force_and_print(exons[coord[0]][coord[1]])
+            self._length_force_and_print(exons[coord[0]][coord[1]], splice_site_dict)
 
+        for boundary_key in splice_site_dict:
+            if len(splice_site_dict[boundary_key]) == 2:
+                print("=====")
+                for splice_site in splice_site_dict[boundary_key]:
+                    print(splice_site)
+                    f.write(splice_site["gene"] + "," + splice_site["species"] + "," +
+                            splice_site["query_junction"] + "," + splice_site["splice-seq"] + "," +
+                            splice_site["left_or_right"] + "," + splice_site["fill"] + "\n")
 
 
     def _is_compatible(self, x, y, exon_diff):
@@ -232,7 +242,46 @@ class ImprovedExonParser(ExonBlastXMLParser):
 
         return True
 
-    def _length_force_and_print(self, hsp):
+    def _get_splice_site(self, hsp, subject_boundary, strand, side, fill):
+
+        splice_site = {"gene": "",
+                       "species": "",
+                       "query_junction": 0,
+                       "splice_seq": "",
+                       "left_or_right": side,
+                       "fill": 0}
+
+        # side refers to what side the splice site is on in comparison to the intron
+        # the boundary is the end of the conding region
+        if strand == "1" and side == "right":
+            arr = ncbi_get_gene_sequence(hsp["contig_acc"], subject_boundary - 2,
+                                        subject_boundary - 1, strand)
+        elif strand == "1" and side == "left":
+            arr = ncbi_get_gene_sequence(hsp["contig_acc"], subject_boundary + 1,
+                                        subject_boundary + 2, strand)
+        elif strand == "2" and side == "right":
+            arr = ncbi_get_gene_sequence(hsp["contig_acc"], subject_boundary + 2,
+                                         subject_boundary + 1, strand)
+        else:
+            arr = ncbi_get_gene_sequence(hsp["contig_acc"], subject_boundary - 1,
+                                         subject_boundary - 2, strand)
+
+        for ch in arr:
+            splice_site["splice_seq"] += ch
+
+        if side == "left":
+            splice_site["query_junction"] = int(hsp["ref_range"].split("-")[1])
+        else:
+            splice_site["query_junction"] = int(hsp["ref_range"].split("-")[0])-1
+
+        splice_site["gene"] = hsp["gene_name"]
+        splice_site["species"] = self.species_name
+        splice_site["fill"] = fill
+
+        return splice_site
+
+
+    def _length_force_and_print(self, hsp, splice_site_dict):
 
         result_sequence = hsp["hseq"]
 
@@ -250,14 +299,9 @@ class ImprovedExonParser(ExonBlastXMLParser):
         else:
             strand = "2"
 
-        string = ""
-        arr = ncbi_get_gene_sequence(hsp["contig_acc"], hit_bound1,
-                                     hit_bound2, strand)
-        for ch in arr:
-            string += ch
-
-        print(string)
-
+        left_allow_splice = False
+        left_subject_boundary = 0
+        to_salvage = 0
         if missing_left > 0:
 
             if strand == "1":
@@ -265,27 +309,18 @@ class ImprovedExonParser(ExonBlastXMLParser):
                 upper_bound = hit_bound1 - 1
                 to_salvage = upper_bound - lower_bound + 1
 
-                splice_site = ""
                 if lower_bound - 2 >= 1:
-                    arr = ncbi_get_gene_sequence(hsp["contig_acc"], lower_bound - 2,
-                                                 lower_bound - 1, strand)
-                    for ch in arr:
-                        splice_site += ch
-                    print(hsp["ref_range"])
-                    print("right splice site: " + splice_site)
+                    left_allow_splice = True
+                    left_subject_boundary = lower_bound
+
             else:
                 lower_bound = min(hit_bound1 + missing_left, hsp["contig_len"])
                 upper_bound = hit_bound1 + 1
                 to_salvage = lower_bound - upper_bound + 1
 
-                splice_site = ""
                 if lower_bound + 2 <= hsp["contig_len"]:
-                    arr = ncbi_get_gene_sequence(hsp["contig_acc"], lower_bound + 2,
-                                                 lower_bound + 1, strand)
-                    for ch in arr:
-                        splice_site += ch
-                    print(hsp["ref_range"])
-                    print("right splice site: " + splice_site)
+                    left_allow_splice = True
+                    left_subject_boundary = lower_bound
 
             string = ""
             if 0 < to_salvage: # TODO change it back to 0-5 later (< 10)
@@ -295,15 +330,35 @@ class ImprovedExonParser(ExonBlastXMLParser):
                 for ch in arr:
                     string += ch
 
-                string = "-"*(missing_left - to_salvage) + string
+                # TODO this is for inserting gaps
+                # string = "-"*(missing_left - to_salvage) + string
 
             else:
-                string = "-"*missing_left + string
+                pass
+                #TODO for inserting gaps
+                #string = "-"*missing_left + string
 
-            #print("missing left recovered: " + string + " iteration: " + exon_iteration['Iteration_iter-num'])
+            # print("missing left recovered: " + string + " iteration: " + exon_iteration['Iteration_iter-num'])
 
             result_sequence = string + result_sequence
 
+        else:
+            left_subject_boundary = hit_bound1
+            left_allow_splice = True
+
+
+        if left_allow_splice:
+            splice_site = self._get_splice_site(hsp, left_subject_boundary, strand, "right", to_salvage)
+            query_junction_id = splice_site["query_junction"]
+            if query_junction_id in splice_site_dict:
+                splice_site_dict[query_junction_id].append(splice_site)
+            else:
+                splice_site_dict[query_junction_id] = [splice_site]
+
+
+        right_allow_splice = False
+        right_subject_boundary = 0
+        to_salvage = 0
         if missing_right > 0:
 
             if strand == "1":
@@ -311,30 +366,18 @@ class ImprovedExonParser(ExonBlastXMLParser):
                 upper_bound = min(hit_bound2 + missing_right, hsp["contig_len"])
                 to_salvage = upper_bound - lower_bound + 1
 
-                #TODO splice site test
-                splice_site = ""
                 if upper_bound + 2 <= hsp["contig_len"]:
-                    arr = ncbi_get_gene_sequence(hsp["contig_acc"], upper_bound+1,
-                                                 upper_bound+2, strand)
-                    for ch in arr:
-                        splice_site += ch
-                    print(hsp["ref_range"])
-                    print("left splice site: " + splice_site)
+                    right_allow_splice = True
+                    right_subject_boundary = upper_bound
 
             else:
                 lower_bound = hit_bound2 - 1
                 upper_bound = max(hit_bound2 - missing_right, 1)
                 to_salvage = lower_bound - upper_bound + 1
 
-                # TODO
-                splice_site = ""
                 if upper_bound - 2 >= 1:
-                    arr = ncbi_get_gene_sequence(hsp["contig_acc"], upper_bound - 1,
-                                                 upper_bound - 2, strand)
-                    for ch in arr:
-                        splice_site += ch
-                    print(hsp["ref_range"])
-                    print("left splice site: " + splice_site)
+                    right_allow_splice = True
+                    right_subject_boundary = upper_bound
 
             string = ""
             # 10 >
@@ -345,13 +388,28 @@ class ImprovedExonParser(ExonBlastXMLParser):
                 for ch in arr:
                     string += ch
 
-                string = string + "-"*(missing_right - to_salvage)
+                # TODO gap insertion
+                #string = string + "-"*(missing_right - to_salvage)
             else:
-                string = string + "-"*missing_right
+                pass
+                # TODO gap insertion
+                #string = string + "-"*missing_right
 
             # print("missing right recovered: " + string + " iteration: " + exon_iteration['Iteration_iter-num'])
 
             result_sequence = result_sequence + string
+
+        else:
+            right_allow_splice = True
+            right_subject_boundary = hit_bound2
+
+        if right_allow_splice:
+            splice_site = self._get_splice_site(hsp, right_subject_boundary, strand, "left", to_salvage)
+            query_junction_id = splice_site["query_junction"]
+            if query_junction_id in splice_site_dict:
+                splice_site_dict[query_junction_id].append(splice_site)
+            else:
+                splice_site_dict[query_junction_id] = [splice_site]
 
         transcript_file = self.create_transcript_file(hsp["ref_acc"], hsp["gene_name"])
 
@@ -368,7 +426,7 @@ if __name__ == "__main__":
     #path = r"C:\Users\tonyx\Downloads\KGMVRFG9013-Alignment.xml"
     #path = r"C:\Users\tonyx\Downloads\M2GBJPF2013-Alignment.xml"
     #path = r"C:\Users\tonyx\Downloads\M2HJANYT016-Alignment.xml"
-    path = r"/Users/tonyx/Downloads/WPXVH7AK016-Alignment.xml"
+    path = r"/Users/tonyx/Downloads/WR27YB5H016-Alignment.xml"
     save_dir = r"/Users/tonyx/Downloads"
 
     Entrez.email = "xiaohan.xie@mail.utoronto.ca"
