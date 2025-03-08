@@ -166,8 +166,8 @@ class ImprovedExonParser(ExonBlastXMLParser):
 
         # print(picked)
         #f = open(r"/crun/tony.xie/Downloads/intron_lengths2.txt", "a")
-        f = open(r"C:\Users\tonyx\Downloads\intron_lengths2.txt", "a")
-        f.write(self.species_name + "\n")
+        #f = open(r"C:\Users\tonyx\Downloads\intron_lengths2.txt", "a")
+        #f.write(self.species_name + "\n")
 
         for i in range(1, len(picked)):
             before_hsp = exons[picked[i-1][0]][picked[i-1][1]]
@@ -178,10 +178,11 @@ class ImprovedExonParser(ExonBlastXMLParser):
             exon_diff = after_exon - before_exon
 
             if (latter_hsp["ref_acc"] == before_hsp["ref_acc"]):
-                f.write(before_hsp["gene_name"] + "_" + str(before_exon) + "_" + str(after_exon) + "\n")
-                f.write(str((abs(latter_hsp["h_start"]-before_hsp["h_end"])-1) // exon_diff) + "\n")
+                #f.write(before_hsp["gene_name"] + "_" + str(before_exon) + "_" + str(after_exon) + "\n")
+                #f.write(str((abs(latter_hsp["h_start"]-before_hsp["h_end"])-1) // exon_diff) + "\n")
+                pass
 
-        f.close()
+        #f.close()
 
         splice_site_dict = {}
         for coord in picked:
@@ -192,7 +193,8 @@ class ImprovedExonParser(ExonBlastXMLParser):
                 print("=====")
                 for splice_site in splice_site_dict[boundary_key]:
                     print(splice_site)
-                    f.write(splice_site["gene"] + "," + splice_site["species"] + "," +
+
+                    splice_site_file.write(splice_site["gene"] + "," + splice_site["species"] + "," +
                             str(splice_site["query_junction"]) + "," + splice_site["splice_seq"] + "," +
                             splice_site["left_or_right"] + "," + str(splice_site["fill"]) + "\n")
 
