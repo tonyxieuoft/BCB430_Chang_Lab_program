@@ -193,7 +193,7 @@ class ImprovedExonParser(ExonBlastXMLParser):
                 for splice_site in splice_site_dict[boundary_key]:
                     print(splice_site)
                     f.write(splice_site["gene"] + "," + splice_site["species"] + "," +
-                            str(splice_site["query_junction"]) + "," + splice_site["splice-seq"] + "," +
+                            str(splice_site["query_junction"]) + "," + splice_site["splice_seq"] + "," +
                             splice_site["left_or_right"] + "," + str(splice_site["fill"]) + "\n")
 
 
