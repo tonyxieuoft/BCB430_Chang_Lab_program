@@ -31,6 +31,8 @@ class ImprovedExonParser(ExonBlastXMLParser):
 
     def parse_blast_xml(self):
 
+        splice_site_file = open("/crun/tony.xie/Downloads/official_results/splice_site_1-1-4-1-e0.5.csv", "a")
+
         # track the last gene name (so we know at which iteration we begin at a new gene)
         past_gene_name = ""
         dp_gene_tracker = None
@@ -53,7 +55,7 @@ class ImprovedExonParser(ExonBlastXMLParser):
 
                 # if the current gene we just finished iterating through has hsps to parse
                 if dp_gene_tracker is not None:
-                    self._identify_best_hsps(dp_gene_tracker)
+                    self._identify_best_hsps(dp_gene_tracker, splice_site_file)
 
                 # reset to the new gene
                 dp_gene_tracker = []
@@ -103,8 +105,6 @@ class ImprovedExonParser(ExonBlastXMLParser):
 
             dp_gene_tracker.append(dp_hits_tracker)
 
-        splice_site_file = open("/Users/tonyx/Documents/chang_lab/splice_site_1-1-4-1-e0.5.csv", "w")
-        splice_site_file.write("gene,species,query_junction,splice_seq,left_or_right,fill\n")
         self._identify_best_hsps(dp_gene_tracker, splice_site_file) # do it for the last one
 
 
