@@ -9,7 +9,7 @@ from NCBI_Genome_Blaster.assemble_blast_result_sequences import \
 
 MAX_INTRON_LENGTH = 1000000
 #MAX_CONTIG_GAP = 20000
-MAX_OVERLAP = 50
+MAX_OVERLAP = 25
 
 MATCH_SCORE = 1
 MISMATCH_SCORE = -1
@@ -186,12 +186,24 @@ class ImprovedFullParser(ExonBlastXMLParser):
         s1_overlap = s1_array[len(s1_array) - overlap:]
         q_overlap = q_array[len(q_array) - overlap:]
 
+        #print("q")
+        #print(q_overlap)
+        #print("s1")
+        #print(s1_overlap)
+        #print("s2")
+        #print(s2_overlap)
+
         max_score = self._sort_overlap(q_overlap, s1_overlap, s2_overlap)[1]
 
         overlap_loss = 0
         for i in range(overlap):
             overlap_loss += self._score_corrector_helper(s1_overlap[i], q_overlap[i])
             overlap_loss += self._score_corrector_helper(s2_overlap[i], q_overlap[i])
+
+        #print("max score")
+        #print(max_score)
+        #print("overlap loss")
+        #print(overlap_loss)
 
         return max_score - overlap_loss
 
@@ -266,7 +278,7 @@ class ImprovedFullParser(ExonBlastXMLParser):
                 else:
                     mismatch_no += 1
 
-            return build_overlap, 0, match_no * MATCH_SCORE + mismatch_no * MISMATCH_SCORE
+            return build_overlap, match_no * MATCH_SCORE + mismatch_no * MISMATCH_SCORE
 
         else:
             # get start alignment position (we are not interested in all the places that are the same)
@@ -288,7 +300,8 @@ class ImprovedFullParser(ExonBlastXMLParser):
                     max_score = score
                     best_partition = k
 
-            return to_add_overlap[:best_partition] + build_overlap[best_partition:], max_score
+            return (to_add_overlap[:best_partition] + build_overlap[best_partition:],
+                    max_score + i * MATCH_SCORE + (len(to_add_overlap) - 1 - j) * MATCH_SCORE)
 
     def _perform_global_alignment(self, seq1, seq2):
 

@@ -314,9 +314,8 @@ class Analyser:
                         #print("matching species: " + species)
                         #_global_aligner(ss_dict1[species], ss_dict2[species])
 
-    def _align_against_reference(self, converted_NEPR):
+    def _align_against_reference(self, converted_NEPR, csv_for_r):
 
-        csv_for_r = "/Users/tonyx/Documents/chang_lab/exon_against_ref.csv"
         csv_f = open(csv_for_r, "w")
         csv_f.write("gene,gap_full,gap_exon,match,mismatch\n")
 
@@ -388,7 +387,7 @@ class Analyser:
 
 
 if __name__ == "__main__":
-    alignment_path1 = "/Users/tonyx/Documents/chang_lab/1-1-4-1-e0.5-full-filtered"
+    alignment_path1 = "/Users/tonyx/Documents/chang_lab/1-1-4-1-e1-full-raw-score-filtered"
     alignment_path2 = "/Users/tonyx/Documents/chang_lab/1-1-4-1-e0.5-exon-filtered"
 
     wd = "/Users/tonyx/Documents/chang_lab/mafft_test"
@@ -397,7 +396,9 @@ if __name__ == "__main__":
 
     ref_dir = "/Users/tonyx/Documents/chang_lab/converted_NEPR"
 
-    exon._align_against_reference(ref_dir)
+    csv_for_r = "/Users/tonyx/Documents/chang_lab/full_raw_against_ref.csv"
+
+    full._align_against_reference(ref_dir, csv_for_r)
     #_global_aligner("bruhasdfaskjfewj", "asdfasifew")
 
 
