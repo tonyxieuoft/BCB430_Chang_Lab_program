@@ -7,7 +7,7 @@ if __name__ == "__main__":
                     "Squatina squatina"]
 
     alignment_dir = r"/Users/tonyx/Documents/chang_lab/alignments2"
-    save_dir = r"/Users/tonyx/Documents/chang_lab/1-1-4-1-e0.5-exon-filtered"
+    save_dir = r"/Users/tonyx/Documents/chang_lab/1-1-4-1-e0.5-exon_forcefull-filtered"
 
     os.mkdir(save_dir)
 

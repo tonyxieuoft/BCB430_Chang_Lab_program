@@ -7,10 +7,13 @@ from NCBI_Exon_Puller.ncbi_exon_puller import ncbi_get_gene_sequence
 from NCBI_Genome_Blaster.assemble_blast_result_sequences import \
     ExonBlastXMLParser, SEQUENCE_INDICES_FROM_MRNA_TAG
 
-MAX_INTRON_LENGTH = 10000000
+MAX_INTRON_LENGTH = 1000000
 #MAX_CONTIG_GAP = 20000
 MAX_OVERLAP = 50
 
+MATCH_SCORE = 1
+MISMATCH_SCORE = -1
+GAP_SCORE = -4
 
 def extract_query_title(title_str):
     query_title = title_str.split(" ")
@@ -75,6 +78,7 @@ class ImprovedFullParser(ExonBlastXMLParser):
                     hsp_attributes["q_end"] = int(hsp["Hsp_query-to"])
 
                     hsp_attributes["seq_range"] = abs(hsp_attributes["q_start"] - hsp_attributes["q_end"]) + 1
+                    hsp_attributes["raw_score"] = int(hsp["Hsp_score"])
 
                     hsp_attributes["h_start"] = int(hsp["Hsp_hit-from"])
                     hsp_attributes["h_end"] = int(hsp["Hsp_hit-to"])
@@ -98,9 +102,13 @@ class ImprovedFullParser(ExonBlastXMLParser):
             self._identify_best_version(contig_sep_collection)  # do it for the last one
 
     def _identify_best_version(self, contig_sep_collection):
+        """
+        Taking in all HSP results, organized by contig
+        """
 
         dp_gene_level_results = []
 
+        # we observe each contig separately, generating the DP arrays
         for i in range(len(contig_sep_collection)):
 
             contig_results = contig_sep_collection[i]
@@ -114,14 +122,15 @@ class ImprovedFullParser(ExonBlastXMLParser):
             for i in range(len(contig_results)):
 
                 #print(contig_results[i])
-                single_coverage = contig_results[i]["seq_range"]
+                single_coverage = contig_results[i]["raw_score"]
                 dp_pointers[i] = -1
                 dp_best_coverage[i] = single_coverage
                 for j in range(i):
                     if self._is_compatible(contig_results[j], contig_results[i]):
                         if contig_results[i]["q_start"] <= contig_results[j]["q_end"]:
-                            overlap = contig_results[j]["q_end"] - contig_results[i]["q_start"] + 1
-                            curr_coverage = single_coverage + dp_best_coverage[j] - overlap
+                            overlap_adjustment = self._initial_overlap_score_corrector(contig_results[j],
+                                                                                       contig_results[i])
+                            curr_coverage = single_coverage + dp_best_coverage[j] + overlap_adjustment
                         else:
                             curr_coverage = single_coverage + dp_best_coverage[j]
 
@@ -134,6 +143,7 @@ class ImprovedFullParser(ExonBlastXMLParser):
 
             dp_gene_level_results.append({"pointers": dp_pointers, "best_coverage": dp_best_coverage})
 
+        # get the contig with the best gene model
         max_global_coverage = 0
         best_contig = -1
         for i in range(len(dp_gene_level_results)):
@@ -145,23 +155,62 @@ class ImprovedFullParser(ExonBlastXMLParser):
         best_coverage_array = dp_gene_level_results[best_contig]["best_coverage"]
         best_pointers = dp_gene_level_results[best_contig]["pointers"]
 
+        # for the contig with the best gene model, get the last HSP to use
         best_ender = -1
         for i in range(len(best_coverage_array)):
             if best_coverage_array[i] == max_global_coverage:
                 best_ender = i
 
+        # generate the traceback chain for stitching together the best sequence
         k = best_ender
         traceback_chain = [k]
         while best_pointers[k] != -1:
             traceback_chain.append(best_pointers[k])
             k = best_pointers[k]
 
-        result_seq = self._stitch_best_sequence(contig_sep_collection[best_contig],
+        self._stitch_best_sequence(contig_sep_collection[best_contig],
                                                 traceback_chain)
 
-    def _stitch_best_sequence(self, hsp_data, traceback_chain):
+    def _initial_overlap_score_corrector(self, hsp1, hsp2):
 
-        print(traceback_chain)
+        """
+        Returns the overlap adjustment (generally a negative value)
+        """
+
+        overlap = hsp1["q_end"] - hsp2["q_start"] + 1
+
+        q_array, s1_array = self._convert_hsp_to_array(hsp1)
+        s2_array = self._convert_hsp_to_array(hsp2)[1]
+
+        s2_overlap = s2_array[:overlap]
+        s1_overlap = s1_array[len(s1_array) - overlap:]
+        q_overlap = q_array[len(q_array) - overlap:]
+
+        max_score = self._sort_overlap(q_overlap, s1_overlap, s2_overlap)[1]
+
+        overlap_loss = 0
+        for i in range(overlap):
+            overlap_loss += self._score_corrector_helper(s1_overlap[i], q_overlap[i])
+            overlap_loss += self._score_corrector_helper(s2_overlap[i], q_overlap[i])
+
+        return max_score - overlap_loss
+
+    def _score_corrector_helper(self, s_ch, q_ch):
+        """
+        Takes in a subject character (if insertion, multiple), as well as the query character, and returns the score
+        """
+        if s_ch == q_ch:
+            return MATCH_SCORE
+        else:
+            if s_ch == "-":
+                return GAP_SCORE
+            elif len(s_ch) > 1:
+                return GAP_SCORE * (len(s_ch) - 1)
+            else:
+                return MISMATCH_SCORE
+
+
+    def _stitch_best_sequence(self, hsp_data, traceback_chain):
 
         last_hsp = hsp_data[traceback_chain[0]]
         building_array = self._convert_hsp_to_array(last_hsp)[1]
@@ -189,7 +238,7 @@ class ImprovedFullParser(ExonBlastXMLParser):
                 #print(to_add_overlap)
                 #print(overlap_query_section)
 
-                best_overlap = self._sort_overlap(overlap_query_section, to_add_overlap, build_overlap)
+                best_overlap = self._sort_overlap(overlap_query_section, to_add_overlap, build_overlap)[0]
                 #print(best_overlap)
                 building_array = array_to_add[:len(array_to_add)-overlap] + best_overlap + building_array[overlap:]
 
@@ -201,9 +250,23 @@ class ImprovedFullParser(ExonBlastXMLParser):
         self._write_to_file(hsp_data[0], building_array)
 
     def _sort_overlap(self, query_section, to_add_overlap, build_overlap):
+        """
+        Given overlapping subject sequences and a query, return the sequence of the best compromise,
+        the partition index, and compromise score, in that order
+        """
 
         if to_add_overlap == build_overlap:
-            return build_overlap
+
+            # we just need to gauge the number of matches and mismatches to get the actual raw score
+            match_no = 0
+            mismatch_no = 0
+            for i in range(len(to_add_overlap)):
+                if query_section[i] == to_add_overlap[i]:
+                    match_no += 1
+                else:
+                    mismatch_no += 1
+
+            return build_overlap, 0, match_no * MATCH_SCORE + mismatch_no * MISMATCH_SCORE
 
         else:
             # get start alignment position (we are not interested in all the places that are the same)
@@ -225,7 +288,7 @@ class ImprovedFullParser(ExonBlastXMLParser):
                     max_score = score
                     best_partition = k
 
-            return to_add_overlap[:best_partition] + build_overlap[best_partition:]
+            return to_add_overlap[:best_partition] + build_overlap[best_partition:], max_score
 
     def _perform_global_alignment(self, seq1, seq2):
 
@@ -239,9 +302,9 @@ class ImprovedFullParser(ExonBlastXMLParser):
 
         seq2 = "".join(seq2)
 
-        gap = -5
-        match = 2
-        mismatch = -3
+        gap = GAP_SCORE
+        match = MATCH_SCORE
+        mismatch = MISMATCH_SCORE
 
         i_bounds = len(seq1) + 1
         j_bounds = len(seq2) + 1
@@ -340,8 +403,11 @@ class ImprovedFullParser(ExonBlastXMLParser):
                         " genome:" + hsp["contig_acc"] + " ")
                         #+ \
                         #hsp["ref_range"])
-        transcript_file.write(fasta_heading + "\n")
-        transcript_file.write(result_sequence + "\n")
+
+        print(fasta_heading + "\n")
+        print(result_sequence + "\n")
+        #transcript_file.write(fasta_heading + "\n")
+        #transcript_file.write(result_sequence + "\n")
         transcript_file.close()
 
 
@@ -355,7 +421,3 @@ if __name__ == "__main__":
                              {"taxon": "selachii", "name": "carcharodon"},
                              False)
     obj.parse_blast_xml()
-    print("===")
-    x = ['G', 'T', 'T', 'G', 'T', 'G', 'T', 'T', 'A', 'C', 'T', 'G', 'G']
-    y = ['G', 'T', 'T', 'C', 'T', 'G', 'T', 'T', 'A', '-', '-', 'G', 'G']
-    print(obj._perform_global_alignment(x, y))
