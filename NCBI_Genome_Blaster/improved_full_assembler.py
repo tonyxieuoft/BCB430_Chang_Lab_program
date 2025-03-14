@@ -404,10 +404,8 @@ class ImprovedFullParser(ExonBlastXMLParser):
                         #+ \
                         #hsp["ref_range"])
 
-        print(fasta_heading + "\n")
-        print(result_sequence + "\n")
-        #transcript_file.write(fasta_heading + "\n")
-        #transcript_file.write(result_sequence + "\n")
+        transcript_file.write(fasta_heading + "\n")
+        transcript_file.write(result_sequence + "\n")
         transcript_file.close()
 
 
