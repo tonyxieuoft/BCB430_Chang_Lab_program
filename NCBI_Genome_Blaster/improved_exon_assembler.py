@@ -31,7 +31,9 @@ class ImprovedExonParser(ExonBlastXMLParser):
 
     def parse_blast_xml(self):
 
-        splice_site_file = open("/crun/tony.xie/Downloads/official_results/splice_site_1-1-4-1-e0.5.csv", "a")
+        # TODO disable SPLICE
+        #splice_site_file = open("/crun/tony.xie/Downloads/official_results/splice_site_1-1-4-1-e0.5.csv", "a")
+        splice_site_file = open("/crun/tony.xie/Downloads/dummy.csv","w")
 
         # track the last gene name (so we know at which iteration we begin at a new gene)
         past_gene_name = ""
@@ -85,6 +87,7 @@ class ImprovedExonParser(ExonBlastXMLParser):
                 hsp_attributes["q_end"] = int(top_hsp["Hsp_query-to"])
 
                 hsp_attributes["seq_range"] = abs(hsp_attributes["q_start"] - hsp_attributes["q_end"]) + 1
+                hsp_attributes["raw_score"] = int(top_hsp["Hsp_score"])
 
                 hsp_attributes["h_start"] = int(top_hsp["Hsp_hit-from"])
                 hsp_attributes["h_end"] = int(top_hsp["Hsp_hit-to"])
@@ -120,7 +123,7 @@ class ImprovedExonParser(ExonBlastXMLParser):
             # instantiate base cases
             if k == 0:
                 for i in range(len(hits)):
-                    dp_table[k][i] = (hits[i]["seq_range"], -1, -1)
+                    dp_table[k][i] = (hits[i]["raw_score"], -1, -1)
 
             else:
                 for i in range(len(hits)):
@@ -143,7 +146,7 @@ class ImprovedExonParser(ExonBlastXMLParser):
                                 prev_exon = a
                                 prev_hit = b
 
-                    dp_table[k][i] = (max_coverage + hits[i]["seq_range"],
+                    dp_table[k][i] = (max_coverage + hits[i]["raw_score"],
                                       prev_exon, prev_hit)
 
         # print(dp_table)
@@ -188,6 +191,8 @@ class ImprovedExonParser(ExonBlastXMLParser):
         for coord in picked:
             self._length_force_and_print(exons[coord[0]][coord[1]], splice_site_dict)
 
+        # TODO disable SPLICE
+        """
         for boundary_key in splice_site_dict:
             if len(splice_site_dict[boundary_key]) == 2:
                 print("=====")
@@ -198,6 +203,7 @@ class ImprovedExonParser(ExonBlastXMLParser):
                             str(splice_site["query_junction"]) + "," + splice_site["splice_seq"] + "," +
                             splice_site["left_or_right"] + "," + str(splice_site["fill"]) + "\n")
 
+        """
 
     def _is_compatible(self, x, y, exon_diff):
         """
@@ -325,7 +331,7 @@ class ImprovedExonParser(ExonBlastXMLParser):
                     left_subject_boundary = lower_bound
 
             string = ""
-            if 0 < to_salvage: # TODO change it back to 0-5 later (< 10)
+            if 0 < to_salvage < 17: # TODO change it back to 0-5 later (< 10)
                 print("getting gene sequence")
                 arr = ncbi_get_gene_sequence(hsp["contig_acc"], lower_bound,
                                              upper_bound, strand)
@@ -349,7 +355,8 @@ class ImprovedExonParser(ExonBlastXMLParser):
             left_allow_splice = True
 
 
-        if left_allow_splice:
+        # TODO disabled SPLICE
+        if False and left_allow_splice:
             splice_site = self._get_splice_site(hsp, left_subject_boundary, strand, "right", to_salvage)
             query_junction_id = splice_site["query_junction"]
             if query_junction_id in splice_site_dict:
@@ -383,7 +390,7 @@ class ImprovedExonParser(ExonBlastXMLParser):
 
             string = ""
             # 10 >
-            if to_salvage > 0: # change it back later
+            if 17 > to_salvage > 0: # change it back later
                 print("getting gene seqnece")
                 arr = ncbi_get_gene_sequence(hsp["contig_acc"], lower_bound, upper_bound, strand)
 
@@ -405,7 +412,8 @@ class ImprovedExonParser(ExonBlastXMLParser):
             right_allow_splice = True
             right_subject_boundary = hit_bound2
 
-        if right_allow_splice:
+        # TODO disable SPLICE
+        if False and right_allow_splice:
             splice_site = self._get_splice_site(hsp, right_subject_boundary, strand, "left", to_salvage)
             query_junction_id = splice_site["query_junction"]
             if query_junction_id in splice_site_dict:
