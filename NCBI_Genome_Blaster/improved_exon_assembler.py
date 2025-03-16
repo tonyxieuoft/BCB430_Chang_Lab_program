@@ -331,7 +331,7 @@ class ImprovedExonParser(ExonBlastXMLParser):
                     left_subject_boundary = lower_bound
 
             string = ""
-            if 0 < to_salvage < 17: # TODO change it back to 0-5 later (< 10)
+            if False and 0 < to_salvage < 17: # TODO change it back to 0-5 later (< 10)
                 print("getting gene sequence")
                 arr = ncbi_get_gene_sequence(hsp["contig_acc"], lower_bound,
                                              upper_bound, strand)
@@ -390,7 +390,7 @@ class ImprovedExonParser(ExonBlastXMLParser):
 
             string = ""
             # 10 >
-            if 17 > to_salvage > 0: # change it back later
+            if False and 17 > to_salvage > 0: # change it back later
                 print("getting gene seqnece")
                 arr = ncbi_get_gene_sequence(hsp["contig_acc"], lower_bound, upper_bound, strand)
 

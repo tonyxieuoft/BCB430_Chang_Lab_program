@@ -6,8 +6,8 @@ if __name__ == "__main__":
                     "Torpedo suessii",
                     "Squatina squatina"]
 
-    alignment_dir = r"/Users/tonyx/Documents/chang_lab/alignments5"
-    save_dir = "/Users/tonyx/Documents/chang_lab/1-1-4-1-e1-full-raw-score-filtered-fixed"
+    alignment_dir = r"/Users/tonyx/Documents/chang_lab/alignments6"
+    save_dir = "/Users/tonyx/Documents/chang_lab/1-1-4-1-e0.5-exon-raw-score-forced-renamed"
 
     os.mkdir(save_dir)
 
@@ -23,7 +23,7 @@ if __name__ == "__main__":
             while line != "" and line[0] != ">":
                 line = f1.readline()
             if line.split()[1] + " " + line.split()[2] not in red_problems:
-                f2.write(line)
+                f2.write(">" + line.split()[1][0] + line.split()[2][:5] + "\n")
                 line = f1.readline()
                 while line != "" and line[0] != ">":
                     f2.write(line)
