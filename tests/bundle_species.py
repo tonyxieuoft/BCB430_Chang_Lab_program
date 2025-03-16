@@ -4,8 +4,8 @@ from Basic_Tools.lists_and_files import file_to_list
 
 if __name__ == "__main__":
 
-    path = "/Users/tonyx/Documents/chang_lab/major_comparisons/GNB2_giga_mafft2.fas"
-    path2 = "/Users/tonyx/Documents/chang_lab/major_comparisons/GNB2_giga_mafft2_organized.fas"
+    path = "/Users/tonyx/Documents/chang_lab/major_comparisons/GNB2_giga_fixed_mafft2.fas"
+    path2 = "/Users/tonyx/Documents/chang_lab/major_comparisons/GNB2_giga_fixed_mafft2_organized.fas"
     f2 = open(path2, "w")
 
     arr = file_to_list(path)
