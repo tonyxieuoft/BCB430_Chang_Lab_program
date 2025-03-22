@@ -194,6 +194,7 @@ class Analyser:
         curr_species = ""
         for line in alignment_arr:
             if line[0] == ">":
+                #curr_species = line[1:]
                 curr_species = line.split()[1] + " " + line.split()[2]
             else:
                 seq = ""
@@ -261,15 +262,15 @@ class Analyser:
 
         return seqs[0], seqs[1], gap_seq1, gap_seq2, match, mismatch
 
-    def _align_against(self, other):
+    def _align_against(self, other, csv_for_r):
 
-        csv_for_r = "/Users/tonyx/Documents/chang_lab/full_against_nlf_exon2.csv"
         csv_f = open(csv_for_r, "w")
         csv_f.write("gene,gap_full,gap_exon,match,mismatch\n")
 
         for gene in self.gene_species_sequence_dict:
             print("=====")
             print(gene)
+
             if gene in other.gene_species_sequence_dict:
                 ss_dict1 = self.gene_species_sequence_dict[gene]
                 ss_dict2 = other.gene_species_sequence_dict[gene]
@@ -282,6 +283,7 @@ class Analyser:
                 species_considered = 0
 
                 for species in ss_dict1:
+
                     if species in ss_dict2:
 
                         a_seq1, a_seq2, gap_full, gap_exon, match, mismatch = (
@@ -388,18 +390,20 @@ class Analyser:
 
 if __name__ == "__main__":
     alignment_path1 = "/Users/tonyx/Documents/chang_lab/1-1-4-1-e1-full-raw-score-filtered-fixed"
-    alignment_path2 = "/Users/tonyx/Documents/chang_lab/1-1-4-1-e0.5-exon-filtered"
+    alignment_path2 = "/Users/tonyx/Documents/chang_lab/1-1-4-1-e0.5-exon_ws11_nf"
+    #alignment_path3 = "/Users/tonyx/Documents/chang_lab/1-1-4-1-e0.5-exon-raw-score-no_force"
 
     wd = "/Users/tonyx/Documents/chang_lab/mafft_test"
     full = Analyser(alignment_path1, wd)
-    exon = Analyser(alignment_path2, wd)
+    exon1 = Analyser(alignment_path2, wd)
+    #exon2 = Analyser(alignment_path3, wd)
 
     ref_dir = "/Users/tonyx/Documents/chang_lab/converted_NEPR"
 
-    csv_for_r = "/Users/tonyx/Documents/chang_lab/exon_against_ref.csv"
+    csv_for_r = "/Users/tonyx/Documents/chang_lab/ws11_exon_no_force_against_ref.csv"
 
-    #full._align_against(exon)
-    exon._align_against_reference(ref_dir, csv_for_r)
+    #full._align_against(exon1, csv_for_r)
+    exon1._align_against_reference(ref_dir, csv_for_r)
     #_global_aligner("bruhasdfaskjfewj", "asdfasifew")
 
 
