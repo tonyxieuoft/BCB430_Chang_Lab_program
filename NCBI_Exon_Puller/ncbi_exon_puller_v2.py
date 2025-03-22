@@ -181,7 +181,7 @@ def read_gene_table_v2(text: str, id_to_org: Dict[str, str], gene_name: str) -> 
                             splice_seq += ch
 
                         splice_f = open(splice_file_output, "a")
-                        print(splice_seq + ",end," + curr_org + "," + str(junction_position) + "," + gene_name + "\n")
+                        splice_f.write(splice_seq + ",end," + curr_org + "," + str(junction_position) + "," + gene_name + "\n")
                         splice_f.close()
 
                     if get_end:
