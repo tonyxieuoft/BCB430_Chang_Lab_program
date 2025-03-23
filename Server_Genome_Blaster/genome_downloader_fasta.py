@@ -40,7 +40,7 @@ def read_species_data(genome_storage_path):
     return species_data
 
 
-class ServerGenomeDownloader:
+class ServerFastaGenomeDownloader:
 
     def __init__(self, save_path, taxa_list, genome_storage_path):
 
@@ -167,7 +167,7 @@ if __name__ == "__main__":
     taxa_list = ["elasmobranchii"]
     genome_storage = "/crun2/storage5/TonyX/elasmobranch_genomes_fasta"
 
-    downloader = ServerGenomeDownloader(save_path, taxa_list, genome_storage)
+    downloader = ServerFastaGenomeDownloader(save_path, taxa_list, genome_storage)
     downloader.set_accessions_to_download()
     #downloader.write_to_species_data_file()
     downloader.download_genomes()

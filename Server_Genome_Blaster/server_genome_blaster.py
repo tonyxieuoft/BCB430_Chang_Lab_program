@@ -108,6 +108,8 @@ class ServerGenomeBlaster:
     def parse_blast_xml(self, file_to_analyze, curr_species):
         pass
 
+#class Server
+
 class ServerExonGenomeBlaster(ServerGenomeBlaster):
 
     def parse_blast_xml(self, file_to_analyze, curr_species):

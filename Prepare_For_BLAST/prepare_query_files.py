@@ -5,6 +5,7 @@ from typing import Dict, List
 from Basic_Tools.taxonomy_browser import get_taxonomy_lineage, get_single_taxid
 from Basic_Tools.lists_and_files import file_to_list, list_to_string
 from Basic_Tools.basic_dictionaries import dict_get_values
+from GeMoMa.exon_info_to_gff import exon_file_to_gff
 from Prepare_For_BLAST.taxa_assigner import get_assignments
 from Quality_Checking.get_longest_transcript import get_longest_transcript
 
@@ -187,6 +188,77 @@ class BlastPreparer:
     def single_query_assembly(self, ref_species_name: str,
                               assigned_taxa: str) -> bool:
         pass
+
+class GeMoMaPreparer(BlastPreparer):
+
+    # TODO SAVE PATH is the fasta path here
+    def __init__(self, ref_seq_path, taxa_path, save_path, gff_path):
+        super().__init__(ref_seq_path, taxa_path, save_path)
+
+        self.gff_path = gff_path
+
+    def single_query_assembly(self, ref_species_name: str,
+                              assigned_taxa: str) -> bool:
+        """
+        Assumes that exons for reference sequences have been pulled out and are in
+        the folder format: general folder -> gene -> taxon -> species -> transcript.
+        Concatenate all results for one species into a single query_file, and name the
+        query_file after the taxon that the query will be blasted against. If no reference
+        sequence of a species exists for a given gene, asks the user to input an
+        alternative species to draw the sequence from (or finds one automatically).
+
+        :param autofill: '1' for automatically pulling from the closest available
+        species when a sequence is missing, '0' for manual user input.
+        :param ref_species_name: the species to concatenate results for
+        :param reference_seq_path: the general folder containing reference sequences
+        :param save_path: str
+        :param assigned_taxa: the subject_taxa that the query will be blasted against
+        :return: True iff the species has reference sequences for every
+        specified gene. Also, a query_file will be created in the specified save_path
+        """
+
+        # query query_file to contain reference sequences to blast against a taxon
+        query_path = os.path.join(self.save_path, assigned_taxa + ".fas")
+        gff_path = os.path.join(self.gff_path, assigned_taxa + ".gff")
+
+        complete_species = True
+
+        # follows through the folder structure
+        for gene in os.listdir(self.ref_seq_path):
+            gene_path = os.path.join(self.ref_seq_path, gene)
+
+            species_found = False
+            available_species = []
+
+            for species_file in os.listdir(gene_path):
+
+                species_path = os.path.join(gene_path, species_file)
+
+                species_name = os.path.splitext(species_file)[0]
+                available_species.append(species_name)
+                # if the species is the one we are looking for
+
+                if species_name.upper() == ref_species_name.upper():
+
+                    self.write_to_query(species_path, query_path, gff_path)
+                    species_found = True
+
+            if not species_found:
+
+                complete_species = False
+                to_select = self.select_fill_in(ref_species_name,
+                                                available_species)
+
+                if to_select != "":
+                    # there exists an alternative that we can use
+                    species_path = os.path.join(gene_path, to_select + ".fas")
+                    self.write_to_query(species_path, query_path, gff_path)
+
+        return complete_species
+
+    def write_to_query(self, species_path, query_path, gff_path):
+
+        exon_file_to_gff(species_path, query_path, gff_path)
 
 
 class ExonBlastPreparer(BlastPreparer):

@@ -17,7 +17,7 @@ from NCBI_Genome_Blaster.driver_genome_blaster_v2 import \
 from NCBI_Genome_Blaster.local_genome_blaster import local_genome_blaster
 from Prepare_For_BLAST.NEPR_convert import convert_NEPR_directory
 from Prepare_For_BLAST.prepare_query_files import ExonBlastPreparer, \
-    ExonBlastPreparer, FullBlastPreparer
+    ExonBlastPreparer, FullBlastPreparer, GeMoMaPreparer
 from Quality_Checking.get_longest_transcript import \
     optimize_transcripts_by_length
 from Quality_Checking.quality_analysis import QualityAnalyser
@@ -369,6 +369,10 @@ class UI:
         else:
             print("Queries will be concatenated into full-length sequences.")
         print()
+
+        print("Press 1 for normal, or 2 for GeMoMa (all above commands will be overwritten)")
+        pick_gemoma = numeric_user_input(1, 2, "")
+
         queries_path = make_unique_directory(self.download_dir, "query_files")
         print("Great. Query files will be at the path: " + queries_path)
         print("Enter any key to continue.")
@@ -377,10 +381,18 @@ class UI:
         print("-----------------------------------------------------------------")
         print("Making query files...")
 
-        if exon_or_full_query_choice == 1:
-            blast_preparer = ExonBlastPreparer(self.blast_reference_dir, self.taxa_filepath, queries_path)
+        gffs_path = ""
+        if pick_gemoma == 2:
+
+            gffs_path = make_unique_directory(self.download_dir, "gffs")
+            print("MAKING A GFF PATH TOO AT: " + gffs_path)
+            blast_preparer = GeMoMaPreparer(self.blast_reference_dir, self.taxa_filepath, queries_path, gffs_path)
+
         else:
-            blast_preparer = FullBlastPreparer(self.blast_reference_dir, self.taxa_filepath, queries_path)
+            if exon_or_full_query_choice == 1:
+                blast_preparer = ExonBlastPreparer(self.blast_reference_dir, self.taxa_filepath, queries_path)
+            else:
+                blast_preparer = FullBlastPreparer(self.blast_reference_dir, self.taxa_filepath, queries_path)
 
         blast_preparer.prepare_query_files(auto_assign)
         #print(blast_preparer.get_queries_to_genes_to_exons())
@@ -405,8 +417,9 @@ class UI:
         print("(1) for remote BLAST via Selenium")
         print("(2) for local BLAST")
         print("(3) for server BLAST")
+        print("(4) if you have already selected GeMoMa")
 
-        remote_or_local_or_server = numeric_user_input(1, 3, "")
+        remote_or_local_or_server = numeric_user_input(1, 4, "")
 
         # throwaway variable for server blast only, might change later
         genome_storage_path = ""
@@ -416,26 +429,36 @@ class UI:
         elif remote_or_local_or_server == 2:
             print("Local BLAST selected. Please note that up to 5 GB of space may "
                   "be required for genome download.")
-        else:
+        elif remote_or_local_or_server == 3:
             print("Server BLAST selected.")
             print()
             print("Please enter the directory to which the server's genomes are"
                   " currently stored (at the level containing the species data"
                   " file).")
             genome_storage_path = get_generic_directory()
+        else:
+            print("GeMoMa confirmed")
+            print()
+            print("Please enter the directory to which the server's genomes (NON BLAST DB) are "
+                  "currently stored, at the level containing the species data file")
 
-        print("Default expect threshold is 0.05. Enter:\n"
-              "(1) to proceed\n"
-              "(2) to enter a custom expect threshold")
-        expect_choice = numeric_user_input(1, 2, "", "Incorrect. Enter 1 or 2.")
-        if expect_choice == 1:
-            expect_value = 0.05
+        # if we haven't picked gemoma
+        expect_value = -1
+        if pick_gemoma != 2:
+            print("Default expect threshold is 0.05. Enter:\n"
+                  "(1) to proceed\n"
+                  "(2) to enter a custom expect threshold")
+            expect_choice = numeric_user_input(1, 2, "", "Incorrect. Enter 1 or 2.")
+            if expect_choice == 1:
+                expect_value = 0.05
 
-        if expect_choice == 2:
-            expect_value = 0
-            print("Enter an expect threshold value (0 < e-value <= 1):")
-            expect_value = expect_threshold_user_input()
-        print()
+            if expect_choice == 2:
+                expect_value = 0
+                print("Enter an expect threshold value (0 < e-value <= 1):")
+                expect_value = expect_threshold_user_input()
+            print()
+
+
         self.blast_results_path = make_unique_directory(self.download_dir, "blast_results")
         print("Blast results will be at the path: " + self.blast_results_path)
         print("Enter any key to begin the blasting process")
@@ -462,7 +485,7 @@ class UI:
             local_genome_blaster(self.blast_results_path, queries_path, blast_preparer.taxa_blast_order,
                                  blast_preparer.complete_reference_species, expect_value)
 
-        else:
+        elif remote_or_local_or_server == 3:
             if exon_or_full_query_choice == 1:
                 #genome_blaster = ServerExonGenomeBlaster(self.blast_results_path, queries_path, blast_preparer.taxa_blast_order,
                 #                                         blast_preparer.complete_reference_species, genome_storage_path, self.exon_pull_dir)
@@ -479,6 +502,9 @@ class UI:
                 #                                         blast_preparer.taxa_to_codes, blast_preparer.queries_to_genes_to_exons)
             genome_blaster.download_new_genomes()
             genome_blaster.blast_genomes(expect_value)
+
+        else:
+            pass
 
 
         print("-----------------------------------------------------------------")
