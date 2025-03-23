@@ -258,7 +258,7 @@ class GeMoMaPreparer(BlastPreparer):
 
     def write_to_query(self, species_path, query_path, gff_path):
 
-        exon_file_to_gff(species_path, query_path, gff_path)
+        exon_file_to_gff(species_path, gff_path, query_path)
 
 
 class ExonBlastPreparer(BlastPreparer):

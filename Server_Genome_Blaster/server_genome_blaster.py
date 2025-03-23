@@ -10,6 +10,7 @@ from NCBI_Genome_Blaster.improved_full_assembler import ImprovedFullParser
 from Server_Genome_Blaster.genome_downloader import SPECIES_DATA_FILENAME, \
     ServerGenomeDownloader, \
     read_species_data
+from Server_Genome_Blaster.genome_downloader_fasta import ServerFastaGenomeDownloader
 
 
 class ServerGenomeBlaster:
@@ -108,7 +109,89 @@ class ServerGenomeBlaster:
     def parse_blast_xml(self, file_to_analyze, curr_species):
         pass
 
-#class Server
+class GemomaRunner(ServerGenomeBlaster):
+
+    def __init__(self, save_path, queries_path, taxa_blast_order,
+                 complete_reference_species, genome_storage_path, taxa_to_codes,
+                 gff_path, gemoma_out):
+        super().__init__(save_path, queries_path, taxa_blast_order,
+                         complete_reference_species, genome_storage_path, taxa_to_codes)
+        self.gff_path = gff_path
+        self.gemoma_out = gemoma_out
+
+    def download_new_genomes(self):
+
+        print("downloading new genomes...")
+        taxa_list = list(self.taxids_to_taxa.keys())
+
+        downloader = ServerFastaGenomeDownloader(self.save_path, taxa_list,
+                                                 self.genome_storage_path)
+        downloader.set_accessions_to_download()
+        if len(downloader.get_accessions_to_download()) == 0:
+            print("No new accessions to download!")
+        else:
+            downloader.download_genomes()
+
+    def blast_genomes(self, expect_value: str):
+
+        available_genome_data = read_species_data(self.genome_storage_path)
+        print("blast_order_dict: " + str(self.blast_order_dict))
+
+        for genome in available_genome_data:
+
+            # observing each genome separately
+            curr_ref_taxon = None
+            curr_prio = float("inf")
+            overarching_taxon = None
+
+            # go through the lineage
+            for taxon in genome["lineage"]:
+
+                # if we have a match to one of our input taxa to predict sequences for
+                if taxon in self.taxids_to_taxa:
+                    # the first match is the overarching taxon
+                    if overarching_taxon is None:
+                        overarching_taxon = self.taxids_to_taxa[taxon]
+                    else:
+                        print(genome["name"] + " is a member of multiple inputted taxa, will be placed in " + overarching_taxon)
+
+                # what to blast first (and everything else gets excluded, yes)
+                # find the best prio (which I feel like should just be the first regardless)
+                if taxon in self.blast_order_dict and self.blast_order_dict[taxon] < curr_prio:
+                    curr_ref_taxon = taxon
+                    curr_prio = self.blast_order_dict[taxon]
+
+            if curr_ref_taxon is not None:
+
+                genome_fasta = os.path.join(self.genome_storage_path, "genome_fastas",
+                                            list_to_string(genome["name"].split(), "_") + ".fna")
+
+                sequence_filepath = os.path.join(self.queries_path, curr_ref_taxon + ".fas")
+                gff_filepath = os.path.join(self.gff_path, curr_ref_taxon + ".gff")
+
+                print("running " + genome["name"] + " against " + curr_ref_taxon + "...")
+                os.system("GeMoMa -Xms5G -Xmx50G "
+                          "GeMoMaPipeline t=" + genome_fasta +
+                          " a=" + gff_filepath + " g="  + sequence_filepath +
+                          " AnnotationFinalizer.r=NO threads=16 outdir=" + self.gemoma_out
+                          )
+
+                # parse the blast results
+
+                gemoma_annotations = os.path.join(self.gemoma_out, "final_annotation.gff")
+                gemoma_protein_predictions = os.path.join(self.gemoma_out, "predicted_proteins.fasta")
+                gemoma_protocol = os.path.join(self.gemoma_out, "protocol_GeMoMaPipeline.txt")
+
+                taxon_and_name = {"taxon": overarching_taxon, "name": genome["name"]}
+                print("parsing...")
+
+                #self.parse_blast_xml(xml_out_path, taxon_and_name)
+                print("done parsing")
+
+                os.remove(gemoma_annotations)
+                os.remove(gemoma_protein_predictions)
+                os.remove(gemoma_protocol)
+
 
 class ServerExonGenomeBlaster(ServerGenomeBlaster):
 

@@ -441,6 +441,10 @@ class UI:
             print()
             print("Please enter the directory to which the server's genomes (NON BLAST DB) are "
                   "currently stored, at the level containing the species data file")
+            genome_storage_path = get_generic_directory()
+            gemoma_download_dir = make_unique_directory(self.download_dir, "gemoma_downloads")
+            print("Great, note that all GeMoMa results will be stored here: " + gemoma_download_dir)
+
 
         # if we haven't picked gemoma
         expect_value = -1

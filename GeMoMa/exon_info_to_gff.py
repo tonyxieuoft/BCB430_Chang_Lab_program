@@ -63,7 +63,7 @@ def exon_file_to_gff(exon_file: str, gff_file: str, fasta_file: str):
                 "." + "\t" +
                 "+" + "\t" +
                 "." + "\t" +
-                "ID=rna-" + gene_name + "\n")
+                "ID=" + gene_name + "\n")
 
     for cds in cds_ranges:
         gff_f.write(gene_name + "\t" +
@@ -74,7 +74,7 @@ def exon_file_to_gff(exon_file: str, gff_file: str, fasta_file: str):
                     "." + "\t" +
                     "+" + "\t" +
                     "." + "\t" +
-                    "Parent=rna-" + mrna_name + "\n")
+                    "Parent=" + gene_name + "\n")
 
     fasta_f = open(fasta_file, "a")
     fasta_f.write(">" + gene_name + " " + mrna_name + "\n")

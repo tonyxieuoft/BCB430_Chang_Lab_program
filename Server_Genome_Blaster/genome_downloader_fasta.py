@@ -147,7 +147,7 @@ class ServerFastaGenomeDownloader:
                     else:
                         genome_fasta_filename += "_" + word
 
-                new_genome_filepath = os.path.join(genome_fasta_dir, genome_fasta_filename)
+                new_genome_filepath = os.path.join(genome_fasta_dir, genome_fasta_filename + ".fna")
 
                 print("moving genome...")
                 os.system("mv " + genome_filepath +
