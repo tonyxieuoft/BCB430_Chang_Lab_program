@@ -84,9 +84,9 @@ def process_gemoma_results(annotation_path, species):
         if gene_name not in gene_model_dict or gene_model_dict[gene_name].score < score:
 
             # create the new model
-            new_model = GeneModel(annotations_arr[GENOMIC_ACCESSION], score,
-                                  annotations_arr[STRAND],
-                                  annotations_arr[BOUND1], annotations_arr[BOUND2])
+            new_model = GeneModel(gff_arr[GENOMIC_ACCESSION], score,
+                                  gff_arr[STRAND],
+                                  gff_arr[BOUND1], gff_arr[BOUND2])
 
             gene_model_dict[gene_name] = new_model
 
@@ -94,6 +94,8 @@ def process_gemoma_results(annotation_path, species):
             while line[0] != "#" and line.split()[TYPE] != "gene":
                 gff_arr = line.split()
                 new_model.add_to_range(gff_arr[BOUND1], gff_arr[BOUND2])
+
+                line = annot_f.readline()
 
         else:
             line = annot_f.readline()
@@ -106,16 +108,18 @@ def get_gene_model_sequences():
     pass
 
 if __name__ == "__main__":
-    pass
 
 
-
-
-
-
-
-
-
+    annotation_file = "/Users/tonyx/Documents/chang_lab/final_annotation_8.gff"
+    dct = process_gemoma_results(annotation_file, "hello")
+    for gene in dct:
+        print("=====")
+        print(gene)
+        print(dct[gene].accession)
+        print(dct[gene].gene_range)
+        print(dct[gene].strand)
+        print(dct[gene].cds_ranges)
+        print(dct[gene].score)
 
 
 
@@ -124,11 +128,4 @@ if __name__ == "__main__":
 
 
 
-    pass
 
-if __name__ == "__main__":
-
-
-
-
-    pass
