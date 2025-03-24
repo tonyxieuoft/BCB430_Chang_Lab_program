@@ -10,7 +10,7 @@ from NCBI_Exon_Puller.Transcript import Transcript
 from NCBI_Exon_Puller.ncbi_exon_puller import ncbi_get_gene_sequence
 
 
-splice_file_output = "/crun/tony.xie/Downloads/reference_splice_site_output.csv"
+#splice_file_output = "/crun/tony.xie/Downloads/reference_splice_site_output.csv"
 
 
 def ncbi_get_gene_features_v2(ids: str, id_to_org: Dict[str, str], gene_name) -> Dict:
@@ -106,11 +106,13 @@ def read_gene_table_v2(text: str, id_to_org: Dict[str, str], gene_name: str) -> 
             acc_name = line_keywords[4]
             acc_quality = acc_name[:2]
 
+
             ### ============ Get Splice Site ========================
-            relevant_transcript_ids = ['XM_059956423.1', 'XM_041173625.1', 'XM_059945786.1', 'XM_041207015.1', 'XM_059950643.1', 'XM_041195929.1', 'XM_059955473.1', 'XM_041213792.1', 'XM_059946101.1', 'XM_041176112.1', 'XM_059975050.1', 'XM_041178838.1', 'XM_059947580.1', 'XM_041210456.1', 'XM_059952777.1', 'XM_041174680.1', 'XM_059963252.1', 'XM_041199335.1', 'XM_059946625.1', 'XM_041178670.1', 'XM_059948319.1', 'XM_041216848.1', 'XM_052017529.1', 'XM_069936896.1', 'XM_059944490.1', 'XM_055647860.1', 'XM_033036884.1', 'XM_063067743.1', 'XM_041190931.1', 'XM_059990205.1', 'XM_041193610.1', 'XM_059967774.1', 'XM_041211548.1', 'XM_059985789.1', 'XM_059956044.1', 'XM_041180364.1', 'XM_059986830.1', 'XM_041203252.1', 'XM_059963352.1', 'XM_041194575.1', 'XM_059963252.1', 'XM_041199335.1', 'XM_059952428.1', 'XM_041206315.1', 'XM_059989449.1', 'XM_041173738.1', 'XM_059950157.1', 'XM_059971408.1', 'XM_041196729.1', 'XM_059993484.1', 'XM_041192083.1', 'XM_059952479.1', 'XM_033044102.1', 'XM_059961194.1', 'XM_041215304.1', 'XM_063064065.1', 'XM_041207809.1']
+            #relevant_transcript_ids = ['XM_059956423.1', 'XM_041173625.1', 'XM_059945786.1', 'XM_041207015.1', 'XM_059950643.1', 'XM_041195929.1', 'XM_059955473.1', 'XM_041213792.1', 'XM_059946101.1', 'XM_041176112.1', 'XM_059975050.1', 'XM_041178838.1', 'XM_059947580.1', 'XM_041210456.1', 'XM_059952777.1', 'XM_041174680.1', 'XM_059963252.1', 'XM_041199335.1', 'XM_059946625.1', 'XM_041178670.1', 'XM_059948319.1', 'XM_041216848.1', 'XM_052017529.1', 'XM_069936896.1', 'XM_059944490.1', 'XM_055647860.1', 'XM_033036884.1', 'XM_063067743.1', 'XM_041190931.1', 'XM_059990205.1', 'XM_041193610.1', 'XM_059967774.1', 'XM_041211548.1', 'XM_059985789.1', 'XM_059956044.1', 'XM_041180364.1', 'XM_059986830.1', 'XM_041203252.1', 'XM_059963352.1', 'XM_041194575.1', 'XM_059963252.1', 'XM_041199335.1', 'XM_059952428.1', 'XM_041206315.1', 'XM_059989449.1', 'XM_041173738.1', 'XM_059950157.1', 'XM_059971408.1', 'XM_041196729.1', 'XM_059993484.1', 'XM_041192083.1', 'XM_059952479.1', 'XM_033044102.1', 'XM_059961194.1', 'XM_041215304.1', 'XM_063064065.1', 'XM_041207809.1']
+            ### =====================================================
 
             # if there exists both the exon and cds column
-            if cds_column_no != -1 and exon_column_no != -1 and acc_name in relevant_transcript_ids: # and acc_quality != "XM":
+            if cds_column_no != -1 and exon_column_no != -1: # and acc_name in relevant_transcript_ids: # and acc_quality != "XM":
 
                 # ======= For splice site ==========
                 real_range = []
@@ -138,8 +140,7 @@ def read_gene_table_v2(text: str, id_to_org: Dict[str, str], gene_name: str) -> 
                     table_data = table[line_no].split("\t\t")
 
                 # =============== For splice site ============
-                # =============================================
-
+                """
                 junction_position = 0
                 strand = ""
 
@@ -204,9 +205,13 @@ def read_gene_table_v2(text: str, id_to_org: Dict[str, str], gene_name: str) -> 
                         splice_f.write(splice_seq + ",start," + curr_org + "," + str(junction_position) + "," + gene_name + "\n")
                         splice_f.close()
 
-                # =======================
+                
+                """
+                # ==============================
 
                 orgs_to_transcripts[curr_org].append(transcript)
+
+
 
         line_no += 1
 
