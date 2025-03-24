@@ -122,7 +122,7 @@ class GeMoMaProcessor:
                 self.gene_model_dict[gene_name] = new_model
 
                 line = annot_f.readline()
-                while line[0] != "#" and line.split()[TYPE] != "gene":
+                while line.strip() != "" and line[0] != "#" and line.split()[TYPE] != "gene":
                     gff_arr = line.split()
                     new_model.add_to_range(gff_arr[BOUND1], gff_arr[BOUND2])
 
