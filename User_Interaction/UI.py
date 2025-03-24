@@ -22,7 +22,7 @@ from Quality_Checking.get_longest_transcript import \
     optimize_transcripts_by_length
 from Quality_Checking.quality_analysis import QualityAnalyser
 from Server_Genome_Blaster.server_genome_blaster import ServerExonGenomeBlaster, \
-    ServerFullGenomeBlaster, ServerImprovedExonGenomeBlaster, ServerImprovedFullGenomeBlaster
+    ServerFullGenomeBlaster, ServerImprovedExonGenomeBlaster, ServerImprovedFullGenomeBlaster, GemomaRunner
 from User_Interaction.expect_threshold_user_input import \
     expect_threshold_user_input
 from User_Interaction.file_acceptors import enter_gene_filepath, \
@@ -423,6 +423,7 @@ class UI:
 
         # throwaway variable for server blast only, might change later
         genome_storage_path = ""
+        gemoma_download_dir = ""
         print()
         if remote_or_local_or_server == 1:
             print("Remote BLAST selected.")
@@ -508,7 +509,12 @@ class UI:
             genome_blaster.blast_genomes(expect_value)
 
         else:
-            pass
+            genome_blaster = GemomaRunner(self.blast_results_path, queries_path,
+                                          blast_preparer.taxa_blast_order, blast_preparer.complete_reference_species,
+                                          genome_storage_path, blast_preparer.taxa_to_codes,
+                                          gffs_path, gemoma_download_dir)# last two are the unique ones
+            genome_blaster.download_new_genomes()
+            genome_blaster.blast_genomes(expect_value)
 
 
         print("-----------------------------------------------------------------")

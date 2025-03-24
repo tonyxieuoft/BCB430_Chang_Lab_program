@@ -3,6 +3,7 @@ from abc import abstractmethod
 
 from Basic_Tools.lists_and_files import list_to_string
 from Basic_Tools.taxonomy_browser import get_taxa_taxids
+from GeMoMa.process_gemoma_results import GeMoMaProcessor
 from NCBI_Genome_Blaster.assemble_blast_result_sequences import BlastXMLParser, \
     ExonBlastXMLParser, FullBlastXMLParser
 from NCBI_Genome_Blaster.improved_exon_assembler import ImprovedExonParser
@@ -184,6 +185,9 @@ class GemomaRunner(ServerGenomeBlaster):
 
                 taxon_and_name = {"taxon": overarching_taxon, "name": genome["name"]}
                 print("parsing...")
+
+                processor = GeMoMaProcessor(gemoma_annotations, taxon_and_name, )
+                processor.process_gemoma_results()
 
                 #self.parse_blast_xml(xml_out_path, taxon_and_name)
                 print("done parsing")
