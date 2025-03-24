@@ -186,7 +186,7 @@ class GemomaRunner(ServerGenomeBlaster):
                 taxon_and_name = {"taxon": overarching_taxon, "name": genome["name"]}
                 print("parsing...")
 
-                processor = GeMoMaProcessor(gemoma_annotations, taxon_and_name, )
+                processor = GeMoMaProcessor(gemoma_annotations, taxon_and_name, self.save_path)
                 processor.process_gemoma_results()
 
                 #self.parse_blast_xml(xml_out_path, taxon_and_name)
