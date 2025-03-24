@@ -261,6 +261,7 @@ def ncbi_exon_puller_v2(search_query: str, gene_queries: List[str],
 
     # get the initial search results (based on initial query)
     search_results = v1.ncbi_gene_search(search_query)
+    time.sleep(0.4)
 
     # then, get the ids that come out from it
     ids_arr = search_results["IdList"]
@@ -271,6 +272,7 @@ def ncbi_exon_puller_v2(search_query: str, gene_queries: List[str],
 
     # get summaries
     summaries = v1.ncbi_get_gene_page_summaries(ids_string)
+    time.sleep(0.4)
 
     relevant_ids = []
     relevant_organisms = []
@@ -326,6 +328,7 @@ def ncbi_exon_puller_v2(search_query: str, gene_queries: List[str],
     # get the features
     orgs_to_transcripts = ncbi_get_gene_features_v2(relevant_ids_string,
                                                     id_to_org, gene_name)
+    time.sleep(0.4)
 
     # create a list
     transcript_list = []
