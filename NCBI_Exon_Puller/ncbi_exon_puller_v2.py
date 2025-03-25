@@ -378,6 +378,7 @@ def ncbi_exon_puller_v2(search_query: str, gene_queries: List[str],
 
                         transcript_file.write(fasta_heading + cds_sequence + "\n")
                 else:
+                    print("we are on the cds side")
                     fasta_heading = ">" + gene_name + " " + org + " mRNA:" + \
                                     transcript.accession + " genome:na " + \
                                     "1-" + \
