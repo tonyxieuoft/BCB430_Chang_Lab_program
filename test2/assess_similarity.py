@@ -1,7 +1,7 @@
 import os
 
 from After_BLAST.concatenate_exons import concatenate_exons
-from Basic_Tools.lists_and_files import file_to_list
+from Basic_Tools.lists_and_files import file_to_list, make_unique_directory
 
 batoidea = ["Leucoraja erinaceus",
            "Leucoraja ocellata",
@@ -387,12 +387,82 @@ class Analyser:
                         formatted_match + "," +
                         formatted_mismatch + "\n")
 
+    def phylo_tree_generation(self, converted_NEPR):
+
+        save_dir = make_unique_directory(self.wd, "phylo_adjusted")
+
+        for gene_file in os.listdir(self.alignment_dir):
+
+            gene_path = os.path.join(self.alignment_dir, gene_file)
+            gene_name = os.path.splitext(gene_file)[0]
+
+            shark_ref = ""
+            batoid_ref = ""
+            NEPR_gene_dir = os.path.join(converted_NEPR, gene_name)
+            for file in os.listdir(NEPR_gene_dir):
+                file_path = os.path.join(NEPR_gene_dir, file)
+                ref_species = os.path.splitext(file)[0]
+
+                if ref_species == "Carcharodon carcharias":
+                    shark_ref = (">Reference " + ref_species +
+                                 concatenate_exons(file_path).split("\n")[1] + "\n")
+                else:
+                    batoid_ref = (">Reference " + ref_species +
+                                 concatenate_exons(file_path).split("\n")[1] + "\n")
+
+            in_f = open(gene_path, "r")
+            out_f = open(os.path.join(save_dir, gene_file), "w")
+
+            if shark_ref != "":
+                out_f.write(shark_ref)
+            if batoid_ref != "":
+                out_f.write(batoid_ref)
+
+            line = in_f.readline()
+            while line != "":
+                if line[0] == ">":
+                    species_name = line.split()[1] + " "+ line.split()[2]
+                    out_f.write(">" + species_name + "\n")
+                else:
+                    out_f.write(line)
+
+                line = in_f.readline()
+
+            in_f.close()
+            out_f.close()
+
+        muscle_folder = make_unique_directory(self.wd, "muscle")
+        for file in save_dir:
+
+            in_path = os.path.join(save_dir, file)
+            out_path = os.path.join(muscle_folder, file)
+            os.system("muscle -in " + in_path + " -out " + out_path)
+
+        phylo_folder = make_unique_directory(self.wd, "phylo")
+        for file in muscle_folder:
+
+            in_path = os.path.join(muscle_folder, file)
+
+            os.system("nice -2 /usr/local/bin/iqtree2 "
+                      "-s " + in_path + " -pre " + phylo_folder + "/out -T AUTO")
+
+
+
+
+
+
+
+
 
 if __name__ == "__main__":
-    alignment_path1 = "/Users/tonyx/Documents/chang_lab/1-1-4-1-e1-full-raw-score-filtered-fixed"
-    alignment_path2 = "/Users/tonyx/Documents/chang_lab/1-1-4-1-e0.5-exon_ws11_nf"
+    #alignment_path1 = "/Users/tonyx/Documents/chang_lab/1-1-4-1-e1-full-raw-score-filtered-fixed"
+    #alignment_path2 = "/Users/tonyx/Documents/chang_lab/1-1-4-1-e0.5-exon_ws11_nf"
     #alignment_path3 = "/Users/tonyx/Documents/chang_lab/1-1-4-1-e0.5-exon-raw-score-no_force"
 
+    alignment_path1 = "/Users/tonyx/Documents/chang_lab/BCB430_final_results/GeMoMa_vision_results"
+    alignment_path2 = "/Users/tonyx/Documents/chang_lab/BCB430_final_results/exon_ws11_f16"
+
+    # just play around in
     wd = "/Users/tonyx/Documents/chang_lab/mafft_test"
     full = Analyser(alignment_path1, wd)
     exon1 = Analyser(alignment_path2, wd)
@@ -400,10 +470,10 @@ if __name__ == "__main__":
 
     ref_dir = "/Users/tonyx/Documents/chang_lab/converted_NEPR"
 
-    csv_for_r = "/Users/tonyx/Documents/chang_lab/ws11_exon_no_force_against_ref.csv"
+    csv_for_r = "/Users/tonyx/Documents/chang_lab/GeMoMa_vs_ref.csv"
 
     #full._align_against(exon1, csv_for_r)
-    exon1._align_against_reference(ref_dir, csv_for_r)
+    full._align_against_reference(ref_dir, csv_for_r)
     #_global_aligner("bruhasdfaskjfewj", "asdfasifew")
 
 

@@ -2,8 +2,9 @@ import os
 
 if __name__ == "__main__":
 
-    blast_results_dir = input("Enter blast results dir")
-    pulled_sequence_dir = input("Enter directory for pulled rnaseq full transcripts")
+    blast_results_dir = input("Enter transcriptome blast results dir: ")
+    pulled_sequence_dir = input("Enter an output directory (not made yet!) for pulled rnaseq full transcripts: ")
+    blast_db = input("Enter path to trinity blast database: ")
     os.mkdir(pulled_sequence_dir)
 
     for blast_file in os.listdir(blast_results_dir):
@@ -29,7 +30,7 @@ if __name__ == "__main__":
 
             print(e_value)
 
-            os.system("blastdbcmd -db trinitydb -entry " + transcript_name + " >> " +
+            os.system("blastdbcmd -db " + blast_db + " -entry " + transcript_name + " >> " +
                       pulled_seq_path)
 
             line = blast_f.readline()

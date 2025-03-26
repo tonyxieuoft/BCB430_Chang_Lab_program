@@ -6,8 +6,10 @@ if __name__ == "__main__":
                     "Torpedo suessii",
                     "Squatina squatina"]
 
-    alignment_dir = r"/Users/tonyx/Documents/chang_lab/alignments7_exon_ws11_nf"
-    save_dir = "/Users/tonyx/Documents/chang_lab/1-1-4-1-e0.5-exon_ws11_nf"
+    #os.mkdir("/Users/tonyx/Documents/chang_lab/BCB430_final_results")
+
+    alignment_dir = r"/Users/tonyx/Documents/chang_lab/GeMoMa_vision_results"
+    save_dir = "/Users/tonyx/Documents/chang_lab/BCB430_final_results/GeMoMa_vision_results"
 
     os.mkdir(save_dir)
 
