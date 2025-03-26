@@ -409,7 +409,7 @@ class Analyser:
                     shark_ref = (">Reference " + ref_species + "\n" +
                                  concatenate_exons(file_path).split("\n")[1] + "\n")
                 else:
-                    batoid_ref = (">Reference " + ref_species +
+                    batoid_ref = (">Reference " + ref_species + "\n" +
                                  concatenate_exons(file_path).split("\n")[1] + "\n")
 
             in_f = open(gene_path, "r")
@@ -433,19 +433,19 @@ class Analyser:
             in_f.close()
             out_f.close()
 
-        muscle_folder = make_unique_directory(self.wd, "muscle")
+        mafft_folder = make_unique_directory(self.wd, "mafft")
         for file in os.listdir(save_dir):
 
             #print("raw_file_name: " + file)
 
             in_path = os.path.join(save_dir, file)
-            out_path = os.path.join(muscle_folder, file)
-            os.system("muscle -align " + in_path + " -output " + out_path)
+            out_path = os.path.join(mafft_folder, file)
+            os.system("mafft --auto " + in_path + " > " + out_path)
 
         phylo_folder = make_unique_directory(self.wd, "phylo")
-        for file in os.listdir(muscle_folder):
+        for file in os.listdir(mafft_folder):
 
-            in_path = os.path.join(muscle_folder, file)
+            in_path = os.path.join(mafft_folder, file)
 
             os.system("nice -2 /usr/local/bin/iqtree2 "
                       "-s " + in_path + " -pre " + phylo_folder + "/out -T AUTO")
