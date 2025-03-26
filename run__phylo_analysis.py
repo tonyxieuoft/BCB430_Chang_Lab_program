@@ -7,6 +7,7 @@ if __name__ == "__main__":
     print("Enter directory containing fasta files of unaligned sequences")
     dir_path = get_generic_directory()
     # /crun/tony.xie/Downloads/phylo_accel/GeMoMa_vision_results
+    # /crun/tony.xie/Downloads/phylo_accel/exon_ws11_f16
 
     print("Enter reference sequence converted_NEPR dir")
     reference_path = get_generic_directory()
@@ -14,7 +15,7 @@ if __name__ == "__main__":
 
     # just play around in
     wd = "/crun/tony.xie/Downloads/phylo_accel"
-    analyser = Analyser("/crun/tony.xie/Downloads/official_results/alignments8", wd)
+    analyser = Analyser(dir_path, wd)
     # exon2 = Analyser(alignment_path3, wd)
 
     # full._align_against(exon1, csv_for_r)
