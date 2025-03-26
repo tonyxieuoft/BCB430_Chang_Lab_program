@@ -389,11 +389,13 @@ class Analyser:
 
     def phylo_tree_generation(self, converted_NEPR):
 
-        save_dir = make_unique_directory(self.wd, "phylo_adjusted")
+        save_dir = make_unique_directory(self.wd, "raw_adjusted")
 
         for gene_file in os.listdir(self.alignment_dir):
 
             gene_path = os.path.join(self.alignment_dir, gene_file)
+
+            #print("gene path: " + gene_path)
             gene_name = os.path.splitext(gene_file)[0]
 
             shark_ref = ""
@@ -404,7 +406,7 @@ class Analyser:
                 ref_species = os.path.splitext(file)[0]
 
                 if ref_species == "Carcharodon carcharias":
-                    shark_ref = (">Reference " + ref_species +
+                    shark_ref = (">Reference " + ref_species + "\n" +
                                  concatenate_exons(file_path).split("\n")[1] + "\n")
                 else:
                     batoid_ref = (">Reference " + ref_species +
@@ -433,6 +435,8 @@ class Analyser:
 
         muscle_folder = make_unique_directory(self.wd, "muscle")
         for file in os.listdir(save_dir):
+
+            #print("raw_file_name: " + file)
 
             in_path = os.path.join(save_dir, file)
             out_path = os.path.join(muscle_folder, file)
