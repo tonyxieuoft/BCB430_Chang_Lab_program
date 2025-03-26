@@ -441,7 +441,7 @@ class Analyser:
 
             in_path = os.path.join(save_dir, file)
             out_path = os.path.join(mafft_folder, file)
-            os.system("mafft --auto --threads -1 " + in_path + " > " + out_path)
+            os.system("mafft --auto --threads 16 " + in_path + " > " + out_path)
 
 
         phylo_folder = make_unique_directory(self.wd, "phylo")
