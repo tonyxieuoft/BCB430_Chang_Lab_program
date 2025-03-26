@@ -440,7 +440,7 @@ class Analyser:
 
             in_path = os.path.join(save_dir, file)
             out_path = os.path.join(muscle_folder, file)
-            os.system("muscle -align" + in_path + " -output " + out_path)
+            os.system("muscle -align " + in_path + " -output " + out_path)
 
         phylo_folder = make_unique_directory(self.wd, "phylo")
         for file in os.listdir(muscle_folder):
