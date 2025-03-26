@@ -432,14 +432,14 @@ class Analyser:
             out_f.close()
 
         muscle_folder = make_unique_directory(self.wd, "muscle")
-        for file in save_dir:
+        for file in os.listdir(save_dir):
 
             in_path = os.path.join(save_dir, file)
             out_path = os.path.join(muscle_folder, file)
             os.system("muscle -in " + in_path + " -out " + out_path)
 
         phylo_folder = make_unique_directory(self.wd, "phylo")
-        for file in muscle_folder:
+        for file in os.listdir(muscle_folder):
 
             in_path = os.path.join(muscle_folder, file)
 
