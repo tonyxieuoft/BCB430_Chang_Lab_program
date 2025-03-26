@@ -398,7 +398,7 @@ class Analyser:
             #print("gene path: " + gene_path)
             gene_name = os.path.splitext(gene_file)[0]
 
-            """
+
             shark_ref = ""
             batoid_ref = ""
             NEPR_gene_dir = os.path.join(converted_NEPR, gene_name)
@@ -442,16 +442,15 @@ class Analyser:
             in_path = os.path.join(save_dir, file)
             out_path = os.path.join(mafft_folder, file)
             os.system("mafft --auto " + in_path + " > " + out_path)
-        """
 
-        mafft_folder = "/crun/tony.xie/Downloads/phylo_accel/mafft1"
+
         phylo_folder = make_unique_directory(self.wd, "phylo")
         for file in os.listdir(mafft_folder):
 
             in_path = os.path.join(mafft_folder, file)
 
             os.system("nice -2 /usr/local/bin/iqtree2 "
-                      "-s " + in_path + " -pre " + phylo_folder + "/" + file + " -T AUTO")
+                      "-s " + in_path + " -pre " + phylo_folder + "/" + file + " -T 16")
 
 
 
