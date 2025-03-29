@@ -32,8 +32,8 @@ class ImprovedExonParser(ExonBlastXMLParser):
     def parse_blast_xml(self):
 
         # TODO disable SPLICE
-        #splice_site_file = open("/crun/tony.xie/Downloads/official_results/splice_site_1-1-4-1-e0.5.csv", "a")
-        splice_site_file = open("/crun/tony.xie/Downloads/dummy.csv","w")
+        splice_site_file = open("/crun/tony.xie/Downloads/official_results/splice_site_1-1-4-1-e0.5_plus_forced_seq.csv", "a")
+        #splice_site_file = open("/crun/tony.xie/Downloads/dummy.csv","w")
 
         # track the last gene name (so we know at which iteration we begin at a new gene)
         past_gene_name = ""
