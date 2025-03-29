@@ -188,9 +188,8 @@ class ImprovedExonParser(ExonBlastXMLParser):
         #f.close()
 
         splice_site_dict = {}
-        forced_seq_dict = {}
         for coord in picked:
-            self._length_force_and_print(exons[coord[0]][coord[1]], splice_site_dict, forced_seq_dict)
+            self._length_force_and_print(exons[coord[0]][coord[1]], splice_site_dict)
 
         # TODO disable SPLICE
 
