@@ -362,7 +362,7 @@ class ImprovedExonParser(ExonBlastXMLParser):
         if left_allow_splice:
             splice_site = self._get_splice_site(hsp, left_subject_boundary, strand, "right", to_salvage)
 
-            splice_site["forced_seq"] = forced_seq_left
+            splice_site["forced_seq"] = forced_seq_left + result_sequence[:2]
 
             query_junction_id = splice_site["query_junction"]
             if query_junction_id in splice_site_dict:
@@ -425,7 +425,7 @@ class ImprovedExonParser(ExonBlastXMLParser):
         if right_allow_splice:
             splice_site = self._get_splice_site(hsp, right_subject_boundary, strand, "left", to_salvage)
 
-            splice_site["forced_seq"] = forced_seq_right
+            splice_site["forced_seq"] = result_sequence[-2:] + forced_seq_right
 
             query_junction_id = splice_site["query_junction"]
             if query_junction_id in splice_site_dict:
