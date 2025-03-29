@@ -262,6 +262,78 @@ class Analyser:
 
         return seqs[0], seqs[1], gap_seq1, gap_seq2, match, mismatch
 
+    def _mafft_aligner_and_codon_detector(self,seq1, seq2):
+
+        new_file = os.path.join(self.wd, "tmp.fas")
+        mafft_output = os.path.join(self.wd, "tmp_mafft.fas")
+
+        f = open(new_file, "w")
+        f.write(">seq1\n")
+        f.write(seq1 + "\n")
+        f.write(">seq2\n")
+        f.write(seq2 + "\n")
+        f.close()
+
+        os.system("mafft --auto --quiet --thread -4 " + new_file + " > " + mafft_output)
+
+        f = open(mafft_output, "r")
+        line = f.readline().strip()
+        seqs = []
+        seq = ""
+        while line != "":
+            if line[0] == ">":
+                if seq != "":
+                    seqs.append(seq)
+                    seq = ""
+            else:
+                seq += line
+
+            line = f.readline().strip()
+
+        seqs.append(seq)
+
+        os.system("rm " + new_file)
+        os.system("rm " + mafft_output)
+
+        # print(file_friendly_species)
+        # print("length1: " + str(len(seqs[0])) + " length2: " + str(len(seqs[1])))
+
+        output_dir = {"non_three_multiples": 0,
+                      "internal_stop_num": 0,
+                      "non_meth_start": 0,
+                      "non_stop_end": 0,
+                      "problematic_codon": 0}
+
+        if len(seqs[0]) % 3 != 0:
+            output_dir["non_three_multiples"] = 1
+        else:
+            for i in range(0, len(seqs[0]), 3):
+
+                incomplete_codon = False
+                for j in range(i, i+3):
+                    if seqs[0][j] == "-":
+                        incomplete_codon = True
+
+                if not incomplete_codon:
+                    codon = seqs[0][i:i+3].upper()
+                    if i == 0 and codon != "ATG":
+                        output_dir["non_meth_start"] = 1
+                        output_dir["problematic_codon"] = 1
+                    elif i != len(seqs[0]) - 3 and codon in ["TGA", "TAA", "TAG"]:
+                        output_dir["internal_stop_num"] = 1
+                        output_dir["problematic_codon"] = 1
+                    elif i == len(seqs[0]) - 3 and codon not in ["TGA", "TAA", "TAG"]:
+                        output_dir["non_stop_end"] = 1
+                        output_dir["problematic_codon"] = 1
+
+
+        # print("gap_full: " + str(gap_full) +
+        #      "gap_exon: " + str(gap_exon) +
+        #      "match: " + str(match) +
+        #      "mismatch: " + str(mismatch))
+
+        return output_dir
+
     def _align_against(self, other, csv_for_r):
 
         csv_f = open(csv_for_r, "w")
@@ -271,7 +343,7 @@ class Analyser:
             print("=====")
             print(gene)
 
-            if gene in other.gene_species_sequence_dict:
+            if gene in other.gene_species_sequence_dict and gene == "RDH12":
                 ss_dict1 = self.gene_species_sequence_dict[gene]
                 ss_dict2 = other.gene_species_sequence_dict[gene]
 
@@ -288,6 +360,10 @@ class Analyser:
 
                         a_seq1, a_seq2, gap_full, gap_exon, match, mismatch = (
                             self._mafft_pairwise_aligner(ss_dict1[species], ss_dict2[species]))
+
+                        print(species)
+                        print(a_seq1)
+                        print(a_seq2)
 
                         gene_gap_full += gap_full / len(a_seq1)
                         gene_gap_exon += gap_exon / len(a_seq1)
@@ -326,13 +402,104 @@ class Analyser:
             print("====")
             print(gene)
 
+            if gene == "RDH12":
+
+                shark_ref = None
+                batoid_ref = None
+
+                gene_gap_full = 0
+                gene_gap_exon = 0
+                gene_match = 0
+                gene_mismatch = 0
+
+                species_considered = 0
+
+                NEPR_gene_dir = os.path.join(converted_NEPR, gene)
+                for file in os.listdir(NEPR_gene_dir):
+                    file_path = os.path.join(NEPR_gene_dir, file)
+                    ref_species = os.path.splitext(file)[0]
+
+                    if ref_species == "Carcharodon carcharias":
+                        shark_ref = concatenate_exons(file_path).split("\n")[1]
+                    else:
+                        batoid_ref = concatenate_exons(file_path).split("\n")[1]
+
+                ss_dict = self.gene_species_sequence_dict[gene]
+                for species in ss_dict:
+                    seq1 = ss_dict[species]
+                    if species in selachii:
+                        if shark_ref is not None:
+                            a_seq1, a_seq2, gap_full, gap_exon, match, mismatch = (
+                                self._mafft_pairwise_aligner(seq1, shark_ref))
+                        else:
+                            a_seq1, a_seq2, gap_full, gap_exon, match, mismatch = (
+                                self._mafft_pairwise_aligner(seq1, batoid_ref))
+                    else:
+                        if batoid_ref is not None:
+                            a_seq1, a_seq2, gap_full, gap_exon, match, mismatch = (
+                                self._mafft_pairwise_aligner(seq1, batoid_ref))
+                        else:
+                            a_seq1, a_seq2, gap_full, gap_exon, match, mismatch = (
+                                self._mafft_pairwise_aligner(seq1, shark_ref))
+
+                    print(species)
+                    print(a_seq1)
+                    print(a_seq2)
+
+                    gene_gap_full += gap_full / len(a_seq1)
+                    gene_gap_exon += gap_exon / len(a_seq1)
+                    gene_match += match / len(a_seq1)
+                    gene_mismatch += mismatch / len(a_seq1)
+
+                    species_considered += 1
+
+                formatted_gap_full = "{:.5f}".format(gene_gap_full / species_considered)
+                formatted_gap_exon = "{:.5f}".format(gene_gap_exon / species_considered)
+                formatted_match = "{:.5f}".format(gene_match / species_considered)
+                formatted_mismatch = "{:.5f}".format(gene_mismatch / species_considered)
+
+                print(formatted_gap_full)
+                print(formatted_gap_exon)
+                print(formatted_match)
+                print(formatted_mismatch)
+
+                csv_f.write(gene + "," +
+                            formatted_gap_full + "," +
+                            formatted_gap_exon + "," +
+                            formatted_match + "," +
+                            formatted_mismatch + "\n")
+
+    def _detect_codon_quality(self, converted_NEPR, csv_for_r):
+
+        csv_f = open(csv_for_r, "w")
+        csv_f.write("gene,"
+                    "non_three_multiples,"
+                    "internal_stop_num,"
+                    "non_meth_start,"
+                    "non_stop_end,"
+                    "problematic_codon,"
+                    "is_nms,"
+                    "is_nse,"
+                    "nms_nse,"
+                    "is_nms_nse\n")
+
+        for gene in self.gene_species_sequence_dict:
+
+            print("====")
+            print(gene)
+
             shark_ref = None
             batoid_ref = None
 
-            gene_gap_full = 0
-            gene_gap_exon = 0
-            gene_match = 0
-            gene_mismatch = 0
+            non_three_multiples = 0
+            internal_stop_num = 0
+            non_meth_start = 0
+            non_stop_end = 0
+            problematic_codon = 0
+            is_nms = 0
+            is_nse = 0
+            nms_nse = 0
+            is_nms_nse = 0
 
             species_considered = 0
 
@@ -351,41 +518,64 @@ class Analyser:
                 seq1 = ss_dict[species]
                 if species in selachii:
                     if shark_ref is not None:
-                        a_seq1, a_seq2, gap_full, gap_exon, match, mismatch = (
-                            self._mafft_pairwise_aligner(seq1, shark_ref))
+                        quality_dict = (
+                            self._mafft_aligner_and_codon_detector(seq1, shark_ref))
                     else:
-                        a_seq1, a_seq2, gap_full, gap_exon, match, mismatch = (
-                            self._mafft_pairwise_aligner(seq1, batoid_ref))
+                        quality_dict = (
+                            self._mafft_aligner_and_codon_detector(seq1, batoid_ref))
                 else:
                     if batoid_ref is not None:
-                        a_seq1, a_seq2, gap_full, gap_exon, match, mismatch = (
-                            self._mafft_pairwise_aligner(seq1, batoid_ref))
+                        quality_dict = (
+                            self._mafft_aligner_and_codon_detector(seq1, batoid_ref))
                     else:
-                        a_seq1, a_seq2, gap_full, gap_exon, match, mismatch = (
-                            self._mafft_pairwise_aligner(seq1, shark_ref))
+                        quality_dict = (
+                            self._mafft_aligner_and_codon_detector(seq1, shark_ref))
 
-                gene_gap_full += gap_full / len(a_seq1)
-                gene_gap_exon += gap_exon / len(a_seq1)
-                gene_match += match / len(a_seq1)
-                gene_mismatch += mismatch / len(a_seq1)
+                non_three_multiples += quality_dict["non_three_multiples"]
+                internal_stop_num += quality_dict["internal_stop_num"]
+                non_meth_start += quality_dict["non_meth_start"]
+                non_stop_end += quality_dict["non_stop_end"]
+                problematic_codon += quality_dict["problematic_codon"]
+
+                if quality_dict["internal_stop_num"] == 1 and quality_dict["non_meth_start"] == 1 and quality_dict["non_stop_end"] == 1:
+                    is_nms_nse += 1
+                elif quality_dict["internal_stop_num"] == 1 and quality_dict["non_meth_start"] == 1 and quality_dict["non_stop_end"] == 0:
+                    is_nms += 1
+                elif quality_dict["internal_stop_num"] == 1 and quality_dict["non_meth_start"] == 0 and quality_dict["non_stop_end"] == 1:
+                    is_nse += 1
+                elif quality_dict["internal_stop_num"] == 0 and quality_dict["non_meth_start"] == 1 and quality_dict["non_stop_end"] == 1:
+                    nms_nse += 1
 
                 species_considered += 1
 
-            formatted_gap_full = "{:.5f}".format(gene_gap_full / species_considered)
-            formatted_gap_exon = "{:.5f}".format(gene_gap_exon / species_considered)
-            formatted_match = "{:.5f}".format(gene_match / species_considered)
-            formatted_mismatch = "{:.5f}".format(gene_mismatch / species_considered)
+            formatted_non_three = "{:.5f}".format(non_three_multiples / species_considered)
+            formatted_internal_stop = "{:.5f}".format(internal_stop_num / species_considered)
+            formatted_non_meth_start = "{:.5f}".format(non_meth_start / species_considered)
+            formatted_non_stop_end = "{:.5f}".format(non_stop_end / species_considered)
+            formatted_problematic_codon = "{:.5f}".format(problematic_codon / species_considered)
 
-            print(formatted_gap_full)
-            print(formatted_gap_exon)
-            print(formatted_match)
-            print(formatted_mismatch)
+            formatted_is_nms = "{:.5f}".format(is_nms / species_considered)
+            formatted_is_nse = "{:.5f}".format(is_nse / species_considered)
+            formatted_nms_nse = "{:.5f}".format(nms_nse / species_considered)
+            formatted_is_nms_nse= "{:.5f}".format(is_nms_nse / species_considered)
+
+            print(formatted_non_three)
+            print(formatted_internal_stop)
+            print(formatted_non_meth_start)
+            print(formatted_non_stop_end)
+            print(formatted_problematic_codon)
+
 
             csv_f.write(gene + "," +
-                        formatted_gap_full + "," +
-                        formatted_gap_exon + "," +
-                        formatted_match + "," +
-                        formatted_mismatch + "\n")
+                        formatted_non_three + "," +
+                        formatted_internal_stop + "," +
+                        formatted_non_meth_start + "," +
+                        formatted_non_stop_end + "," +
+                        formatted_problematic_codon + "," +
+                        formatted_is_nms + "," +
+                        formatted_is_nse + "," +
+                        formatted_nms_nse + "," +
+                        formatted_is_nms_nse + "\n")
 
     def phylo_tree_generation(self, converted_NEPR):
 
@@ -476,10 +666,12 @@ if __name__ == "__main__":
 
     ref_dir = "/Users/tonyx/Documents/chang_lab/converted_NEPR"
 
-    csv_for_r = "/Users/tonyx/Documents/chang_lab/GeMoMa_vs_ref.csv"
+    csv_for_r_gap_mismatch = "/Users/tonyx/Documents/chang_lab/throwaway.csv"
+    csv_for_r_codon_quality = "/Users/tonyx/Documents/chang_lab/exon_ws11_f16_codon_quality_including_overlap.csv"
 
-    #full._align_against(exon1, csv_for_r)
-    full._align_against_reference(ref_dir, csv_for_r)
+    #full._align_against(exon1, csv_for_r_gap_mismatch)
+    exon1._align_against_reference(ref_dir, csv_for_r_gap_mismatch)
+    #exon1._detect_codon_quality(ref_dir, csv_for_r_codon_quality)
     #_global_aligner("bruhasdfaskjfewj", "asdfasifew")
 
 

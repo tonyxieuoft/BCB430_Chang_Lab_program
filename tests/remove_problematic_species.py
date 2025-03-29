@@ -8,8 +8,8 @@ if __name__ == "__main__":
 
     #os.mkdir("/Users/tonyx/Documents/chang_lab/BCB430_final_results")
 
-    alignment_dir = r"/Users/tonyx/Documents/chang_lab/GeMoMa_vision_results"
-    save_dir = "/Users/tonyx/Documents/chang_lab/BCB430_final_results/GeMoMa_vision_results"
+    alignment_dir = r"/Users/tonyx/Documents/chang_lab/alignments6_exon_ws11_f16"
+    save_dir = "/Users/tonyx/Documents/chang_lab/BCB430_final_results/exon_ws11_f16"
 
     os.mkdir(save_dir)
 

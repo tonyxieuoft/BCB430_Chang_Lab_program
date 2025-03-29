@@ -188,11 +188,12 @@ class ImprovedExonParser(ExonBlastXMLParser):
         #f.close()
 
         splice_site_dict = {}
+        forced_seq_dict = {}
         for coord in picked:
-            self._length_force_and_print(exons[coord[0]][coord[1]], splice_site_dict)
+            self._length_force_and_print(exons[coord[0]][coord[1]], splice_site_dict, forced_seq_dict)
 
         # TODO disable SPLICE
-        """
+
         for boundary_key in splice_site_dict:
             if len(splice_site_dict[boundary_key]) == 2:
                 print("=====")
@@ -201,9 +202,9 @@ class ImprovedExonParser(ExonBlastXMLParser):
 
                     splice_site_file.write(splice_site["gene"] + "," + splice_site["species"] + "," +
                             str(splice_site["query_junction"]) + "," + splice_site["splice_seq"] + "," +
-                            splice_site["left_or_right"] + "," + str(splice_site["fill"]) + "\n")
+                            splice_site["left_or_right"] + "," + str(splice_site["fill"]) + splice_site["forced_seq"] + "\n")
 
-        """
+
 
     def _is_compatible(self, x, y, exon_diff):
         """
@@ -310,6 +311,7 @@ class ImprovedExonParser(ExonBlastXMLParser):
         left_allow_splice = False
         left_subject_boundary = 0
         to_salvage = 0
+        forced_seq_left = ""
         if missing_left > 0:
 
             if strand == "1":
@@ -331,12 +333,14 @@ class ImprovedExonParser(ExonBlastXMLParser):
                     left_subject_boundary = lower_bound
 
             string = ""
-            if False and 0 < to_salvage < 17: # TODO change it back to 0-5 later (< 10)
+            if 0 < to_salvage: # TODO change it back to 0-16 later
                 print("getting gene sequence")
                 arr = ncbi_get_gene_sequence(hsp["contig_acc"], lower_bound,
                                              upper_bound, strand)
                 for ch in arr:
                     string += ch
+
+                forced_seq_left = string
 
                 # TODO this is for inserting gaps
                 # string = "-"*(missing_left - to_salvage) + string
@@ -356,8 +360,11 @@ class ImprovedExonParser(ExonBlastXMLParser):
 
 
         # TODO disabled SPLICE
-        if False and left_allow_splice:
+        if left_allow_splice:
             splice_site = self._get_splice_site(hsp, left_subject_boundary, strand, "right", to_salvage)
+
+            splice_site["forced_seq"] = forced_seq_left
+
             query_junction_id = splice_site["query_junction"]
             if query_junction_id in splice_site_dict:
                 splice_site_dict[query_junction_id].append(splice_site)
@@ -368,6 +375,7 @@ class ImprovedExonParser(ExonBlastXMLParser):
         right_allow_splice = False
         right_subject_boundary = 0
         to_salvage = 0
+        forced_seq_right = ""
         if missing_right > 0:
 
             if strand == "1":
@@ -390,12 +398,14 @@ class ImprovedExonParser(ExonBlastXMLParser):
 
             string = ""
             # 10 >
-            if False and 17 > to_salvage > 0: # change it back later
+            if to_salvage > 0: # change it back later # TODO to between 0 and 16, no?
                 print("getting gene seqnece")
                 arr = ncbi_get_gene_sequence(hsp["contig_acc"], lower_bound, upper_bound, strand)
 
                 for ch in arr:
                     string += ch
+
+                forced_seq_right = string
 
                 # TODO gap insertion
                 #string = string + "-"*(missing_right - to_salvage)
@@ -413,8 +423,11 @@ class ImprovedExonParser(ExonBlastXMLParser):
             right_subject_boundary = hit_bound2
 
         # TODO disable SPLICE
-        if False and right_allow_splice:
+        if right_allow_splice:
             splice_site = self._get_splice_site(hsp, right_subject_boundary, strand, "left", to_salvage)
+
+            splice_site["forced_seq"] = forced_seq_right
+
             query_junction_id = splice_site["query_junction"]
             if query_junction_id in splice_site_dict:
                 splice_site_dict[query_junction_id].append(splice_site)

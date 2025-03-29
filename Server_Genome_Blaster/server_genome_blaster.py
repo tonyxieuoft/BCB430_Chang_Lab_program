@@ -90,7 +90,7 @@ class ServerGenomeBlaster:
                 print("blasting " + genome["name"] + " against " + curr_ref_taxon + "...")
                 os.system("nice -5 blastn -db " + blast_db +
                           " -outfmt 5 -evalue " + str(expect_value) +
-                          " -word_size 8 -gapopen 4 -gapextend 1 -reward 1 "
+                          " -word_size 11 -gapopen 4 -gapextend 1 -reward 1 "
                           "-penalty -1 "
                           "-num_threads 16 "
                           #"-task dc-megablast "
