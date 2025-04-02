@@ -67,6 +67,7 @@ def read_gene_table_v2(text: str, id_to_org: Dict[str, str], gene_name: str) -> 
         # new org
         if line_keywords and line_keywords[0] == "Reference":
 
+            """
             # ======= To get splice sites ============
             for keyword in line_keywords:
                 if len(keyword) >= 3 and keyword[0] == "N" and keyword[2] == "_":
@@ -74,7 +75,9 @@ def read_gene_table_v2(text: str, id_to_org: Dict[str, str], gene_name: str) -> 
                     genomic_id = keyword
 
                     break
-
+                    
+            ###        
+            """
 
             if curr_org in orgs_to_transcripts and not orgs_to_transcripts[curr_org]:
                 orgs_to_transcripts.pop(curr_org)
