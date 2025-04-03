@@ -33,7 +33,7 @@ class ImprovedExonParser(ExonBlastXMLParser):
 
         # TODO disable SPLICE
         splice_site_file = open("/crun/tony.xie/Downloads/official_results/splice_site_1-1-4-1-e0.5_plus_forced_seq.csv", "a")
-        #splice_site_file = open("/crun/tony.xie/Downloads/dummy.csv","w")
+        splice_site_file = open("/crun2/storage5/AnthonyR/Gene_pipeline_reference/dummy.csv","w")
 
         # track the last gene name (so we know at which iteration we begin at a new gene)
         past_gene_name = ""
@@ -193,6 +193,7 @@ class ImprovedExonParser(ExonBlastXMLParser):
 
         # TODO disable SPLICE
 
+        """
         for boundary_key in splice_site_dict:
             if len(splice_site_dict[boundary_key]) == 2:
                 print("=====")
@@ -203,6 +204,7 @@ class ImprovedExonParser(ExonBlastXMLParser):
                             str(splice_site["query_junction"]) + "," + splice_site["splice_seq"] + "," +
                             splice_site["left_or_right"] + "," + str(splice_site["fill"]) + splice_site["forced_seq"] + "\n")
 
+        """
 
 
     def _is_compatible(self, x, y, exon_diff):
@@ -359,7 +361,7 @@ class ImprovedExonParser(ExonBlastXMLParser):
 
 
         # TODO disabled SPLICE
-        if left_allow_splice:
+        if False and left_allow_splice:
             splice_site = self._get_splice_site(hsp, left_subject_boundary, strand, "right", to_salvage)
 
             splice_site["forced_seq"] = forced_seq_left + result_sequence[:2]
@@ -422,7 +424,7 @@ class ImprovedExonParser(ExonBlastXMLParser):
             right_subject_boundary = hit_bound2
 
         # TODO disable SPLICE
-        if right_allow_splice:
+        if False and right_allow_splice:
             splice_site = self._get_splice_site(hsp, right_subject_boundary, strand, "left", to_salvage)
 
             splice_site["forced_seq"] = result_sequence[-2:] + forced_seq_right
