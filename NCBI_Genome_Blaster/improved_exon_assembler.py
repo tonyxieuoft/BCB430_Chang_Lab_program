@@ -7,43 +7,70 @@ from NCBI_Exon_Puller.ncbi_exon_puller import ncbi_get_gene_sequence
 from NCBI_Genome_Blaster.assemble_blast_result_sequences import \
     ExonBlastXMLParser, SEQUENCE_INDICES_FROM_MRNA_TAG
 
+# maximum intron length for gene models --- from Hara et al. 2018, it appears to be around 1 million for elasmobranchs
 MAX_INTRON_LENGTH = 1000000
-MAX_CONTIG_GAP = 20000
 
 def extract_query_title(title_str):
 
+    """
+    Extracts the gene name, accession and query range for an exon reference query based on an input query heading.
+    @param title_str An input query header for an exon reference
+    @return Returns the name of the gene corresponding to the exon reference query, the NCBI accession of the
+            subject genome that was blasted, and the exon's range in relation to the full coding sequence (e.g., 35-56)
+    """
+
+    # separate the query title based on spaces
     query_title = title_str.split(" ")
+
+    # the gene name is the first word in the title
     gene_name = query_title[0]
 
+    # a tracker to determine which part of the title contains the transcript accession for the full coding sequence
     mrna_section_no = 1
+    # iteratively check through the words in the title
     while (len(query_title[mrna_section_no]) < len("mRNA") or
            query_title[mrna_section_no][:len("mRNA")] != "mRNA") and \
             (len(query_title[mrna_section_no]) < len("reference") or
              query_title[mrna_section_no][:len("reference")] != "reference"):
+        # increment until the mRNA section is found
         mrna_section_no += 1
 
+    # the genomic accession for the subject genome that was blasted is immediately after the "mRNA section"
     acc = query_title[mrna_section_no].split(":")[1]
+    # the query range is also a constant distance away from the "mRNA section"
     q_range = query_title[mrna_section_no + SEQUENCE_INDICES_FROM_MRNA_TAG]
 
     return gene_name, acc, q_range
 
 class ImprovedExonParser(ExonBlastXMLParser):
 
+    """
+    A class that extends the ExonBLASTXMLParser general class. See the "assemble_blast_results_sequences.py"
+    file for more details. The general improvements made here over the previous approach include the follow:
+
+    1) Consideration of maximum intron length
+    2) Length-forcing
+    3) Enforcement of HSP co-linearity: if HSP 1 is before HSP 2 in the reference sequence, it must also be before
+    HSP 2 in the corresponding genome
+    """
+
     def parse_blast_xml(self):
+        """
+        Parse an input XML file containing all BLAST results for a given species and all of its reference sequences
+        against a single subject genome.
+        """
 
-        # TODO disable SPLICE
-        # splice_site_file = open("/crun/tony.xie/Downloads/official_results/splice_site_1-1-4-1-e0.5_plus_forced_seq.csv", "a")
-        splice_site_file = open("/crun2/storage5/AnthonyR/Gene_pipeline_reference/dummy.csv","w")
-
-        # track the last gene name (so we know at which iteration we begin at a new gene)
+        # track the last gene name encountered (so we know at which iteration we begin at a new gene)
         past_gene_name = ""
         dp_gene_tracker = None
 
-        # convert XML file to dictionary
+        # convert BLAST XML file into dictionary (the format is exactly the same as the BLAST output file downloaded
+        # from NCBI)
         results_dict = file_xml_to_dictionary(self.xml_filepath)
 
-        # get iterations (each corresponding to a fasta entry in the query file)
-        # this means each iteration corresponds to an exon query
+        # Each iteration corresponds to a single exon reference query
+        # Convert the iterations into a list (note that "BlastOutput" and "BlastOutput_iterations" are the same names
+        # used in the BLAST output file
         exon_iterations = get_xml_list(results_dict['BlastOutput']['BlastOutput_iterations'])
 
         for exon_iteration in exon_iterations:
@@ -57,7 +84,7 @@ class ImprovedExonParser(ExonBlastXMLParser):
 
                 # if the current gene we just finished iterating through has hsps to parse
                 if dp_gene_tracker is not None:
-                    self._identify_best_hsps(dp_gene_tracker, splice_site_file)
+                    self._identify_best_hsps(dp_gene_tracker)
 
                 # reset to the new gene
                 dp_gene_tracker = []
@@ -78,40 +105,73 @@ class ImprovedExonParser(ExonBlastXMLParser):
                 else:
                     hsp_attributes["contig_acc"] = hit['Hit_accession']
 
-                # get attributes for the hsp
+                # Get attributes for the HSP. Here, "hsp_attributes" represents a dictionary that will contain
+                # attributes for a SINGLE HSP
 
+                # the query and subject sequence portions of the HSP
                 hsp_attributes["qseq"] = top_hsp["Hsp_qseq"]
                 hsp_attributes["hseq"] = top_hsp["Hsp_hseq"]
 
+                # the start and ending indices of the query that the HSP corresponds to
                 hsp_attributes["q_start"] = int(top_hsp["Hsp_query-from"])
                 hsp_attributes["q_end"] = int(top_hsp["Hsp_query-to"])
 
+                # the sequence range (a single value) of the query
                 hsp_attributes["seq_range"] = abs(hsp_attributes["q_start"] - hsp_attributes["q_end"]) + 1
+
+                # IMPORTANT --- the query's raw score, which will be used for our dynamic programming calculations
                 hsp_attributes["raw_score"] = int(top_hsp["Hsp_score"])
 
+                # the start and ending indices of the subject that the HSP corresponds to
                 hsp_attributes["h_start"] = int(top_hsp["Hsp_hit-from"])
                 hsp_attributes["h_end"] = int(top_hsp["Hsp_hit-to"])
 
+                # the length of the subject
                 hsp_attributes["contig_len"] = int(hit['Hit_len'])
+
+                # the length of the query
                 hsp_attributes["query_len"] = int(exon_iteration['Iteration_query-len'])
 
+                # the accession for the reference transcript (corresponding to the query)
                 hsp_attributes["ref_acc"] = ref_transcript_var
+
+                # the range of query in reference to the reference transcript
                 hsp_attributes["ref_range"] = ref_sequence_range
+
+                # the name of the gene that the HSP corresponds to
                 hsp_attributes["gene_name"] = gene_name
 
+                # if the starting index of the HSP (subject side) is less than the ending index of the HSP, it is on
+                # the plus strand
                 if hsp_attributes["h_start"] < hsp_attributes["h_end"]:
                     hsp_attributes["strand"] = "Plus"
                 else:
+                    # otherwise, it's on the minus strand
                     hsp_attributes["strand"] = "Minus"
 
+                # store the HSP dictionary that we have just created in an expanding list (eventually, it will contain
+                # all HSPs from a single query
                 dp_hits_tracker.append(hsp_attributes)
 
+            # the 'dp_gene_tracker" list stores "hits trackers", each containing all of the hits based on a single
+            # exon query
             dp_gene_tracker.append(dp_hits_tracker)
 
-        self._identify_best_hsps(dp_gene_tracker, splice_site_file) # do it for the last one
+        # once we have collected all hits from all exon references for a single gene, we move onto the stage of
+        # identifying the best HSPs for the gene model!
+        self._identify_best_hsps(dp_gene_tracker)
 
 
-    def _identify_best_hsps(self, exons, splice_site_file):
+    def _identify_best_hsps(self, exons):
+
+        """
+        Identifies the best HSPs to select for the gene model. As input, this function takes in a list of lists as
+        follows:
+            Each index of the outer list corresponds to a single exon query. This index stores an inner list. The
+            indices of the inner list each contain a dictionary with information about a single HSP for the particular
+            exon query.
+
+        """
 
         num_exons = len(exons)
         dp_table = []
