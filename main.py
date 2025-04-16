@@ -1,3 +1,7 @@
+"""
+This is the main menu. It facilitates the interface for user interaction, and provides a flow to all the functions.
+"""
+
 import sys
 
 from User_Interaction.UI import UI

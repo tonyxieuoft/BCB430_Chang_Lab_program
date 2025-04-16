@@ -1,3 +1,10 @@
+"""
+This file doesn't really contain code. It mostly just contains prompts to the user on what to input.
+Therefore, there is very little documentation in this section.
+
+"""
+
+
 import shutil
 
 from Bio import Entrez
@@ -11,10 +18,10 @@ from Basic_Tools.numeric_user_input import numeric_user_input
 from Gene_Description_Refiner.gene_description_refiner import \
     gene_description_refiner
 from NCBI_Exon_Puller.handle_ncbi_exon_puller import handle_ncbi_exon_puller
-from NCBI_Genome_Blaster.driver_genome_blaster import driver_genome_blaster
-from NCBI_Genome_Blaster.driver_genome_blaster_v2 import \
+from HSP_Selector_and_Processor.driver_genome_blaster import driver_genome_blaster
+from HSP_Selector_and_Processor.driver_genome_blaster_v2 import \
     DriverExonGenomeBlasterV2, DriverFullGenomeBlasterV2, DriverGenomeBlasterV2
-from NCBI_Genome_Blaster.local_genome_blaster import local_genome_blaster
+from HSP_Selector_and_Processor.local_genome_blaster import local_genome_blaster
 from Prepare_For_BLAST.NEPR_convert import convert_NEPR_directory
 from Prepare_For_BLAST.prepare_query_files import ExonBlastPreparer, \
     ExonBlastPreparer, FullBlastPreparer, GeMoMaPreparer

@@ -1,3 +1,7 @@
+"""
+This is a simple script that concatenates exons into a full coding sequence.
+"""
+
 from Basic_Tools.lists_and_files import file_to_list
 
 def concatenate_exons(fasta_path: str):

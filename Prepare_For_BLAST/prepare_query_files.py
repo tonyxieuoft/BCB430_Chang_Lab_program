@@ -12,27 +12,28 @@ from Quality_Checking.get_longest_transcript import get_longest_transcript
 
 class BlastPreparer:
     """
-
-    Attributes
-    ----------
-    ref_seq_path: str
-        path pointing to a directory of reference sequences
-    taxa_to_ref_species: Dict[str,List]
-    genes_to_available_species:
-
+    Here, we define a BLAST preparer class that formats exon references into suitable query files
     """
-
     def __init__(self, ref_seq_path, taxa_path, save_path):
-
+        """
+        To construct the class, we need a path to the directory containing reference sequences (in converted NEPR
+        format), a path to taxa of interest to BLAST, and a path to save the resultant query files produced
+        """
+        # instantiate the path to the reference sequence directory
         self.ref_seq_path = ref_seq_path
+
+        # instantiate the save path
         self.save_path = save_path
 
+        # instantiate a list of the reference species that we have
         self.ref_species = None
         self.set_reference_species()
 
+        # a dictionary mapping taxa to NCBI lineage codes
         self.taxa_to_codes = None
         self.set_taxa_of_interest(taxa_path)
 
+        # an entire lineage for the particular taxon of interest
         self.lineage_dict = None
         self.set_lineage_dict()
 
@@ -42,6 +43,10 @@ class BlastPreparer:
         self.taxa_blast_order = None
 
     def get_taxa_blast_order(self):
+        """
+        Get the order in which the taxa of interest will be blasted. To see why this matters, consult the ReadMe in
+        greater detail
+        """
         return self.taxa_blast_order
 
     def get_complete_ref_species(self):
@@ -230,14 +235,15 @@ class GeMoMaPreparer(BlastPreparer):
             species_found = False
             available_species = []
 
+            # now, go through every species file
             for species_file in os.listdir(gene_path):
 
                 species_path = os.path.join(gene_path, species_file)
 
                 species_name = os.path.splitext(species_file)[0]
                 available_species.append(species_name)
-                # if the species is the one we are looking for
 
+                # if the species is the one we are looking for
                 if species_name.upper() == ref_species_name.upper():
 
                     self.write_to_query(species_path, query_path, gff_path)

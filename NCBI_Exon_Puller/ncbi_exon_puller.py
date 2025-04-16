@@ -1,3 +1,8 @@
+"""
+Scripts in this file automate the acquisition of reference sequences and associated exon-intron boundaries from NCBI.
+"""
+
+
 import os
 import time
 from typing import List, Dict

@@ -1,3 +1,7 @@
+"""
+THis is a simple script that combines predictions for the same gene into the same file (for alignment purposes).
+"""
+
 import os
 from typing import List
 
@@ -6,6 +10,12 @@ from Prepare_For_BLAST.get_longest_transcript import get_longest_transcript
 
 
 def concatenate_gene_results(paths: List[str], save_path):
+    """
+    Combine predictions for the same gene into a single file. This function requires two inputs:
+    1) paths: a number of paths each pointing to BLAST output directory for which genes can be collected
+    and combined into single alignment-like files
+    2) save_path: Path to which the combined gene result files can be outputted.
+    """
 
     gene_to_encountered_species = {}
 
@@ -25,15 +35,19 @@ def concatenate_gene_results(paths: List[str], save_path):
             # assigned_taxa
             encountered_species = gene_to_encountered_species[gene]
 
+            # here, we go into the taxon-level folder
             for taxa in os.listdir(gene_path):
                 taxa_path = os.path.join(gene_path, taxa)
 
+                # here, we go into the species-level folder
                 for species in os.listdir(taxa_path):
                     species_path = os.path.join(taxa_path, species)
 
+                    # if we haven't already added a gene for the species into the file, we do so now
                     if species not in encountered_species or \
                             gene not in encountered_species[species]:
 
+                        # this updates the hash table according to the gene-species combinations that we have seen
                         if species not in encountered_species:
                             encountered_species[species] = {gene: True}
                         else:

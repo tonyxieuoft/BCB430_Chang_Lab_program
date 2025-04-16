@@ -1,3 +1,8 @@
+"""
+Scripts in this file handle the automation of reference sequence acquisition from NCBI. In particular, it processes the
+user gene query and taxon input files, and formats them into NCBI search queries.
+"""
+
 import os
 from typing import List, Tuple
 from Bio import Entrez

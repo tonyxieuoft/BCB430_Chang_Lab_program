@@ -10,7 +10,7 @@ from Bio import Entrez
 
 from Basic_Tools.xml_extraction import file_xml_to_dictionary, get_xml_list
 from NCBI_Exon_Puller.ncbi_exon_puller import ncbi_get_gene_sequence
-from NCBI_Genome_Blaster.create_basic_XML_processor import \
+from HSP_Selector_and_Processor.create_basic_XML_processor import \
     ExonBlastXMLParser, SEQUENCE_INDICES_FROM_MRNA_TAG
 
 # maximum intron length for gene models --- from Hara et al. 2018, it appears to be around 1 million for elasmobranchs
