@@ -12,6 +12,7 @@
     - [Concatenate gene sequences into alignment files](#nepr--blast-result-directories-required-input)
 - [Methods and Algorithms](#methods-and-algorithms)
     - [Automatic assignment of reference species to sub-taxa (option 3 part a)](#automatic-assignment-of-reference-species-to-sub-taxa-in-option-3a)
+- [Chang Lab Gene Prediction Algorithm (BCB430](#chang-lab-gene-prediction-algorithm-bcb430)
 
 ## Requirements
 
@@ -284,7 +285,7 @@ When it's time to BLAST, Carcharodon carcharias sequences are used first to quer
 
 **Please note** that much more goes into phylogenetic analysis than purely clade and lineage information, and the algorithm only roughly estimates appropriate reference sequence for a given taxon. If the user is willing to spend more time and has phylogenetic trees with molecuar distances on hand, they can manually specify these assignments to increase accuracy.
 
-### CHANG LAB GENE PREDICTION PROGRAM (relevance toward BCB430)
+## Chang Lab Gene Prediction Program (BCB430)
 
 The Chang Lab gene prediction program is a specificity-oriented approach aimed towards reducing the artifactual detection of positively selected sites in dN/dS-based analysis. The program can be categorized into three broad, conceptual sections:
 
