@@ -284,7 +284,29 @@ When it's time to BLAST, Carcharodon carcharias sequences are used first to quer
 
 **Please note** that much more goes into phylogenetic analysis than purely clade and lineage information, and the algorithm only roughly estimates appropriate reference sequence for a given taxon. If the user is willing to spend more time and has phylogenetic trees with molecuar distances on hand, they can manually specify these assignments to increase accuracy.
 
-### More to come!
+### CHANG LAB GENE PREDICTION PROGRAM (relevance toward BCB430)
+
+The Chang Lab gene prediction program is a specificity-oriented approach aimed towards reducing the artifactual detection of positively selected sites in dN/dS-based analysis. The program can be categorized into three broad, conceptual sections:
+
+**HSP acquisition:** Using exons from the reference sequence as queries, nucleotide BLAST (current version 2.16.0) is conducted against each whole genome assembly of interest. A gap open penalty of 4, gap extension of 1, match of 1, and mismatch of 1 are currently used as the BLAST settings; these settings are optimized for detecting genomic segments with roughly 75% sequence similarity, and encompasses a wide range of genes and speices. Furthermore, in line with a more specificity-oriented approach, a larger word size of 11 is used, although this may be adjusted in future iterations of the program. All of this can be observed in the file `automate_server_blast.py` in the `Server_Genome_Blaster`directory. 
+
+**Selecting optimal HSPs:** The program maintains a grouping of the HSPs based on the exon query from which they came. Then, using a dynamic programming algorithm, it determines the set of HSPs maximizing the cumulative raw BLAST score satisfying the following constraints:
+
+- At most one HSP per exon query is selected (stringent exon-based nature, supposing intron-exon conservation as outlined in the introduction)
+- The HSPs must come from the same contig and strand (so that nonsensical cross-strand or cross chromosomal gene models are not predicted)
+- The HSPs must be in co-linear order: HSPs corresponding to earlier exon queries in the reference gene must be positioned earlier in the subject genome and cannot overlap with the other HSPs (following what is commonly understood regarding mRNA transcription)
+- The subject genomic positions of adjacent HSPs must be no more than a pre-set maximum intron length (so that predicted genes do not span unreasonable lengths across a contig). For elasmobranchs, we set this limit to 1 million base pairs, based on a comprehensive study of shark genomes by Hara et al., 2018. 
+
+The above can be observed in the `gene_model_selector_and_processor.py` python file contained in the `HSP_Selector_and_Processor` directory. Like previous sequence homology-based programs such as genBlastG and GeMoMa (She et al., 2011; Keilwagen et al., 2016), the cumulative raw BLAST score is maximized. The rationale behind this is that raw BLAST scores scale linearly with gaps, matches and mismatches, making their addition very simple. E-values, which are derived from raw BLAST scores, are conceptually more difficult to process given their conversion into a probabilistic framework (Lu et al., 2024). Details regarding the implementation of the dynamic programming algorithm can be found in our GitHub. 
+
+**Processing HSP ends via length forcing:** After selecting an optimal set of HSPs maximizing the cumulative raw score (see the above), we extended the ends of each HSP by a number of base pairs equivalent to the difference between the positions (relative to the reference sequence) of each HSP endpoint and the positions of the corresponding exon endpoints. This process can be observed in the `gene_model_selector_and_processor.py` file contained in the `HSP_Selector_and_Processor` directory. We illustrate this with an example as follows:
+
+- Suppose that we have an exon reference corresponding to positions 35-86 in the full coding sequence. Also, suppose that after running nucleotide BLAST, an HSP match to the exon reference, selected as part of the optimal set of HSPs, maps to positions 40-80 in the full coding sequence (this information is provided in the BLAST output file). Then, assuming intron-exon junction conservation, the program “forcefully lengthens” the HSP by 5 base pairs to the left (by fetching the 5 base pairs immediately to the left of the HSP in the subject genome) and executes the same process to extend the HSP by 6 base pairs to the right. 
+
+The rationale for this process is to bypass a reliance on canonical splice site detection (given notable genes that have non-canonical splice sites), described in detail in the introduction.
+
+**Combining Processed HSP ends to Form a Gene Model:** Processed HSPs from the optimal set were concatenated together based on the order that they mapped to the reference coding sequence. For exon queries that did not have an HSP selected as part of the optimal set, a gap (using dashes) was maintained. The code executing this can be found in scripts contained in the `After_BLAST` directory.
+
 
 
 
