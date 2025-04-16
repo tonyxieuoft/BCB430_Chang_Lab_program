@@ -17,14 +17,14 @@
 ## Requirements
 
 The following must be installed:
-- Google Chrome
-- ChromeDriver (https://sites.google.com/chromium.org/driver/downloads/)
-- Selenium for Python (https://pypi.org/project/selenium/)
 - BioPython (https://biopython.org/wiki/Download)
 
-Selenium and BioPython are both Python libraries, and can be installed from the command line using Python's package management tool `pip`. More information is available in the above links. 
+The following can be optionally installed:
+- GeMoMa, version 1.9 (https://anaconda.org/bioconda/gemoma)
 
-Google Chrome, ChromeDriver and Selenium are required for the web-driver based automation of NCBI BLAST, whereas BioPython is required to pull sequences from the NCBI Entrez database. 
+BioPython is a Python libraries, and can be installed from the command line using Python's package management tool `pip`. More information is available in the above link. 
+
+GeMoMa is a sensitivity-driven sequence homology-based gene prediction program. It was initially developed in 2016 by Keilwagen et al. As part of my BCB430 project, I incorporated into the workflow to benchmark against my own homology-based program.
 
 ## Installation and Usage
 
@@ -46,8 +46,8 @@ After running the program, the user is first aked for their email, which is requ
 
 After the user enters in basic details, a main menu with five options appears:
 1. Pull existing sequence data from the NCBI Gene database
-2. Refine gene names and descriptions used to query the NCBI Gene database.
-3. Run NCBI BLAST to pull exons from whole GENOMES
+2. Refine gene names and descriptions used to query the NCBI Gene database. - DEPRECATED
+3. Predict orthologous sequences from whole GENOMES
 4. Concatenate gene sequences into alignment files
 5. Quit the program
 
@@ -132,7 +132,7 @@ Each *fasta file* is titled `{transcript_length}_{transcript_accession}.fas` and
 
 From here on forth, the structure of the directories produced by the NCBI Exon Puller will be referred to as the **NEPR** format.
 
-### Option 2: Refine gene names and descriptions used to query the NCBI Gene database (Gene Description Refiner)
+### Option 2: Refine gene names and descriptions used to query the NCBI Gene database (Gene Description Refiner) - DEPRECATED
 
 Oftentimes, gene names and descriptions for the same gene vary between different taxa. This inconsistent naming is especially prevelant for taxonomic groups that lack sequence annotation (eg. Elasmobranchii, the group containing sharks, rays and skates). 
 
