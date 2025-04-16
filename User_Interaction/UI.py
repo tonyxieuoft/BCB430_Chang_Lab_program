@@ -21,7 +21,7 @@ from Prepare_For_BLAST.prepare_query_files import ExonBlastPreparer, \
 from Quality_Checking.get_longest_transcript import \
     optimize_transcripts_by_length
 from Quality_Checking.quality_analysis import QualityAnalyser
-from Server_Genome_Blaster.server_genome_blaster import ServerExonGenomeBlaster, \
+from Server_Genome_Blaster.automate_server_blast import ServerExonGenomeBlaster, \
     ServerFullGenomeBlaster, ServerImprovedExonGenomeBlaster, ServerImprovedFullGenomeBlaster, GemomaRunner
 from User_Interaction.expect_threshold_user_input import \
     expect_threshold_user_input

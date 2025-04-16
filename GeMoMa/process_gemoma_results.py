@@ -3,7 +3,7 @@ from Bio import Entrez
 
 from Basic_Tools.lists_and_files import list_to_string
 from NCBI_Exon_Puller.ncbi_exon_puller import ncbi_get_gene_sequence
-from NCBI_Genome_Blaster.assemble_blast_result_sequences import get_directory
+from NCBI_Genome_Blaster.create_basic_XML_processor import get_directory
 
 GENOMIC_ACCESSION = 0
 TYPE = 2
