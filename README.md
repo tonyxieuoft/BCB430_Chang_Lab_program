@@ -158,15 +158,13 @@ The refined file produced by the gene description refiner is in the *same format
 
 After the homology search is complete, the refined file should be used as the input gene query file in a **second** iteration of the NCBI exon puller to acquire sequences that were previously missed.  
 
-### Option 3 part (a): Generating query files in preparation of blasting whole GENOMES (NCBI Genome Blaster)
+### Option 3 part (a): Generating query files in preparation of blasting whole GENOMES (Prepare_For_BLAST)
 
-The main purpose of the NCBI Genome Blaster is predict and extract gene sequences from unannotated whole genomes of species that do not directly have NCBI Gene database sequences.  
+The main purpose of the NCBI Genome Blaster (now split into both the HSP_Selector_and_Processor and Server_Genome_Blaster) is to predict and extract gene sequences from unannotated whole genomes of species that do not directly have NCBI Gene database sequences.  
 
-BLAST requires the provision of reference sequences to query subject genomes. For the current version of the program, these reference sequences must be in contained in a **NEPR** format directory and acquired from an iteration of the NCBI exon puller.  
+BLAST requires the provision of reference sequences to query subject genomes. For the current version of the program, these reference sequences must be in contained in a **NEPR** format directory and acquired from an iteration of the NCBI exon puller (or otherwise formatted as such.  
 
-Ideally, the phylogenetic distance between the query sequence and subject genome species' should be minimal to maximize the likelihood of accurate coding-region extraction. Therefore, it is unwise to use a single reference sequence to query subject genomes for an entire large taxon; this is especially true for genes under positive selection. Instead, each reference species should be assigned to BLAST subject genomes for a **small** taxon that they are closest to **within** the overarching taxon of interest. 
-
-The program generates query files for BLAST based on the above considerations. The formats of required input and resultant output files/directories are stated below in greater detail:
+Ideally, the phylogenetic distance between the query sequence and subject genome species' should be minimal to maximize the likelihood of accurate coding-region extraction. The program generates query files for BLAST based on the above considerations. The formats of required input and resultant output files/directories are stated below in greater detail:
 
 #### Directory Containing Reference Sequences (required input)
 
