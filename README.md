@@ -1,5 +1,11 @@
 # NCBI Exon Extraction and BLAST Pipeline
 
+## Updated Roadmap (April 2025)
+
+<img width="1002" alt="Screenshot 2025-04-16 at 7 07 43 AM" src="https://github.com/user-attachments/assets/d3d9c7a7-3538-4534-9295-667ef1eba670" />
+
+
+
 ## Table of Contents
 
 - [Requirements](#requirements)
