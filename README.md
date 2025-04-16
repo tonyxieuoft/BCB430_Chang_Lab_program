@@ -12,7 +12,7 @@
     - [Concatenate gene sequences into alignment files](#nepr--blast-result-directories-required-input)
 - [Methods and Algorithms](#methods-and-algorithms)
     - [Automatic assignment of reference species to sub-taxa (option 3 part a)](#automatic-assignment-of-reference-species-to-sub-taxa-in-option-3a)
-- [Chang Lab Gene Prediction Algorithm (BCB430](#chang-lab-gene-prediction-algorithm-bcb430)
+- [Chang Lab Gene Prediction Algorithm (BCB430](#chang-lab-gene-prediction-program-bcb430) 
 
 ## Requirements
 
